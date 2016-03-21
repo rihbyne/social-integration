@@ -7,6 +7,7 @@ var server              = require('http').Server(app);
 var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
+var post 		        = require('./api/post.js');  
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -23,6 +24,10 @@ app.post('/secure/changePassEmail', notification.changePassEmail);
 app.post('/secure/resettedConfirmation', notification.resettedConfirmation);
 app.post('/secure/sendMail', mailer.sendPHPmail);
 app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
+
+app.get('/secure/getpost', post.getpost);
+app.get('/secure/getpost/:post_title', post.getsinglepost);
+app.post('/secure/setpost', post.setpost);
 
 server.listen(4000, function(){
 	console.log('Connected To server at port 4000 with socket');

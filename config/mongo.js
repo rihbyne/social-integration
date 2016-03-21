@@ -2,7 +2,7 @@
 var mongoose        = require('mongoose');      // For Mongoose 
 
 // Build the connection string 
-var dbURI = 'mongodb://localhost/notification'; 
+var dbURI = 'mongodb://localhost/social_network'; 
 
 // Create the database connection 
 mongoose.connect(dbURI); 

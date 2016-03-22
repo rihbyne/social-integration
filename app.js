@@ -25,8 +25,11 @@ app.post('/secure/resettedConfirmation', notification.resettedConfirmation);
 app.post('/secure/sendMail', mailer.sendPHPmail);
 app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
-app.get('/secure/getpost', post.getpost);
-app.get('/secure/getpost/:post_title', post.getsinglepost);
+app.get('/secure/getpost', post.getpost); // Get all post
+app.get('/secure/getpost/post/:post_title', post.getsinglepost);
+app.get('/secure/getpost/user', post.getuserposts);
+app.get('/secure/getpost/user/:post_user', post.getuserpost);
+app.post('/secure/hashtag', post.gethashtag);
 app.post('/secure/setpost', post.setpost);
 
 server.listen(4000, function(){

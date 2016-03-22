@@ -20,6 +20,7 @@ module.exports.getpost = function(req, res) {			 // get a post
 module.exports.getsinglepost = function(req, res) {			 // get a post 
 	console.log('Show single post');
     var post_title = req.params.post_title;
+    console.log(post_title);
     // get the post and check for errors
     post_model.post.findOne({post_title: post_title}).exec(function(err, singlepost) {
         if (err)
@@ -35,6 +36,49 @@ module.exports.getsinglepost = function(req, res) {			 // get a post
     
 };
 
+//Get all post
+module.exports.getuserposts = function(req, res) {			 // get a post 
+	console.log('Show all posts for single user');
+    var user = req.params.post_user;
+    // find posts of user and check for errors
+    post_model.post.find({posted_by:user}).exec(function(err, userposts) {
+        if (err)
+            res.send(err);
+
+        res.json({ posts: userposts});
+    });
+    
+};
+
+//Get single post of user
+module.exports.getuserpost = function(req, res) {			 // get a post 
+	console.log('Show all posts for single user');
+    var user = req.params.post_user;
+    var post_id = req.params.post_id;
+    // find posts of user and check for errors
+    post_model.post.find({posted_by:user}).exec(function(err, userposts) {
+        if (err)
+            res.send(err);
+
+        res.json({ posts: userposts});
+    });
+    
+};
+
+//Get all post
+module.exports.gethashtag = function(req, res) {			 // get a post 
+	console.log('Show all HashTag');
+   
+    // save the bear and check for errors
+    post_model.post_hashtag.find(function(err, allhashtag) {
+        if (err)
+            res.send(err);
+
+        res.json({ posts: allhashtag});
+    });
+    
+};
+
 //Set post
 module.exports.setpost = function(req, res) {				// create a post 
 	console.log('Add post');
@@ -43,8 +87,8 @@ module.exports.setpost = function(req, res) {				// create a post
 	var post_title 		 = req.body.post_title; 					// get the post name (comes from the request)
 	var post_description = req.body.post_description; 				// get the post name (comes from the request)
 
-	var mentionusers = [];
-	var hashtags 	 = [];
+	var mentionusers = new Array();
+	var hashtags 	 = new Array();
 
 	var regexat = /@([^\s]+)/g;
 	var regexhash = /#([^\s]+)/g;
@@ -57,54 +101,68 @@ module.exports.setpost = function(req, res) {				// create a post
 	  hashtags.push(match_hash[1]);
 	}
 
-	console.log(mentionusers);
-	console.log(hashtags); 
-
-	post_model.post.count({}, function( err, count){
+	console.log('Mention Users : ',mentionusers);
+	console.log('Hash Tags : ',hashtags); 
     	
-    	var post = new post_model.post({
-    		post_id 		 : count++,
-			posted_by 		 : posted_by,
-			post_title	     : post_title,        
-		    post_description : post_description,      
-		    created_at	     : Date.now(),        
-		    last_update	 	 : Date.now() 
-		});      			// create a new instance of the post model
+	var post = new post_model.post({
+		posted_by 		 : posted_by,
+		post_title	     : post_title,        
+	    post_description : post_description,      
+	    created_at	     : Date.now(),        
+	    last_update	 	 : Date.now() 
+	});      			// create a new instance of the post model
 
-		if (mentionusers) {
+	// save the post and check for errors
+	post.save(function(err) {
+	    if (err)
+	        res.send(err);
 
-			var post_mention = new post_model.post_mention({ 
-				post_id			: post.post_id,
-				posted_by		: posted_by,
-			    mention_users	: mentionusers			     	
-			});
+	    res.json({ message: 'Post created!' }); 
+	});
 
-			post_mention.save(function(err) {
-			    if (err)
-			        res.send(err);
+	if(typeof mentionusers != "undefined" && mentionusers != null && mentionusers.length > 0){
 
-			    res.json({ message: 'Post and Mention users created!' });
-			});
+		var post_mention = new post_model.post_mention({ 
+			post_id			: post.post_id,
+			posted_by		: posted_by,
+		    mention_users	: mentionusers			     	
+		});
 
-		};
-
-		if (hashtags) {
-
-			var post_hash = new post_model.post_hash({
-				if (err) 
-					res.send(err);
-				res.json({message: ''})
-			})
-		};
-    	// save the post and check for errors
-		post.save(function(err) {
+		post_mention.save(function(err) {
 		    if (err)
 		        res.send(err);
 
-		    res.json({ message: 'Post created!' }); 
+		    // res.json({ message: 'Post and Mention users created!' });
 		});
 
-	});
 
+	};
+
+	if(typeof hashtags != "undefined" && hashtags != null && hashtags.length > 0){
+
+		var post_hash = new post_model.post_hashtag({
+			    hashtag :     hashtags     // posted by 
+		});
+
+		var post_hashtag_links = new post_model.post_hashtag_links({ 
+			post_id			: post._id,
+			post_hashtag		: post_hash._id    	
+		});
+
+		post_hash.save(function(err) {
+		    if (err)
+		        res.send(err);
+
+		    // res.json({ message: 'Post and hash tag created!' });
+		});
+
+		post_hashtag_links.save(function(err) {
+		    if (err)
+		        res.send(err);
+
+		    // res.json({ message: 'Post and hash tag created!' });
+		});
+
+	};
 	
 };

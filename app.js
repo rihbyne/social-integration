@@ -29,7 +29,8 @@ app.get('/secure/getpost', post.getpost); // Get all post
 app.get('/secure/getpost/post/:post_title', post.getsinglepost);
 app.get('/secure/getpost/user', post.getuserposts);
 app.get('/secure/getpost/user/:post_user', post.getuserpost);
-app.post('/secure/hashtag', post.gethashtag);
+app.post('/secure/hashtags', post.gethashtag);
+app.post('/secure/hashtags/:hashtag', post.gethashposts);
 app.post('/secure/setpost', post.setpost);
 
 server.listen(4000, function(){

@@ -28,14 +28,6 @@ var post_mention = mongoose.Schema({
 
 }, { versionKey: false });
 
-// post hashtag links Schema
-var post_hashtag_links = mongoose.Schema({
-    
-    post_id:                         {type: String},        // post Id
-    post_hashtag:                    {type: String}        // posted by 	
-
-}, { versionKey: false });
-
 // post hashtag Schema
 var post_hashtag = mongoose.Schema({
     
@@ -43,6 +35,13 @@ var post_hashtag = mongoose.Schema({
 
 }, { versionKey: false });
 
+// post hashtag links Schema
+var post_hashtag_links = mongoose.Schema({
+    
+    post_id:                         {type: String, ref:'post'},        // post Id
+    post_hashtag:                    {type: String, ref:'post_hashtag'}        // posted by     
+
+}, { versionKey: false });
 
 
 // Model

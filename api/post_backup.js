@@ -171,12 +171,12 @@ module.exports.setpost = function(req, res) {				// create a post
 		    mention_users	: mentionusers			     	
 		});
 
-		post_mention.save(function(err) {
-		    if (err)
-		        res.send(err);
+		// post_mention.save(function(err) {
+		//     if (err)
+		//         res.send(err);
 
-		    // res.json({ message: 'Post and Mention users created!' });
-		});
+		//     // res.json({ message: 'Post and Mention users created!' });
+		// });
 
 
 	};
@@ -186,6 +186,30 @@ module.exports.setpost = function(req, res) {				// create a post
 		var post_hash = new post_model.post_hashtag({
 			    hashtag :     hashtags     // posted by 
 		});
+
+		console.log('Hashtag element Present : ',hashtags.length);
+
+			for (var i = 0; i < hashtags.length; i++) {
+				console.log(hashtags[i]);
+
+					// save the bear and check for errors
+				    post_model.post_hashtag.find({post_hashtag: hashtags[i]}, function(err, allhashtag) {
+				        if (err)
+				            res.send(err);
+
+				        //if match, add to array
+				        if (allhashtag) {
+				        	console.log(allhashtag);
+				        }
+				        else{
+				        	console.log('no match found... create new one');
+				        }
+				        //create new one
+				        // res.json({ posts: allhashtag});
+				    });
+			};
+
+			return;
 
 		var post_hashtag_links = new post_model.post_hashtag_links({ 
 			post_id				: post._id,

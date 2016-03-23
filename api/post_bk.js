@@ -129,6 +129,7 @@ module.exports.setpost = function(req, res) {				// create a post
 	var posted_by 		 = req.body.posted_by; 					// get the post name (comes from the request)
 	var post_title 		 = req.body.post_title; 					// get the post name (comes from the request)
 	var post_description = req.body.post_description; 				// get the post name (comes from the request)
+	var post_links 		 = req.body.post_links;
 
 	var mentionusers = new Array();
 	var hashtags 	 = new Array();
@@ -171,12 +172,12 @@ module.exports.setpost = function(req, res) {				// create a post
 		    mention_users	: mentionusers			     	
 		});
 
-		// post_mention.save(function(err) {
-		//     if (err)
-		//         res.send(err);
+		post_mention.save(function(err) {
+		    if (err)
+		        res.send(err);
 
-		//     // res.json({ message: 'Post and Mention users created!' });
-		// });
+		    // res.json({ message: 'Post and Mention users created!' });
+		});
 
 
 	};
@@ -186,30 +187,6 @@ module.exports.setpost = function(req, res) {				// create a post
 		var post_hash = new post_model.post_hashtag({
 			    hashtag :     hashtags     // posted by 
 		});
-
-		console.log('Hashtag element Present : ',hashtags.length);
-
-			for (var i = 0; i < hashtags.length; i++) {
-				console.log(hashtags[i]);
-
-					// save the bear and check for errors
-				    post_model.post_hashtag.find({post_hashtag: hashtags[i]}, function(err, allhashtag) {
-				        if (err)
-				            res.send(err);
-
-				        //if match, add to array
-				        if (allhashtag) {
-				        	console.log(allhashtag);
-				        }
-				        else{
-				        	console.log('no match found... create new one');
-				        }
-				        //create new one
-				        // res.json({ posts: allhashtag});
-				    });
-			};
-
-			return;
 
 		var post_hashtag_links = new post_model.post_hashtag_links({ 
 			post_id				: post._id,
@@ -224,6 +201,22 @@ module.exports.setpost = function(req, res) {				// create a post
 		});
 
 		post_hashtag_links.save(function(err) {
+		    if (err)
+		        res.send(err);
+
+		    // res.json({ message: 'Post and hash tag created!' });
+		});
+
+	};
+
+	if(typeof post_links != "undefined" && post_links != null && post_links.length > 0){
+
+		var post_url = new post_model.post_url({
+			_id 	 : post._id,
+			post_url : post_links     // posted by 
+		});
+
+		post_url.save(function(err) {
 		    if (err)
 		        res.send(err);
 

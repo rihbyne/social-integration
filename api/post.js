@@ -160,7 +160,7 @@ module.exports.setpost = function(req, res) {				// create a post
 	    if (err)
 	        res.send(err);
 
-	    res.json({ message: 'Post created!' }); 
+	    // res.json({ message: 'Post created!' }); 
 	});
 
 	if(typeof mentionusers != "undefined" && mentionusers != null && mentionusers.length > 0){
@@ -171,35 +171,102 @@ module.exports.setpost = function(req, res) {				// create a post
 		    mention_users	: mentionusers			     	
 		});
 
-		post_mention.save(function(err) {
-		    if (err)
-		        res.send(err);
+		// post_mention.save(function(err) {
+		//     if (err)
+		//         res.send(err);
 
-		    // res.json({ message: 'Post and Mention users created!' });
-		});
+		//     // res.json({ message: 'Post and Mention users created!' });
+		// });
 
 
 	};
 
-	if(typeof hashtags != "undefined" && hashtags != null && hashtags.length > 0){
+	if (typeof hashtags != "undefined" && hashtags != null && hashtags.length > 0) {
 
-		var post_hash = new post_model.post_hashtag({
-			    hashtag :     hashtags     // posted by 
+	    console.log('Hashtag element Present : ', hashtags.length);
+
+	    (function(hashtags) {
+
+	        for (var i = 0; i < hashtags.length; i++) {
+	            
+
+	            // save the hashtag and check for errors
+	            post_model.post_hashtag.find({
+	                hashtag: hashtags[i]
+	            }, function(err, hashtagdata) {
+	                if (err)
+	                    res.send(err);
+
+	                //if match, add to array
+	                if (hashtagdata == '' || hashtagdata == null || hashtagdata == 'undefined') {
+
+	                    console.log('no match found... create new one');
+	                    console.log(hashtags[i]);
+	                    var post_hash = new post_model.post_hashtag({
+
+	                        hashtag: hashtags[i] // posted by 
+	                    });
+
+	                    post_hash.save(function(err) {
+	                        if (err)
+	                            res.send(err);
+	                        console.log('Post and hash tag created!');
+	                        // res.json({ message: 'Post and hash tag created!' });
+	                    });
+
+
+	                    var post_hashtag_links = new post_model.post_hashtag_links({
+	                        post_id: post._id,
+	                        post_hashtag: post_hash._id
+	                    });
+
+	                    post_hashtag_links.save(function(err) {
+	                        if (err)
+	                            res.send(err);
+
+	                        // res.json({
+	                        //     message: 'Post and hash tag created!'
+	                        // });
+	                    });
+
+
+	                } else {
+
+	                    console.log('Match Found');
+	                    console.log(hashtagdata);
+
+	                    post_model.post_hashtag_links.update({
+	                        post_hashtag: hashtagdata[0]._id
+	                    }, {
+	                        $push: {
+	                            post_id: post._id
+	                        }
+	                    }, function(err, result) {
+
+	                        console.log(result);
+	                    });
+
+	                }
+	                //create new one
+	                // res.json({ posts: allhashtag});
+
+	            });
+				console.log('out of for loop', hashtags[i]);
+	        };
+
+	    })(hashtags);
+
+
+	};
+	
+	if(typeof post_links != "undefined" && post_links != null && post_links.length > 0){
+
+		var post_url = new post_model.post_url({
+			_id 	 : post._id,
+			post_url : post_links     // posted by 
 		});
 
-		var post_hashtag_links = new post_model.post_hashtag_links({ 
-			post_id				: post._id,
-			post_hashtag		: post_hash._id    	
-		});
-
-		post_hash.save(function(err) {
-		    if (err)
-		        res.send(err);
-
-		    // res.json({ message: 'Post and hash tag created!' });
-		});
-
-		post_hashtag_links.save(function(err) {
+		post_url.save(function(err) {
 		    if (err)
 		        res.send(err);
 

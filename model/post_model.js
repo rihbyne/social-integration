@@ -38,7 +38,7 @@ var post_hashtag = mongoose.Schema({
 // post hashtag links Schema
 var post_hashtag_links = mongoose.Schema({
     
-    post_id:                         {type: String, ref:'post'},        // post Id
+    post_id:                         {type: Array},        // post Id
     post_hashtag:                    {type: String, ref:'post_hashtag'}        // posted by     
 
 }, { versionKey: false });

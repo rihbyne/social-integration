@@ -192,22 +192,68 @@ module.exports.setpost = function(req, res) {
 	};
 
 	if(typeof hashtags != "undefined" && hashtags != null && hashtags.length > 0){
+		
+
+	// console.log('Delimited String :- ' + hashtags);
+	// console.log(hashtags);
+	var hashtagArray = new Array();
+	hashtagArray = hashtags.toString().split(",");
+	for(var x=0;x<hashtagArray.length;x++){
+		 // hashtag: [{
+			//         text:  hashtagArray[x],
+			//         postedBy: post.post_id
+			// 	}]
+		console.log('Hashtag Name:- ' + hashtagArray[x]);
+
 
 		var post_hash = new post_model.post_hashtag({
-			    hashtag :     hashtags[0]     // posted by 
+			  post_id: post.post_id,
+				 hashtag: [{
+			        text:  hashtagArray[x],
+			       
+				}]
+
+			    // hashtag :     hashtags     // posted by 
 		});
+		console.log(post_hash.hashtag);
+			 post_hash.save();
+			  // res.json({ message: 'done!' });
+			  console.log(post._id);
+	}
+
+
+
+
+		// var final_hash = new Array();
+		// for(var x=0;x<hashtags.length;x++){
+		// 	    hashtag: [{
+		// 	        text:  hashtags[x],
+		// 	        postedBy: post.post_id
+	 //    		}]
+	 //    		final_hash.push(x);
+	 //    		console.log(hashtags.length)
+		// 		console.log(hashtags.x)
+  //   		}
+  //   		console.log(final_hash);
+
+  // prahsnt code
+		// var post_hash = new post_model.post_hashtag({
+		// 	    hashtag :     hashtags     // posted by 
+		// });
 
 		var post_hashtag_links = new post_model.post_hashtag_links({ 
 			post_id				: post._id,
 			post_hashtag		: post_hash._id    	
 		});
 
-		post_hash.save(function(err) {
-		    if (err)
-		        res.send(err);
 
-		    // res.json({ message: 'Post and hash tag created!' });
-		});
+		// post_hash.save(function(err) {
+		// 	console.log("we are @save" );
+		//     if (err)
+		//         res.send(err);
+
+		//     // res.json({ message: 'Post and hash tag created!' });
+		// });
 
 		post_hashtag_links.save(function(err) {
 		    if (err)

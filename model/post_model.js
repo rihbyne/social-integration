@@ -32,22 +32,10 @@ var post_mention = mongoose.Schema({
 
 // post hashtag Schema
 var post_hashtag = mongoose.Schema({
-    // _id: {
-    //     type: mongoose.Schema.Types.ObjectId,      // username._id    
-    //     ref:    'post_hashtag_links'
-    // },
-    post_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'post'
-    },
-     hashtag: [{
-        text: String,    // hashtag.
-        // post_id: {
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     ref: 'post'
-        // }
-    }]
-
+    post_id:{type: String, ref:'post'},
+    hashtag: [{
+        text: String
+    }],
    // hashtag:                         {type: String}       // posted by 
 
 }, { versionKey: false });

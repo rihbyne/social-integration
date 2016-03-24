@@ -207,18 +207,17 @@ module.exports.setpost = function(req, res) {
 
 
 		var post_hash = new post_model.post_hashtag({
-			  post_id: post.post_id,
+			post_id: post._id,
 				 hashtag: [{
-			        text:  hashtagArray[x],
-			       
-				}]
-
+			        text:  hashtagArray[x]
+				}],
+				
 			    // hashtag :     hashtags     // posted by 
 		});
-		console.log(post_hash.hashtag);
-			 post_hash.save();
+		post_hash.save();
 			  // res.json({ message: 'done!' });
 			  console.log(post._id);
+			  console.log(post_hash);
 	}
 
 

@@ -1,7 +1,7 @@
 var post_model = require('../model/post_model.js');
 var express = require('express');
-var router = express.Router(); // get an instance of the express Router
-
+var router = express.Router(), // get an instance of the express Router
+	User = require('../model/User.js');
 //Get all post
 module.exports.getpost = function(req, res) { // get a post 
     console.log('Show all post');
@@ -142,9 +142,23 @@ module.exports.gethashtag = function(req, res) { // get a post
 
 //Set post
 module.exports.setpost = function(req, res) { // create a post 
+
+
+
+	
+	var user = new User({
+	    first_name:"sudeep",
+	    last_name:"makwana",
+	    email:"sudeep.makwana@gmail.com"
+	})
+	user.save();
+
+
     console.log('Add post');
 
-    var posted_by = req.body.posted_by; // get the post name (comes from the request)
+    // var posted_by = req.body.posted_by; // get the post name (comes from the request)
+	var posted_by 		 = user._id; 					// get the post name (comes from the request)
+
     var post_title = req.body.post_title; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
     var post_links = req.body.post_links;
@@ -237,13 +251,14 @@ post_hash.save(function(err) {
 			var p_data = post_model.Post_hashtag
 			// p_data.find({post_id:post.post_id})
 			// p_data.find({})
-			p_data.find({post_id:"56f51e518f85b8043dde5592"})
+			p_data.find({post_id:"56f5307f9b985630100af6be"})
 			.populate('post_id')
+			.populate('post_mention')
 			.exec(function (err, result_d) {
 			  if (err) return handleError(err);
 			  // console.log('The post_description is %s' + res);
 			  // console.log('The post_description is %s' + post.post_description);
-			  console.log(result_d[0].post_id);
+			  // console.log(result_d[0].post_id);
 			})
 
 

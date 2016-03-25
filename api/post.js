@@ -206,15 +206,51 @@ module.exports.setpost = function(req, res) { // create a post
             var objValue = hashtags[k];
             myJson.post_keyword[objName] = objValue;
         }
-        var post_hash = new post_model.post_hashtag({
+        var post_hash = new post_model.Post_hashtag({
             post_id: post._id,
             hashtag: myJson
         });
-        post_hash.save();
-        console.log(post._id);
-        console.log("all hashtags in string " + hashtags);
-        console.log(post_hash);
+
+		
+        // post_hash.save();
+        // console.log(post._id);
+        // console.log("all hashtags in string " + hashtags);
+        // console.log(post_hash);
     };
+post_hash.save(function(err) {
+
+
+			 // var Res_hashtag = "prashanttest";
+			 // var query = post_hash.hashtag.find( { post_keyword: { $in : Res_hashtag } } );
+		    // if (!err) {
+		    //     post_model.post_hashtag.findOne({post_keyword: "INDIA/PAK"})
+		    //         .populate('created_at')
+		    //         .populate('post.post_description')
+		    //         .exec(function(err, post_modelpost_hashtag) {
+		    //                console.log(JSON.stringify(post_hashtag, null, "\t"))
+		    //         })
+		    // console.log('Data saved sucessfully')
+		    // console.log(post_hash.hashtag);
+		    // console.log(post_hash);
+		    // }
+
+			var p_data = post_model.Post_hashtag
+			// p_data.find({post_id:post.post_id})
+			// p_data.find({})
+			p_data.find({post_id:"56f51e518f85b8043dde5592"})
+			.populate('post_id')
+			.exec(function (err, result_d) {
+			  if (err) return handleError(err);
+			  // console.log('The post_description is %s' + res);
+			  // console.log('The post_description is %s' + post.post_description);
+			  console.log(result_d[0].post_id);
+			})
+
+
+
+
+		});
+
 
     if (typeof post_links != "undefined" && post_links != null && post_links.length > 0) {
 

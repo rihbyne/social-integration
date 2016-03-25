@@ -51,5 +51,5 @@ var post_hashtag_links = mongoose.Schema({
 module.exports.post = mongoose.model('post', post);
 module.exports.post_url = mongoose.model('post_url', post_url);
 module.exports.post_mention = mongoose.model('post_mention', post_mention);
-module.exports.post_hashtag = mongoose.model('post_hashtag', post_hashtag);
+module.exports.Post_hashtag = mongoose.model('post_hashtag', post_hashtag);
 module.exports.post_hashtag_links = mongoose.model('post_hashtag_links', post_hashtag_links);

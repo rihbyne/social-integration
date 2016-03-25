@@ -151,6 +151,7 @@ module.exports.setpost = function(req, res) {
 	}
 
 	while (match_hash = regexhash.exec(post_description)) {
+	  // hashtags.push("{text:"+match_hash[1]+"}");
 	  hashtags.push(match_hash[1]);
 	}
 
@@ -196,29 +197,63 @@ module.exports.setpost = function(req, res) {
 
 	// console.log('Delimited String :- ' + hashtags);
 	// console.log(hashtags);
-	var hashtagArray = new Array();
-	hashtagArray = hashtags.toString().split(",");
-	for(var x=0;x<hashtagArray.length;x++){
-		 // hashtag: [{
-			//         text:  hashtagArray[x],
-			//         postedBy: post.post_id
-			// 	}]
-		console.log('Hashtag Name:- ' + hashtagArray[x]);
+	// var hashtagArray = new Array();
+
+	
+	// // to remove , from string 
+	// hashtagArray = hashtags.toString().split('"');
+	// console.log("new arrays" +hashtagArray )
+
+
+
+	// for(var x=0;x<hashtagArray.length;x++){
+	// 	 // hashtag: [{
+	// 		//         text:  hashtagArray[x],
+	// 		//         postedBy: post.post_id
+	// 		// 	}]
+	// 	console.log('Hashtag Name text:- ' + hashtagArray[x]);
+
+
+		// var post_hash = new post_model.post_hashtag({
+		// 	post_id: post._id,
+		// 		 hashtag: {text:  hashtags}
+				
+		// 	    // hashtag :     hashtags     // posted by 
+		// });
+
+// valArray1=[121,324,42,31];
+// valArray2=[232,131,443];
+// myJson={post_keyword:{}};
+myJson={post_keyword:{}};
+for(var k=0;k<hashtags.length;k++){
+    var objName='keyword'+k;
+    var objValue=hashtags[k];
+    myJson.post_keyword[objName]=objValue;
+}
+
 
 
 		var post_hash = new post_model.post_hashtag({
 			post_id: post._id,
-				 hashtag: [{
-			        text:  hashtagArray[x]
-				}],
+	        // hashtag: hashtagArray
+	        hashtag: myJson
 				
 			    // hashtag :     hashtags     // posted by 
 		});
 		post_hash.save();
 			  // res.json({ message: 'done!' });
 			  console.log(post._id);
+			  console.log("all hashtags in string "+hashtags);
 			  console.log(post_hash);
-	}
+
+			 
+			 
+				// for(var i = 0; i &lt; 5; i++) {
+				//  (function() {
+				//   process.nextTick(function() {console.log('nexttick-new-scope:'+i)});
+				//  })();
+				// }
+	// }
 
 
 

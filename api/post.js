@@ -1,7 +1,6 @@
 var post_model = require('../model/post_model.js');
 var express = require('express');
-var router 	= express.Router(),             			 // get an instance of the express Router
-	User = require('../model/User.js');
+var router 	= express.Router();             			 // get an instance of the express Router
 
 //Get all post
 module.exports.getpost = function(req, res) {			 // get a post 
@@ -109,7 +108,7 @@ module.exports.getuserpost = function(req, res) {			 // get a post
     
 };
 
-//Get all hashtag
+//Get all post
 module.exports.gethashtag = function(req, res) {			 // get a post 
 	console.log('Show all HashTag');
    
@@ -124,21 +123,13 @@ module.exports.gethashtag = function(req, res) {			 // get a post
 };
 
 //Set post
-module.exports.setpost = function(req, res) {				
-
-	var user = new User({
-	    first_name:"sudeep",
-	    last_name:"makwana",
-	    email:"sudeep.makwana@gmail.com"
-	})
-	user.save();
-
+module.exports.setpost = function(req, res) {				// create a post 
 	console.log('Add post');
 
-	var posted_by 		 = user._id; 					// get the post name (comes from the request)
-	console.log('new post by '+user.first_name);
+	var posted_by 		 = req.body.posted_by; 					// get the post name (comes from the request)
 	var post_title 		 = req.body.post_title; 					// get the post name (comes from the request)
 	var post_description = req.body.post_description; 				// get the post name (comes from the request)
+	var post_links 		 = req.body.post_links;
 
 	var mentionusers = new Array();
 	var hashtags 	 = new Array();
@@ -157,7 +148,7 @@ module.exports.setpost = function(req, res) {
 
 	console.log('Mention Users : ',mentionusers);
 	console.log('Hash Tags : ',hashtags); 
-
+    	
 	var post = new post_model.post({
 		posted_by 		 : posted_by,
 		post_title	     : post_title,        
@@ -171,7 +162,7 @@ module.exports.setpost = function(req, res) {
 	    if (err)
 	        res.send(err);
 
-//	  res.json({ message: 'Post created!' }); 
+	    res.json({ message: 'Post created!' }); 
 	});
 
 	if(typeof mentionusers != "undefined" && mentionusers != null && mentionusers.length > 0){
@@ -193,6 +184,7 @@ module.exports.setpost = function(req, res) {
 	};
 
 	if(typeof hashtags != "undefined" && hashtags != null && hashtags.length > 0){
+
 		
 
 	// console.log('Delimited String :- ' + hashtags);
@@ -255,41 +247,16 @@ for(var k=0;k<hashtags.length;k++){
 				// }
 	// }
 
+	};
 
+	if(typeof post_links != "undefined" && post_links != null && post_links.length > 0){
 
-
-		// var final_hash = new Array();
-		// for(var x=0;x<hashtags.length;x++){
-		// 	    hashtag: [{
-		// 	        text:  hashtags[x],
-		// 	        postedBy: post.post_id
-	 //    		}]
-	 //    		final_hash.push(x);
-	 //    		console.log(hashtags.length)
-		// 		console.log(hashtags.x)
-  //   		}
-  //   		console.log(final_hash);
-
-  // prahsnt code
-		// var post_hash = new post_model.post_hashtag({
-		// 	    hashtag :     hashtags     // posted by 
-		// });
-
-		var post_hashtag_links = new post_model.post_hashtag_links({ 
-			post_id				: post._id,
-			post_hashtag		: post_hash._id    	
+		var post_url = new post_model.post_url({
+			_id 	 : post._id,
+			post_url : post_links     // posted by 
 		});
 
-
-		// post_hash.save(function(err) {
-		// 	console.log("we are @save" );
-		//     if (err)
-		//         res.send(err);
-
-		//     // res.json({ message: 'Post and hash tag created!' });
-		// });
-
-		post_hashtag_links.save(function(err) {
+		post_url.save(function(err) {
 		    if (err)
 		        res.send(err);
 

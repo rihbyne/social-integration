@@ -146,18 +146,19 @@ module.exports.setpost = function(req, res) { // create a post
 
 
 	
-	var user = new User({
-	    first_name:"sudeep",
-	    last_name:"makwana",
-	    email:"sudeep.makwana@gmail.com"
-	})
-	user.save();
+	// var user = new User({
+	//     first_name:"Sudeep",
+	//     last_name:"makwana",
+	//     email:"sudeep.makwana@gmail.com"
+	// })
+	// user.save();
 
 
     console.log('Add post');
 
     // var posted_by = req.body.posted_by; // get the post name (comes from the request)
-	var posted_by 		 = user._id; 					// get the post name (comes from the request)
+	// var posted_by 		 = user._id; 					// get the post name (comes from the request)
+	var posted_by 		 = "56f541b2c1574da8442b2b2c"; 					// get the post name (comes from the request)
 
     var post_title = req.body.post_title; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)

@@ -3,7 +3,7 @@ var mongoose        = require('mongoose');           // For Mongoose
 // Post Schema
 var post = mongoose.Schema({
     
-    posted_by:                       {type: String},        // posted by 
+    posted_by:                       {type: String, ref:'User'},       // posted by 
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     created_at:                      {type: Date},          // created date
@@ -24,18 +24,14 @@ var post_mention = mongoose.Schema({
     
     post_id:                         {type: String},        // post Id
     posted_by:                       {type: String},        // posted by 
-    mention_users:					 {type: String}        // mention users 	
+    mention_users:					 {type: Array}        // mention users 	
 
 }, { versionKey: false });
 
 // post hashtag Schema
 var post_hashtag = mongoose.Schema({
     post_id:{ type: mongoose.Schema.Types.ObjectId, ref:'post'},
-    //     hashtag: [{
-    //     text: String
-    // }],
-   // hashtag:                         {type: String}       // posted by 
-   hashtag:[]
+    hashtag:[]
 }, { versionKey: false });
 
 // post hashtag links Schema

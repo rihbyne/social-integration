@@ -90,25 +90,29 @@ module.exports.gethashposts = function(req, res) { // get a post
 
 //Get all post
 module.exports.getuserposts = function(req, res) { // get a post 
+    
     console.log('Show all posts for single user');
-    var user = req.params.post_user;
-    // find posts of user and check for errors
-    post_model.post.find({
-        posted_by: user
-    }).exec(function(err, userposts) {
+    
+    var user = req.params.user;   // find posts of user and check for errors
+
+    // console.log('user ',req.params.user);
+
+    post_model.post.find({posted_by: user}).exec(function(err, userposts) {
+
         if (err)
             res.send(err);
 
         res.json({
             posts: userposts
         });
+
     });
 
 };
 
 //Get single post of user
 module.exports.getuserpost = function(req, res) { // get a post 
-    console.log('Show all posts for single user');
+    console.log('Show single posts for single user');
     var post_id = req.params.post_id;
     // find posts of user and check for errors
     post_model.post.find({
@@ -283,3 +287,146 @@ post_hash.save(function(err) {
     };
 
 };
+
+module.exports.setnewpost = function(req, res) { // create a post 
+
+    console.log('Add post');
+
+    var posted_by   = req.body.posted_by; // get the post name (comes from the request)
+    var post_title = req.body.post_title; // get the post name (comes from the request)
+    var post_description = req.body.post_description; // get the post name (comes from the request)
+    var post_links = req.body.post_links;
+
+    var mentionusers = new Array();
+    var hashtags = new Array();
+
+    var regexat = /@([^\s]+)/g;
+    var regexhash = /#([^\s]+)/g;
+
+    while (match_at = regexat.exec(post_description)) {
+        mentionusers.push(match_at[1]);
+    }
+
+    while (match_hash = regexhash.exec(post_description)) {
+        hashtags.push(match_hash[1]);
+    }
+
+    console.log('Mention Users : ', mentionusers);
+    console.log('Hash Tags : ', hashtags);
+
+    var post = new post_model.post({
+        posted_by: posted_by,
+        post_title: post_title,
+        post_description: post_description,
+        created_at: Date.now(),
+        last_update: Date.now()
+    }); // create a new instance of the post model
+
+    // save the post and check for errors
+    post.save(function(err) {
+        if (err)
+            res.send(err);
+
+        res.json({
+            message: 'Post created!'
+        });
+    });
+
+    if (typeof mentionusers != "undefined" && mentionusers != null && mentionusers.length > 0) {
+
+        var mention_users = {};
+
+        for(var i = 0; i < mentionusers.length; i++) {
+
+          mention_users['user_'+i] = mentionusers[i];    
+
+        }
+
+        console.log(mention_users);
+
+        var post_mention = new post_model.post_mention({
+            post_id: post.post_id,
+            posted_by: posted_by,
+            mention_users: mention_users
+        });
+
+        post_mention.save(function(err) {
+            if (err)
+                res.send(err);
+        });
+
+    };
+
+    if (typeof hashtags != "undefined" && hashtags != null && hashtags.length > 0) {
+
+        myJson = {
+            post_keyword: {}
+        };
+
+        for (var k = 0; k < hashtags.length; k++) {
+            var objName = 'keyword' + k;
+            var objValue = hashtags[k];
+            myJson.post_keyword[objName] = objValue;
+        }
+        var post_hash = new post_model.Post_hashtag({
+            post_id: post._id,
+            hashtag: myJson
+        });
+
+        post_hash.save(function(err) {
+            if (err)
+                res.send(err);
+        });
+
+           // var p_data = post_model.Post_hashtag;
+
+           //  p_data.find({post_id:"56f5307f9b985630100af6be"})
+           //  .populate('post_id')
+           //  .populate('post_mention')
+           //  .exec(function (err, result_d) {
+           //    if (err) return handleError(err);
+           //  })
+    };
+
+    if (typeof post_links != "undefined" && post_links != null && post_links.length > 0) {
+
+        var post_url = new post_model.post_url({
+            _id: post._id,
+            post_url: post_links // posted by 
+        });
+
+        post_url.save(function(err) {
+            if (err)
+                res.send(err);
+        });
+
+    };
+
+};
+
+module.exports.setuser = function(req, res){
+
+    var W_user_id = req.body.W_user_id;
+    var first_name = req.body.first_name;
+    var last_name = req.body.last_name;
+    var email = req.body.email;
+    var username = req.body.username;
+
+    var setuser = new User({
+        W_user_id : W_user_id,
+        first_name : first_name,
+        last_name : last_name,
+        email : email,
+        username : username
+    });
+
+    setuser.save(function(err) {
+        if (err)
+            res.send(err);
+        res.json({
+            message: 'Users Inserted'
+        });
+
+    });
+
+}

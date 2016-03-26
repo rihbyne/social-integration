@@ -26,12 +26,13 @@ app.post('/secure/sendMail', mailer.sendPHPmail);
 app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
 app.get('/secure/getpost', post.getpost); // Get all post
-app.get('/secure/getpost/post/:post_title', post.getsinglepost);
-app.get('/secure/getpost/user', post.getuserposts);
-app.get('/secure/getpost/user/:post_user', post.getuserpost);
-app.post('/secure/hashtags', post.gethashtag);
+app.get('/secure/getpost/post/:post_title', post.getsinglepost); //Get post by post title
+app.get('/secure/getpost/:user', post.getuserposts); // Get post by user
+app.get('/secure/getpost/user/:post_user', post.getuserpost); // get single post of user
+app.post('/secure/hashtags', post.gethashtag); // 
 app.post('/secure/hashtags/:hashtag', post.gethashposts);
-app.post('/secure/setpost', post.setpost);
+app.post('/secure/setnewpost', post.setnewpost); //Set new post
+app.post('/secure/setuser', post.setuser); //Set new user 
 
 server.listen(4000, function(){
 	console.log('Connected To server at port 4000 with socket');

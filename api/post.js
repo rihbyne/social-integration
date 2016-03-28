@@ -43,49 +43,56 @@ module.exports.getsinglepost = function(req, res) { // get a post
 
 //Get posts of hashtag
 module.exports.gethashposts = function(req, res) { // get a post 
+
     console.log('Show posts of hashtag');
+
     var hashtag = req.params.hashtag;
 
     console.log('Hashtag : ', hashtag);
     // get the post and check for errors
-    post_model.post_hashtag.find({
+    post_model.post_hashtag
+    .find({
         hashtag: hashtag
-    }).exec(function(err, hashs) {
+    })
+    .populate('post_id')
+    .exec(function(err, hashs) {
 
         if (err)
             res.send(err);
 
-        if (hashs) {
-
-            var allposts = new Array();
-
-            for (var i = 0; i < hashs.length; i++) {
-                // console.log(hashs[i]['_id']);
-
-                post_model.post_hashtag_links
-                    .find({
-                        post_hashtag: hashs[i]['_id']
-                    })
-                    .populate('post_id')
-                    .exec(function(err, posts) {
-                        // console.log(posts);
-                        // res.json(posts);
-
-                        allposts.push(posts);
-                        console.log('After push In: \n', allposts);
-                    })
-
-                console.log('After push Out: \n', allposts);
-
-            };
-            // console.log('All posts : ',allposts);
-
-        } else {
-            res.json('No Post Found');
-        }
+        res.json(hashs);
 
     });
 
+
+    // if (hashs) {
+
+    //     var allposts = new Array();
+
+    //     for (var i = 0; i < hashs.length; i++) {
+    //         // console.log(hashs[i]['_id']);
+
+    //         post_model.post_hashtag_links
+    //             .find({
+    //                 post_hashtag: hashs[i]['_id']
+    //             })
+    //             .populate('post_id')
+    //             .exec(function(err, posts) {
+    //                 // console.log(posts);
+    //                 // res.json(posts);
+
+    //                 allposts.push(posts);
+    //                 console.log('After push In: \n', allposts);
+    //             })
+
+    //         console.log('After push Out: \n', allposts);
+
+    //     };
+    //     // console.log('All posts : ',allposts);
+
+    // } else {
+    //     res.json('No Post Found');
+    // }
 };
 
 //Get all post
@@ -93,11 +100,14 @@ module.exports.getuserposts = function(req, res) { // get a post
     
     console.log('Show all posts for single user');
     
-    var user = req.params.user;   // find posts of user and check for errors
+    var username = req.params.user;   // find posts of user and check for errors
 
-    // console.log('user ',req.params.user);
+    console.log('user ',req.params.user);
 
-    post_model.post.find({posted_by: user}).exec(function(err, userposts) {
+    User
+    .find({username: username})
+    .populate('W_user_id')
+    .exec(function(err, userposts) {
 
         if (err)
             res.send(err);
@@ -112,12 +122,21 @@ module.exports.getuserposts = function(req, res) { // get a post
 
 //Get single post of user
 module.exports.getuserpost = function(req, res) { // get a post 
+
     console.log('Show single posts for single user');
+
     var post_id = req.params.post_id;
+    var user = req.params.user;   // find posts of user and check for errors
+
+    console.log('post_id', post_id);
+    console.log('post_user', user);
+
     // find posts of user and check for errors
-    post_model.post.find({
+    post_model.post
+    .find({
         _id: post_id
-    }).exec(function(err, userposts) {
+    })
+    .exec(function(err, userposts) {
         if (err)
             res.send(err);
 
@@ -134,12 +153,14 @@ module.exports.gethashtag = function(req, res) { // get a post
 
     // save the bear and check for errors
     post_model.post_hashtag.find(function(err, allhashtag) {
+
         if (err)
             res.send(err);
 
         res.json({
             posts: allhashtag
         });
+
     });
 
 };
@@ -292,7 +313,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     console.log('Add post');
 
-    var posted_by   = req.body.posted_by; // get the post name (comes from the request)
+    var username   = req.body.username; // get the post name (comes from the request)
     var post_title = req.body.post_title; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
     var post_links = req.body.post_links;
@@ -315,38 +336,71 @@ module.exports.setnewpost = function(req, res) { // create a post
     console.log('Hash Tags : ', hashtags);
 
     var post = new post_model.post({
-        posted_by: posted_by,
+
         post_title: post_title,
         post_description: post_description,
         created_at: Date.now(),
         last_update: Date.now()
+
     }); // create a new instance of the post model
 
+    function getuserid(username, data){
+
+        User
+            .find({username: username})
+            .exec(function(err, userdata){
+
+                if (err)
+                    res.send(err);
+
+                if (userdata == '') {
+                    res.json({
+                        message: 'User not found'
+                    });
+                    return;
+                };
+
+                var data = userdata[0].first_name;
+                return data;
+
+                console.log(data);
+            });
+
+    }
+
+    getuserid(username, function(data){
+        console.log('getuserid', data);
+        post.posted_by = data;
+
+    });
+    
     // save the post and check for errors
     post.save(function(err) {
+
         if (err)
             res.send(err);
 
         res.json({
             message: 'Post created!'
         });
+
     });
 
     if (typeof mentionusers != "undefined" && mentionusers != null && mentionusers.length > 0) {
 
-        var mention_users = {};
+        var mention_users = new Array();
 
         for(var i = 0; i < mentionusers.length; i++) {
 
-          mention_users['user_'+i] = mentionusers[i];    
+          mention_users[i] = mentionusers[i];    
 
         }
 
         console.log(mention_users);
 
         var post_mention = new post_model.post_mention({
-            post_id: post.post_id,
-            posted_by: posted_by,
+            post_id: post._id,
+            posted_by: post.posted_by,
             mention_users: mention_users
         });
 
@@ -359,18 +413,17 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     if (typeof hashtags != "undefined" && hashtags != null && hashtags.length > 0) {
 
-        myJson = {
-            post_keyword: {}
-        };
+        var hashtagkd = new Array();
 
         for (var k = 0; k < hashtags.length; k++) {
-            var objName = 'keyword' + k;
-            var objValue = hashtags[k];
-            myJson.post_keyword[objName] = objValue;
+
+           hashtagkd[k] = hashtags[k];
+
         }
-        var post_hash = new post_model.Post_hashtag({
+
+        var post_hash = new post_model.post_hashtag({
             post_id: post._id,
-            hashtag: myJson
+            hashtag: hashtagkd
         });
 
         post_hash.save(function(err) {
@@ -378,14 +431,6 @@ module.exports.setnewpost = function(req, res) { // create a post
                 res.send(err);
         });
 
-           // var p_data = post_model.Post_hashtag;
-
-           //  p_data.find({post_id:"56f5307f9b985630100af6be"})
-           //  .populate('post_id')
-           //  .populate('post_mention')
-           //  .exec(function (err, result_d) {
-           //    if (err) return handleError(err);
-           //  })
     };
 
     if (typeof post_links != "undefined" && post_links != null && post_links.length > 0) {
@@ -430,3 +475,98 @@ module.exports.setuser = function(req, res){
     });
 
 }
+
+//Get mentionuser's post
+module.exports.getmentionuser = function(req, res) { // get a post 
+    console.log('Show mention user\'s post');
+
+    var post_mention = req.params.mention_user;
+    console.log(post_mention);
+    // find by mention collection using populate and check for errors
+    // post_model.post_mention
+    // .find({
+    //     mention_users: post_mention
+    // })
+    // .populate('post_id')
+    // .exec(function(err, mentionspost) {
+    //     if (err)
+    //         res.send(err);
+    //     if (mentionspost) {
+    //         console.log(mentionspost);
+    //         res.json({
+    //             posts: mentionspost
+    //         });
+    //     } else {
+    //         res.json('No Post Found')
+    //     }
+    // });
+
+    //find by description from post collection
+    post_model.post
+    .find({
+        post_description : new RegExp(post_mention, 'i')
+    })
+    .exec(function(err, mentionspost) {
+        if (err)
+            res.send(err);
+        if (mentionspost) {
+            console.log(mentionspost);
+            res.json({
+                posts: mentionspost
+            });
+        } else {
+            res.json('No Post Found')
+        }
+    });
+
+};
+
+//Get Count of all hashtag
+module.exports.allhashtagcount = function(req, res) { // get a post 
+
+    console.log('Show count of all HashTag');
+
+    // show count of post and check for errors
+    post_model.post_hashtag.aggregate(
+        {$group: 
+         { _id: {hashtag: 'koa'}, count: { $sum: 1 } } 
+    },function(err, allhashtag) {
+
+        if (err)
+            res.send(err);
+
+        res.json({
+            posts: allhashtag
+        });
+
+    });
+
+};
+
+//Get Count of specified hashtag
+module.exports.hashtagcount = function(req, res) { // get a post 
+
+    console.log('Show count of HashTag');
+
+    var hashtagkeywd = req.params.hashtag;
+    // show count of post and check for errors
+    post_model.post_hashtag.aggregate({
+        $group: 
+            { _id: {
+                hashtag: hashtagkeywd
+                }, count: { 
+        $sum: 1 
+            } 
+        } 
+    },function(err, allhashtag) {
+
+        if (err)
+            res.send(err);
+
+        res.json({
+            posts: allhashtag
+        });
+
+    });
+
+};

@@ -1,9 +1,10 @@
 var mongoose        = require('mongoose');           // For Mongoose
+var User = require('../model/User.js');
 
 // Post Schema
 var post = mongoose.Schema({
     
-    posted_by:                       {type: String, ref:'User'},       // posted by 
+    posted_by:                       {type: String},       // posted by 
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     created_at:                      {type: Date},          // created date
@@ -15,23 +16,30 @@ var post = mongoose.Schema({
 var post_url = mongoose.Schema({
     
     post_id:                         {type: Number},        // post Id
-    post_url:                        {type: String},        // post link url 
+    post_url:                        {type: String}        // post link url 
     
 }, { versionKey: false });
 
 // post mention Schema
 var post_mention = mongoose.Schema({
     
-    post_id:                         {type: String},        // post Id
+    post_id:                         {type: String, ref:"post"},        // post Id
     posted_by:                       {type: String},        // posted by 
     mention_users:					 {type: Array}        // mention users 	
 
 }, { versionKey: false });
 
 // post hashtag Schema
+// var post_hashtag = mongoose.Schema({
+//     post_id:                        { type: mongoose.Schema.Types.ObjectId, ref:'post'},
+//     hashtag:[]
+// }, { versionKey: false });
+
 var post_hashtag = mongoose.Schema({
-    post_id:{ type: mongoose.Schema.Types.ObjectId, ref:'post'},
-    hashtag:[]
+
+    post_id:                         {type: String, ref:'post'},
+    hashtag:                         {type: Array}
+
 }, { versionKey: false });
 
 // post hashtag links Schema
@@ -47,5 +55,5 @@ var post_hashtag_links = mongoose.Schema({
 module.exports.post = mongoose.model('post', post);
 module.exports.post_url = mongoose.model('post_url', post_url);
 module.exports.post_mention = mongoose.model('post_mention', post_mention);
-module.exports.Post_hashtag = mongoose.model('post_hashtag', post_hashtag);
+module.exports.post_hashtag = mongoose.model('post_hashtag', post_hashtag);
 module.exports.post_hashtag_links = mongoose.model('post_hashtag_links', post_hashtag_links);

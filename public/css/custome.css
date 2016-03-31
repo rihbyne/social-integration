@@ -249,3 +249,12 @@ h4.h_tag {
 .Hash_wrap .tabs, .tabs .tab {
     line-height: 32px;
 }
+
+/*btn icon fix*/
+.btn-ico {
+    position: absolute;
+    z-index: 5;
+    color: #fff;
+    right: 21px;
+    top: 20px;
+}

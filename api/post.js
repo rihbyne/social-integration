@@ -27,7 +27,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     function allpost(callback) {
         // save the bear and check for errors
-        post_model.post.find({posted_by:'56fa3491c08a9e7812e178ae'}, function(err, allpost) {
+        post_model.post.find({posted_by:'56fa3491c08a9e7812e178ae'}).sort({created_at: -1}).exec(function(err, allpost) {
 
             if (err)
                 res.send(err);
@@ -41,7 +41,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
         setTimeout(function(){
             callback(null, userdetails);
-        }, 5000);
+        }, 1000);
     }
 
     function tweetcount(callback) {
@@ -55,14 +55,14 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
             if (err)
                 res.send(err);
-            console.info(tweetcount);
+            // console.info(tweetcount);
             userdetails.tweetcount = tweetcount
 
         });
 
         setTimeout(function(){
             callback(null, userdetails);
-        }, 5000);
+        }, 1000);
     }
 
     function trends(callback) {
@@ -378,6 +378,7 @@ module.exports.setnewpost = function(req, res) { // create a post
             hashtag: hashtagkd
         });
 
+        //find keyword if it is present update count, other wise create new trend
         post_hash.save(function(err) {
             if (err)
                 res.send(err);

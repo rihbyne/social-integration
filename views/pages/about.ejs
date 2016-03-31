@@ -71,7 +71,7 @@
                                 <% userdetails.allpost.forEach(function(userdetail){ %>
                                 <li class="collection-item avatar">
                                     <img src="images/pro_01.jpg" alt="" class="circle">
-                                    <a href=""><b class="fullname">Sudeep Makwana</b></a><a href="#" class="u_id">@sudeep_dk</a><a href="#" class="post-time">4hr</a><br>
+                                    <a href=""><b class="fullname">Sudeep Makwana</b></a><a href="#" class="u_id">@sudeep_dk</a><a href="#" class="post-time"><%= userdetail.created_at %></a><br>
                                     <p><%= userdetail.post_description %>
                                         </p>
                                         <div class="card-action">

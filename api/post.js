@@ -39,9 +39,9 @@ module.exports.getuserdetails = function(req, res) { // get a post
        
         }); 
 
-        setTimeout(function(){
+        // setTimeout(function(){
             callback(null, userdetails);
-        }, 1000);
+        // }, 1000);
     }
 
     function tweetcount(callback) {
@@ -60,9 +60,9 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
         });
 
-        setTimeout(function(){
+        // setTimeout(function(){
             callback(null, userdetails);
-        }, 1000);
+        // }, 1000);
     }
 
     function trends(callback) {
@@ -303,15 +303,12 @@ module.exports.setnewpost = function(req, res) { // create a post
 
                 if (err)
                     res.send(err);
+                console.log(userdata.length);
+                if (userdata.length !== 0) {
 
-                if (userdata == '') {
-                    res.json({
-                        message: 'User not found'
-                    });
-                    return;
+                    var data = userdata[0]._id;
+                    
                 };
-
-                var data = userdata[0]._id;
                 
                 callback(data);
 
@@ -322,6 +319,14 @@ module.exports.setnewpost = function(req, res) { // create a post
     //call to getuserid function to get _id of user collection
     getuserid(username, function(data){
 
+        if (data == '') {
+
+            res.json({
+                message: 'User not found'
+            });
+            return;
+        };
+        
         post.posted_by = data;
 
         // save the post and check for errors
@@ -400,7 +405,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     };
 
-    res.render('pages/profile');
+    res.redirect('http://127.0.0.1:4000/about');
 
 };
 

@@ -1,5 +1,6 @@
   $(document).ready(function() {
 
+      // dropdown intitilize
       $('.dropdown-button').dropdown({
           inDuration: 300,
           outDuration: 225,
@@ -10,6 +11,12 @@
           alignment: 'right' // Displays dropdown with edge aligned to the left of button
       });
 
-
+      // side nav
       $(".button-collapse").sideNav();
+
+      // tooltipped
+         $('.tooltipped').tooltip({delay: 50});
+
+      // modal
+       $('.modal-trigger').leanModal();   
   })

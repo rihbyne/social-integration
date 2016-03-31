@@ -12,8 +12,9 @@ module.exports.getuserdetails = function(req, res) { // get a post
     var userdetails = new Array();
 
     async.parallel([
-        wait5SecondsAndReturn1,
-        wait5SecondsAndReturn2
+        allpost,
+        tweetcount,
+        hashtag
     ], function (err, results){
         //after 5 seconds, results will be [1, 2]
         console.log(userdetails);
@@ -24,7 +25,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     });
 
-    function wait5SecondsAndReturn1(callback) {
+    function allpost(callback) {
         // save the bear and check for errors
         post_model.post.find({posted_by:'56fa3491c08a9e7812e178ae'}, function(err, allpost) {
 
@@ -43,13 +44,13 @@ module.exports.getuserdetails = function(req, res) { // get a post
         }, 5000);
     }
 
-    function wait5SecondsAndReturn2(callback) {
+    function tweetcount(callback) {
 
         post_model.post
-        .aggregate(
-            // {match: {'posted_by':'56fa3491c08a9e7812e178ae'}}, 
+        .aggregate([
+            {$match: {'posted_by':'56fa3491c08a9e7812e178ae'}}, 
             {$group: { _id: '$posted_by', count: {$sum: 1}}}
-        )
+        ])
         .exec(function(err, tweetcount){
 
             if (err)
@@ -58,6 +59,24 @@ module.exports.getuserdetails = function(req, res) { // get a post
             userdetails.tweetcount = tweetcount
 
         });
+
+        setTimeout(function(){
+            callback(null, userdetails);
+        }, 5000);
+    }
+
+    function hashtag(callback) {
+        // save the bear and check for errors
+         // find the hashtag and check for errors
+        post_model.post_hashtag.find(function(err, allhashtag) {
+
+            if (err)
+                res.send(err);
+
+            userdetails.allhashtag = allhashtag;
+
+        });
+        console.log(userdetails);
 
         setTimeout(function(){
             callback(null, userdetails);
@@ -126,7 +145,12 @@ module.exports.gethashposts = function(req, res) { // get a post
         if (err)
             res.send(err);
 
-        res.json(hashs);
+        // res.json(hashs);
+
+        res.render('pages/hashtag', {
+            hashtags : hashs,
+            hashtagelement: hashtag
+        });
 
     });
 
@@ -221,7 +245,7 @@ module.exports.getuserpost = function(req, res) { // get a post
 module.exports.gethashtag = function(req, res) { // get a post 
     console.log('Show all HashTag');
 
-    // save the bear and check for errors
+    // find the hashtag and check for errors
     post_model.post_hashtag.find(function(err, allhashtag) {
 
         if (err)

@@ -19,6 +19,10 @@ body {
     background: #f5f8fa;
 }
 
+.bg-color {
+    background: #f5f8fa;
+}
+
 .character-counter {
     float: left !important;
 }
@@ -80,10 +84,11 @@ textarea.materialize-textarea {
 }
 
 .collection .collection-item.avatar {
+    cursor: pointer;
     min-height: 65px;
 }
 
-.collection-item.avatar a b {
+.collection-item.avatar a {
     color: #000;
 }
 
@@ -95,6 +100,15 @@ textarea.materialize-textarea {
 
 
 /*social post*/
+
+ul.collection.social_post {
+    overflow: initial;
+    z-index: 50;
+}
+
+.social_post a:hover {
+    text-decoration: underline;
+}
 
 .social_post .u_id {
     color: #000;
@@ -126,23 +140,112 @@ textarea.materialize-textarea {
 
 /*buttons*/
 
-.btn-reply,
-.btn-retweet,
-.btn-like {
+.card-action a.btn-reply,
+.card-action a.btn-retweet,
+.card-action a.btn-like {
     color: #aab8c2;
     margin-right: 8%;
     padding-top: 5px;
     display: inline-block;
 }
 
-.btn-reply:hover {
+a.btn-reply:hover {
     color: #000;
 }
 
-.btn-retweet:hover {
+a.btn-retweet:hover {
     color: #19cf86;
 }
 
-.btn-like:hover {
+a.btn-like:hover {
     color: red;
+}
+
+
+/*/*tooltip/**/
+
+.material-tooltip {
+    padding: 7px 8px;
+    font-size: .8rem;
+    min-height: 0;
+}
+
+
+/*hashtag*/
+
+.trend-wrap {
+    background-color: #fff;
+    padding: 15px 5px 15px 25px;
+}
+
+.trend-wrap.z-depth-1 li {
+    margin-bottom: 15px;
+}
+
+.trend-wrap.z-depth-1 li a {
+    display: block;
+    color: #000;
+    font-size: 14px;
+}
+
+.trend-wrap.z-depth-1 li a:hover {
+    text-decoration: underline;
+}
+
+.trend-wrap.z-depth-1 li span {
+    font-size: 11px;
+    color: #989898;
+}
+
+
+/*tweet btn*/
+
+.btn-tw-st {
+    position: fixed;
+    bottom: 25px;
+    right: 85px;
+}
+
+
+/*tabs*/
+
+.tabs,
+.tabs .tab {
+    height: auto;
+    line-height: 25px;
+    ;
+}
+
+
+/*.tabs .tab a {
+    color: #000;
+}
+.tabs .tab a:hover {
+	opacity: .8
+    color: #000;
+}*/
+
+.tabs .tab a span {
+    display: block;
+}
+
+
+/*searchbox*/
+
+.sb {
+    max-width: 55%;
+    position: absolute;
+    left: 25%;
+}
+
+/*Hashtag*/
+h4.h_tag {
+    text-align: center;
+    background-color: #25223A;
+    color: #fff;
+    padding: 5px 0;
+    font-size: 28px;
+}
+.Hash_wrap .tabs, .tabs .tab {
+    line-height: 32px;
 }

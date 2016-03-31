@@ -59,6 +59,23 @@ app.get('/', function(req, res) {
 
 });
 
+
+// profile
+app.get('/profile', function(req, res) {
+    res.render('pages/profile');
+});
+
+// mention
+app.get('/mention', function(req, res) {
+    res.render('pages/mention');
+});
+
+// hashtag
+app.get('/hashtag/:hashtag',post.gethashposts);
+
+
+
+
 app.get('/secure/getpost', post.getpost); 									// Get all post
 
 app.get('/secure/getpost/post/:post_title', post.getsinglepost); 			// Get post by post title
@@ -72,7 +89,7 @@ app.get('/secure/getpost/user/mention/:mention_user', post.getmentionuser); // G
 app.get('/secure/hashtag/count', post.allhashtagcount); 			    	// Get the count of all hashtag
 app.get('/secure/hashtag/count/:hashtag', post.hashtagcount); 			 	// Get the count of specifiedhashtag
 app.post('/secure/hashtags', post.gethashtag); 								// Get all hashtag keyword 			
-app.post('/secure/hashtags/:hashtag', post.gethashposts);					// Get post from hashtag
+app.get('/secure/hashtags/:hashtag', post.gethashposts);					// Get post from hashtag
 
 app.post('/secure/setuser', post.setuser); 									// Set new user 
 app.post('/secure/setnewpost', post.setnewpost); 							// Set new post

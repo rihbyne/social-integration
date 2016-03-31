@@ -9,7 +9,7 @@
             <% include ../partials/header %>
         </header>
         <div  class="container big">
-            <div class="row">
+            <div class="row bg-color">
                 <div class="col s12 m4 l3">
                     <div class="card">
                         <div class="card-image waves-effect waves-block waves-light">
@@ -23,7 +23,7 @@
                         </div>
                         <div class="card-reveal">
                             <span class="card-title grey-text text-darken-4">Sudeep B Makwana<i class="material-icons right">close</i></span>
-                            <p>I strongly believe that we can change our country's fate we r the future of our country.Full stack programmer. <a href="http://wegotjob.in ">http://wegotjob.in</a></p>
+                            <p>I strongly believe that we can change our country's fate we r the future of our country.Full stack programmer. <a href="http://sudeepdk.com ">http://sudeepdk.com</a></p>
                         </div>
                         <div class="card-action t-count">
                             <ul>
@@ -32,6 +32,16 @@
                                 <li><a href="">Follower<span>74</span></a></li>
                             </ul>
                         </div>
+                    </div>
+                    <div class="trend-wrap z-depth-1">
+                        <h5>Trends</h5>
+                        <ul>
+
+                            <% userdetails.allhashtag.forEach(function(userdetail){ %>
+                                 <li><a href="#12">#<%= userdetail.hashtag %></a><span>26.7K Tweets</span></li>
+                            <% }) %>
+                           
+                        </ul>
                     </div>
                 </div>
                 <!-- left div -->
@@ -49,7 +59,6 @@
                                     </a>
                                     <ul>
                                         <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
-                                        <!-- <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li> -->
                                         <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
                                         <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
                                         <li><a class="btn-floating yellow darken-1"><i class="material-icons">library_add
@@ -57,16 +66,13 @@
                                     </ul>
                                 </div>
                             </div>
-
+                            
                             <ul class="collection social_post">
                                 <% userdetails.allpost.forEach(function(userdetail){ %>
                                 <li class="collection-item avatar">
                                     <img src="images/pro_01.jpg" alt="" class="circle">
                                     <a href=""><b class="fullname">Sudeep Makwana</b></a><a href="#" class="u_id">@sudeep_dk</a><a href="#" class="post-time">4hr</a><br>
                                     <p><%= userdetail.post_description %>
-                                        <!-- <a  href="#12" target="_blank" title="http://forbesindia.com/article/special/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F">
-                                            <span class="js-display-url">forbesindia.com/article/specia</span>
-                                            <span class="invisible"></span><span class="tco-ellipsis"><span class="invisible">&nbsp;</span>…</span></a> -->
                                         </p>
                                         <div class="card-action">
                                             <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
@@ -86,80 +92,50 @@
                                     </li>
                                     <% }) %>
                                     
-                                    <!--     <li class="collection-item avatar">
-                                        <img src="images/pro_01.jpg" alt="" class="circle">
-                                        <a href=""><b class="fullname">Damon Jernstad</b></a><a href="#" class="u_id">@sudeep_dk</a><a href="#" class="post-time">4hr</a><br>
-                                        <small>
-                                        Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
-                                        </small>
-                                        <p>Tata Steel explores outright sale of UK business
-                                            <a href="https://t.co/vmpTXCU5Gd" class="twitter-timeline-link" target="_blank" title="http://forbesindia.com/article/special/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F">
-                                                <span class="invisible">http://</span>
-                                                <span class="js-display-url">forbesindia.com/article/specia</span>
-                                                <span class="invisible">l/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F</span><span class="tco-ellipsis"><span class="invisible">&nbsp;</span>…</span></a>
-                                                <a href="/Blythe" class="p-atreply">
-                                                <s>@</s><b>Blythe</b></a>
-                                            </p>
-                                            <div class="card-action">
-                                                <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
-                                                <a href="#" class="btn-retweet"> <i class="fa fa-retweet"></i></a>
-                                                <a href="#" class="btn-like"><i class="fa fa-heart"></i></a>
-                                                <a href="#"> <i class="material-icons">insert_chart</i></a>
-                                                <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="fa fa-ellipsis-h"></i></a>
-                                                <ul id='dropdown1' class='dropdown-content'>
-                                                    <li><a href="#!">Share via Direct Message</a></li>
-                                                    <li><a href="#!">Copy link to Tweet</a></li>
-                                                    <li><a href="#!">Embed Tweet</a></li>
-                                                    <li><a href="#!">Pin to your profile page</a></li>
-                                                    <li><a href="#!">Unpin from profile page</a></li>
-                                                    <li><a href="#!">Delete Tweet</a></li>
-                                                </ul>
-                                            </div>
-                                        </li>
-                                        -->
-                                    </form>
-                                </div>
-                            </div>
-                            <!-- center div post  -->
-                            <div class="col s12 m4 l3">
-                                <a href="#">Who to follow</a>
-                                <a href="#1" class="right">view all</a>
-                                <ul class="collection">
-                                    <li class="collection-item avatar">
-                                        <img src="images/pro_01.jpg" alt="" class="circle">
-                                        <a href=""><b class="fullname">Damon Jernstad</b></a><br>
-                                        <small>
-                                        Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
-                                        </small>
-                                        <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                                        <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
-                                    </li>
-                                    <li class="collection-item avatar">
-                                        <img src="images/pro_02.jpg" alt="" class="circle">
-                                        <a href=""><b class="fullname">Harrison Bonardi</b></a><br>
-                                        <small>
-                                        Followed by <a href="#12"><b>Aiko</b></a> and <a href="#" class=""><b>others</b></a>
-                                        </small>
-                                        <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                                        <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
-                                    </li>
-                                    <li class="collection-item avatar">
-                                        <img src="images/pro_03.jpg" alt="" class="circle">
-                                        <a href=""><b class="fullname">Linnie Escalona</b></a><br>
-                                        <small>
-                                        Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
-                                        </small>
-                                        <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                                        <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
-                                    </li>
                                 </ul>
-                            </div>
-                            <!-- right div suggesion , footer -->
+                            </form>
                         </div>
                     </div>
-                    <footer>
-                        <% include ../partials/footer %>
-                    </footer>
-                    
-                </body>
-            </html>
+                    <!-- center div post  -->
+                    <div class="col s12 m4 l3">
+                        <a href="#">Who to follow</a>
+                        <a href="#1" class="right">view all</a>
+                        <ul class="collection">
+                            <li class="collection-item avatar">
+                                <img src="images/pro_01.jpg" alt="" class="circle">
+                                <a href=""><b class="fullname">Damon Jernstad</b></a><br>
+                                <small>
+                                Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
+                                </small>
+                                <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                                <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                            </li>
+                            <li class="collection-item avatar">
+                                <img src="images/pro_02.jpg" alt="" class="circle">
+                                <a href=""><b class="fullname">Harrison Bonardi</b></a><br>
+                                <small>
+                                Followed by <a href="#12"><b>Aiko</b></a> and <a href="#" class=""><b>others</b></a>
+                                </small>
+                                <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                                <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                            </li>
+                            <li class="collection-item avatar">
+                                <img src="images/pro_03.jpg" alt="" class="circle">
+                                <a href=""><b class="fullname">Linnie Escalona</b></a><br>
+                                <small>
+                                Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
+                                </small>
+                                <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                                <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- right div suggesion , footer -->
+                </div>
+            </div>
+            <footer>
+                <% include ../partials/footer %>
+            </footer>
+            
+        </body>
+    </html>

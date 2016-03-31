@@ -7,8 +7,8 @@ var post = mongoose.Schema({
     posted_by:                       {type: String, ref:'User'},       // posted by 
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
-    tweet_count:                     {type: Number, default: 0},
-    created_at:                      {type: Date},          // created date
+    tweet_count:                     {type: Number, default: 0, min: 0},
+    created_at:                      {type: Date, default: Date.now},          // created date
     last_update: 				     {type: Date}           // last update date
     
 }, { versionKey: false });

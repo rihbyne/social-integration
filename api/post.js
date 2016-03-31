@@ -2,6 +2,70 @@ var post_model = require('../model/post_model.js');
 var express = require('express');
 var router = express.Router(), // get an instance of the express Router
 	User = require('../model/User.js');
+var util = require('util');
+var async = require('async');
+
+//Get all post
+module.exports.getuserdetails = function(req, res) { // get a post 
+    console.log('Show user details');
+
+    var userdetails = new Array();
+
+    async.parallel([
+        wait5SecondsAndReturn1,
+        wait5SecondsAndReturn2
+    ], function (err, results){
+        //after 5 seconds, results will be [1, 2]
+        console.log(userdetails);
+
+        res.render('pages/about', {
+            userdetails : userdetails
+        });
+
+    });
+
+    function wait5SecondsAndReturn1(callback) {
+        // save the bear and check for errors
+        post_model.post.find({posted_by:'56fa3491c08a9e7812e178ae'}, function(err, allpost) {
+
+            if (err)
+                res.send(err);
+            // console.info(allpost);
+            
+            userdetails.allpost = allpost
+            console.log('allpost', userdetails);
+            // console.log(userdetails);
+       
+        }); 
+
+        setTimeout(function(){
+            callback(null, userdetails);
+        }, 5000);
+    }
+
+    function wait5SecondsAndReturn2(callback) {
+
+        post_model.post
+        .aggregate(
+            // {match: {'posted_by':'56fa3491c08a9e7812e178ae'}}, 
+            {$group: { _id: '$posted_by', count: {$sum: 1}}}
+        )
+        .exec(function(err, tweetcount){
+
+            if (err)
+                res.send(err);
+            console.info(tweetcount);
+            userdetails.tweetcount = tweetcount
+
+        });
+
+        setTimeout(function(){
+            callback(null, userdetails);
+        }, 5000);
+    }
+
+};
+
 //Get all post
 module.exports.getpost = function(req, res) { // get a post 
     console.log('Show all post');
@@ -321,6 +385,16 @@ module.exports.setuser = function(req, res){ //Create new user
     var last_name = req.body.last_name;
     var email = req.body.email;
     var username = req.body.username;
+
+    req.checkBody('first_name, last_name, email, username', 'Empty parameters').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').send('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
 
     var setuser = new User({
         W_user_id : W_user_id,

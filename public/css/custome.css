@@ -1,0 +1,148 @@
+@media only screen and (min-width: 993px) {
+    .container.big {
+        width: 92%;
+        background-color: #fff;
+        margin-top: 15px;
+    }
+}
+
+.container.big .container {
+    background-color: #fff;
+}
+
+.light,
+footer.page-footer .footer-copyright {
+    text-align: center;
+}
+
+body {
+    background: #f5f8fa;
+}
+
+.character-counter {
+    float: left !important;
+}
+
+.fixed-action-btn.horizontal {
+    clear: both;
+    float: right;
+}
+
+.fixed-action-btn {
+    position: relative;
+}
+
+textarea.materialize-textarea {
+    min-height: auto;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.card-action.t-count {
+    padding: 10px 0 0px 0;
+}
+
+.card-action.t-count ul {
+    display: flex;
+    margin: 0;
+}
+
+.card .card-reveal {
+    z-index: 6;
+}
+
+.card-action.t-count ul li {
+    float: left;
+    width: 33%;
+    text-align: center;
+    font-size: 11px;
+}
+
+.card-action.t-count ul li span {
+    display: block;
+    display: block;
+    font-size: 26px;
+    color: #000;
+}
+
+.card-action.t-count ul li a {
+    color: #039be5 !important;
+}
+
+.navbar-fixed {
+    z-index: 999;
+}
+
+.collection .collection-item.avatar:hover {
+    background: #f5f8fa;
+}
+
+.collection .collection-item.avatar {
+    min-height: 65px;
+}
+
+.collection-item.avatar a b {
+    color: #000;
+}
+
+.user_pro_p {
+    position: absolute;
+    bottom: 163px;
+    z-index: 5;
+}
+
+
+/*social post*/
+
+.social_post .u_id {
+    color: #000;
+    font-size: 13px;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.social_post .post-time {
+    font-size: 13px;
+    color: #A29C9C;
+}
+
+
+/*dropdown */
+
+.social_post .dropdown-content li>a,
+.dropdown-content li>span {
+    font-size: 12px;
+    color: #000;
+    padding: 5px 15px;
+    line-height: auto;
+}
+
+.social_post .dropdown-content li {
+    min-height: auto;
+}
+
+
+/*buttons*/
+
+.btn-reply,
+.btn-retweet,
+.btn-like {
+    color: #aab8c2;
+    margin-right: 8%;
+    padding-top: 5px;
+    display: inline-block;
+}
+
+.btn-reply:hover {
+    color: #000;
+}
+
+.btn-retweet:hover {
+    color: #19cf86;
+}
+
+.btn-like:hover {
+    color: red;
+}

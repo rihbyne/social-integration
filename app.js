@@ -2,6 +2,7 @@
 
 var mongo               = require('./config/mongo.js');
 var notificationschema  = require('./model/notification_model.js');
+var express             = require('express');
 var app                 = require('express')();
 var expressValidator 	= require('express-validator');
 var server              = require('http').Server(app);
@@ -9,16 +10,21 @@ var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
 var post 		        = require('./api/post.js');  
+var path                = require('path');  
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(expressValidator());
 
+app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, '/node_modules')));
+
 app.set('view engine', 'ejs');  
 
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html');
-});
+// app.get('/', function (req, res) {
+//   res.sendFile(__dirname + '/index.html');
+// });
 
 app.post('/secure/sendVerificationEmail', notification.sendVerificationEmail);
 app.post('/secure/sendforgotpassword', notification.sendforgotpassword);
@@ -28,6 +34,30 @@ app.post('/secure/sendMail', mailer.sendPHPmail);
 app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
 
+
+// about page 
+app.get('/about', post.getuserdetails);
+
+// user preferance page 
+app.get('/user_preferance', function(req, res) {
+    res.render('pages/user_preferance');
+});
+
+app.get('/', function(req, res) {
+    // save the bear and check for errors
+    var drinks = [
+        { name: 'Bloody Mary', drunkness: 3 },
+        { name: 'Martini', drunkness: 5 },
+        { name: 'Scotch', drunkness: 10 }
+    ];
+    var tagline = "Any code of your own that you haven't looked at for six or more months might as well have been written by someone else.";
+
+    res.render('pages/index', {
+        drinks: drinks,
+        tagline: tagline
+    });
+
+});
 
 app.get('/secure/getpost', post.getpost); 									// Get all post
 
@@ -47,26 +77,6 @@ app.post('/secure/hashtags/:hashtag', post.gethashposts);					// Get post from h
 app.post('/secure/setuser', post.setuser); 									// Set new user 
 app.post('/secure/setnewpost', post.setnewpost); 							// Set new post
 app.post('/secure/setretweet', post.setretweet); 							// Set new user 
-
-app.post('/:urlparam', function(req, res) {
-
-	req.checkBody('postparam', 'Invalid postparam').notEmpty().isInt();
-	req.checkParams('urlparam', 'Invalid urlparam').isAlpha();
-	req.checkQuery('getparam', 'Invalid getparam').isInt();
-	console.error('urlparam');
-	var errors = req.validationErrors();
-
-		if (errors) {
-			res.send('There have been validation errors: ' + util.inspect(errors), 400);
-		return;
-		}
-		res.json({
-			urlparam: req.params.urlparam,
-			getparam: req.params.getparam,
-			postparam: req.params.postparam
-		});
-
-});
 
 server.listen(4000, function(){
 	console.log('Connected To server at port 4000 with socket');

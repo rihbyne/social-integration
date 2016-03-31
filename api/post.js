@@ -14,7 +14,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
     async.parallel([
         allpost,
         tweetcount,
-        hashtag
+        trends
     ], function (err, results){
         //after 5 seconds, results will be [1, 2]
         console.log(userdetails);
@@ -65,7 +65,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
         }, 5000);
     }
 
-    function hashtag(callback) {
+    function trends(callback) {
         // save the bear and check for errors
          // find the hashtag and check for errors
         post_model.post_hashtag.find(function(err, allhashtag) {
@@ -330,9 +330,9 @@ module.exports.setnewpost = function(req, res) { // create a post
             if (err)
                 res.send(err);
 
-            res.json({
-                message: 'Post created!'
-            });
+            // res.json({
+            //     message: 'Post created!'
+            // });
 
         });
 
@@ -399,6 +399,8 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     };
 
+    res.render('pages/profile');
+
 };
 
 //Set users
@@ -410,7 +412,7 @@ module.exports.setuser = function(req, res){ //Create new user
     var email = req.body.email;
     var username = req.body.username;
 
-    req.checkBody('first_name, last_name, email, username', 'Empty parameters').notEmpty();
+    req.checkBody('first_name', 'Empty parameters').notEmpty();
 
     var errors = req.validationErrors();
 

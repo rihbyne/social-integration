@@ -209,25 +209,33 @@
                                     <div class="modal-content">
 
                                         <div class="row">
-                                        <h5>Compose a new Post</h5>
-                                            <div class="input-field col s12 mb-10">
-                                                <textarea id="textarea1" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
-                                                <label for="textarea1"></label>
+
+                                            <form method="post" action="/secure/setnewpost" name="compose_post">
+                                                <input type="hidden" name="username" value="pt">
+                                                <h5>Compose a new Post</h5>
+                                                <div class="input-field col s12 mb-10">
+                                                    <input type="text" name="post_title" value="">
+                                                    <textarea id="textarea1" name="post_description" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
+                                                    <label for="textarea1"></label>
+                                                </div>
+                                                <div class="fixed-action-btn horizontal click-to-toggle">
+                                                    <a class="btn-floating btn-large red">
+                                                        <i class="large mdi-navigation-menu"></i>
+                                                    </a>
+                                                    <ul>
+                                                        <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+                                                        <!-- <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li> -->
+                                                        <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+                                                        <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+                                                        <li><a class="btn-floating yellow darken-1"><i class="material-icons">library_add
+                                                        </i></a></li>
+                                                    </ul>
+                                                </div>
+                                                <input type="submit" value='enter'>
+                                            </form>
+
                                             </div>
-                                            <div class="fixed-action-btn horizontal click-to-toggle">
-                                                <a class="btn-floating btn-large red">
-                                                    <i class="large mdi-navigation-menu"></i>
-                                                </a>
-                                                <ul>
-                                                    <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
-                                                    <!-- <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li> -->
-                                                    <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
-                                                    <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
-                                                    <li><a class="btn-floating yellow darken-1"><i class="material-icons">library_add
-                                                    </i></a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
+
                                     </div>
 <!--                                     <div class="modal-footer">
                                         <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>

@@ -587,7 +587,12 @@ module.exports.setretweet = function(req, res){ //Create new user
     var retweetuserid = req.body.retweet_user_id;
     var tweetstatus = req.body.tweetstatus;
 
-    if (tweetstatus == '1') {
+    console.log('Retweet Api hitted');
+    console.log(req.body.tweetstatus);
+    console.log(req.body.post_id);
+    console.log(req.body.retweet_user_id);
+
+    if (tweetstatus == 1) {
 
         var retweet = new post_model.post_retweet({
             post_id: post_id,
@@ -610,9 +615,10 @@ module.exports.setretweet = function(req, res){ //Create new user
 
             })
 
-            res.json({
-                message: 'User retweeted'
-            });
+            // res.json({
+            //     message: 'User retweeted'
+            // });
+            res.render('pages/about');
 
         });
 

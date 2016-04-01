@@ -81,7 +81,15 @@
                                         </p>
                                         <div class="card-action">
                                             <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
-                                            <a href="#" class="btn-retweet"> <i class="fa fa-retweet"></i></a>
+
+                                            <a href="#" class="btn-retweet"> <%= userdetail.tweet_count %><i class="fa fa-retweet"></i></a>
+                                            <form action="/secure/setretweet" method="post" name='retweetform'>
+                                                
+                                                <input type="hidden" name="tweetstatus" value="1">
+                                                <input type="hidden" name="retweet_user_id" value="56fa34d5c08a9e7812e178af">
+                                                <input type="hidden" name="post_id" value="<%= userdetail._id %>">
+                                                <input type="submit" value="Retweet">
+                                            </form>
                                             <a href="#" class="btn-like"><i class="fa fa-heart"></i></a>
                                             <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'><i class="fa fa-ellipsis-h"></i></a>
                                             <!-- Dropdown Structure -->

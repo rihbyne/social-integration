@@ -13,7 +13,7 @@
                 <div class="col s12 m4 l3">
                     <div class="card">
                         <div class="card-image waves-effect waves-block waves-light">
-                            <img class="activator" src="images/CeoXGIuWQAAtrZN.JPG">
+                            <img class="activator" src="../images/CeoXGIuWQAAtrZN.JPG">
                         </div>
                         <div class="card-content">
                             <img src="images/pro_01.jpg" alt="" class="circle user_pro_p">
@@ -58,64 +58,20 @@
                                     </div>
                                     <div id="test1" class="col s12">
                                         <ul class="collection social_post">
-                                            <li class="collection-item avatar">
-                                                <img src="images/pro_01.jpg" alt="" class="circle">
-                                                <a href="#as"><b class="fullname">Damon Jernstad</b></a><a href="#" class="u_id">@sudeep_dk</a><a href="#" class="post-time">4hr</a><br>
-                                                <small>
-                                                Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
-                                                </small>
-                                                <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                                                <!-- <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a> -->
-                                                <p>Tata Steel explores outright sale of UK business
-                                                    <a href="https://t.co/vmpTXCU5Gd" class="twitter-timeline-link" target="_blank" title="http://forbesindia.com/article/special/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F">
-                                                        <span class="invisible">http://</span>
-                                                        <span class="js-display-url">forbesindia.com/article/specia</span>
-                                                        <span class="invisible">l/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F</span><span class="tco-ellipsis"><span class="invisible">&nbsp;</span>…</span></a>
-                                                        <a href="/Blythe" class="p-atreply">
-                                                        <s>@</s><b>Blythe</b></a>
-                                                    </p>
-                                                    <div class="card-action">
-                                                        <a href="#" class="btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
-                                                        <a href="#" class="btn-retweet tooltipped" data-position="top" data-delay="50" data-tooltip="retweet"> <i class="fa fa-retweet"></i></a>
-                                                        <a href="#" class="btn-like tooltipped" data-position="top" data-delay="50" data-tooltip="like"><i class="fa fa-heart"></i></a>
-                                                        <!-- Dropdown Trigger -->
-                                                        <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="fa fa-ellipsis-h"></i></a>
-                                                        <!-- Dropdown Structure -->
-                                                        <ul id='dropdown1' class='dropdown-content'>
-                                                            <li><a href="#!">Share via Direct Message</a></li>
-                                                            <li><a href="#!">Copy link to Tweet</a></li>
-                                                            <li><a href="#!">Embed Tweet</a></li>
-                                                            <li><a href="#!">Pin to your profile page</a></li>
-                                                            <li><a href="#!">Unpin from profile page</a></li>
-                                                            <li><a href="#!">Delete Tweet</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </li>
+
+                                                <% posts.forEach(function(userdetail, i){ %>
                                                 <li class="collection-item avatar">
-                                                    <img src="images/pro_02.jpg" alt="" class="circle">
-                                                    <a href="#as"><b class="fullname">Damon Jernstad</b></a><a href="#" class="u_id">@Lenita</a><a href="#" class="post-time">5hr</a><br>
-                                                    <small>
-                                                    Followed by <a href="#12"><b>Aiko</b></a> and <a href="#" class=""><b>others</b></a>
-                                                    </small>
-                                                    <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                                                    <p>Tata Steel explores outright sale of UK business
-                                                        <a href="https://t.co/vmpTXCU5Gd" class="twitter-timeline-link" target="_blank" title="http://forbesindia.com/article/special/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F">
-                                                            <span class="invisible">http://</span>
-                                                            <span class="js-display-url">forbesindia.com/article/specia</span>
-                                                            <span class="invisible">l/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F</span><span class="tco-ellipsis"><span class="invisible">&nbsp;</span>…</span></a>
-                                                            <a href="/Mariela" class="p-atreply">
-                                                            <s>@</s><b>Mariela</b></a>
+                                                    <img src="images/pro_01.jpg" alt="" class="circle">
+                                                    <a href=""><b class="fullname">Sudeep Makwana</b></a><a href="#" class="u_id">@sudeep_dk</a><a href="#" class="post-time"><%= userdetail.created_at %></a><br>
+                                                    <p><%= userdetail.post_description %>
                                                         </p>
                                                         <div class="card-action">
-                                                            <a href="#" class="btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
-                                                            <a href="#" class="btn-retweet tooltipped" data-position="top" data-delay="50" data-tooltip="retweet"> <i class="fa fa-retweet"></i></a>
-                                                            <a href="#" class="btn-like tooltipped" data-position="top" data-delay="50" data-tooltip="like"><i class="fa fa-heart"></i></a>
-                                                            <!--                                             <a href="#"> <i class="material-icons">insert_chart</i></a>
-                                                            -->                                            <!-- <a href="#"> <i class="fa fa-ellipsis-h"></i></a> -->
-                                                            <!-- Dropdown Trigger -->
-                                                            <a class='dropdown-button right' href='#' data-activates='dropdown2'><i class="fa fa-ellipsis-h"></i></a>
+                                                            <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
+                                                            <a href="#" class="btn-retweet"> <i class="fa fa-retweet"></i></a>
+                                                            <a href="#" class="btn-like"><i class="fa fa-heart"></i></a>
+                                                            <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'><i class="fa fa-ellipsis-h"></i></a>
                                                             <!-- Dropdown Structure -->
-                                                            <ul id='dropdown2' class='dropdown-content'>
+                                                            <ul id='dropdown<%= i %>' class='dropdown-content'>
                                                                 <li><a href="#!">Share via Direct Message</a></li>
                                                                 <li><a href="#!">Copy link to Tweet</a></li>
                                                                 <li><a href="#!">Embed Tweet</a></li>
@@ -125,40 +81,10 @@
                                                             </ul>
                                                         </div>
                                                     </li>
-                                                    <li class="collection-item avatar">
-                                                        <img src="images/pro_03.jpg" alt="" class="circle">
-                                                        <a href="#as"><b class="fullname">Damon Jernstad</b></a><a href="#" class="u_id">@Melissa</a><a href="#" class="post-time">3hr</a><br>
-                                                        <small>
-                                                        Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
-                                                        </small>
-                                                        <p>Tata Steel explores outright sale of UK business
-                                                            <a href="https://t.co/vmpTXCU5Gd" class="twitter-timeline-link" target="_blank" title="http://forbesindia.com/article/special/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F">
-                                                                <span class="invisible">http://</span>
-                                                                <span class="js-display-url">forbesindia.com/article/specia</span>
-                                                                <span class="invisible">l/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F</span><span class="tco-ellipsis"><span class="invisible">&nbsp;</span>…</span></a>
-                                                                <a href="/Tamika" class="p-atreply">
-                                                                <s>@</s><b>Tamika</b></a>
-                                                            </p>
-                                                            <div class="card-action">
-                                                                <a href="#" class="btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
-                                                                <a href="#" class="btn-retweet tooltipped" data-position="top" data-delay="50" data-tooltip="retweet"> <i class="fa fa-retweet"></i></a>
-                                                                <a href="#" class="btn-like tooltipped" data-position="top" data-delay="50" data-tooltip="like"><i class="fa fa-heart"></i></a>
-                                                                <!--                                             <a href="#"> <i class="material-icons">insert_chart</i></a>
-                                                                -->                                            <!-- <a href="#"> <i class="fa fa-ellipsis-h"></i></a> -->
-                                                                <!-- Dropdown Trigger -->
-                                                                <a class='dropdown-button right' href='#' data-activates='dropdown3'><i class="fa fa-ellipsis-h"></i></a>
-                                                                <!-- Dropdown Structure -->
-                                                                <ul id='dropdown3' class='dropdown-content'>
-                                                                    <li><a href="#!">Share via Direct Message</a></li>
-                                                                    <li><a href="#!">Copy link to Tweet</a></li>
-                                                                    <li><a href="#!">Embed Tweet</a></li>
-                                                                    <li><a href="#!">Pin to your profile page</a></li>
-                                                                    <li><a href="#!">Unpin from profile page</a></li>
-                                                                    <li><a href="#!">Delete Tweet</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
+                                                    <% }) %>
+                                                    
+                                                </ul>
+
                                                 </div>
                                                 <div id="test2" class="col s12">Test 2</div>
                                             </div>

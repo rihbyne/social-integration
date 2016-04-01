@@ -258,3 +258,7 @@ h4.h_tag {
     right: 21px;
     top: 20px;
 }
+
+.social_post .dropdown-content a:hover {
+    text-decoration: none;
+}

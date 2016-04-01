@@ -66,21 +66,20 @@ module.exports.getuserdetails = function(req, res) { // get a post
     }
 
     function trends(callback) {
-        // save the bear and check for errors
-         // find the hashtag and check for errors
-        post_model.post_hashtag.find(function(err, allhashtag) {
 
-            if (err)
+        post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
+
+            console.log(result);
+
+            if (err) {
                 res.send(err);
+            };
 
-            userdetails.allhashtag = allhashtag;
+            res.json({
+                message: results
+            });
 
         });
-        console.log(userdetails);
-
-        setTimeout(function(){
-            callback(null, userdetails);
-        }, 5000);
     }
 
 };
@@ -375,6 +374,62 @@ module.exports.setnewpost = function(req, res) { // create a post
         for (var k = 0; k < hashtags.length; k++) {
 
            hashtagkd[k] = hashtags[k];
+           console.log('hashtagkeyword',hashtagkd[k]);
+
+           post_model.trends
+           .findOneAndUpdate({keyword: hashtags[k]}, {$inc: {count: +1}, updated_at: Date.now()}, {upsert: true, setDefaultsOnInsert: true}, function(err, result){
+
+                if (err) {
+                    res.send(err);
+                };
+                console.log('Trends updated');
+           })
+           // post_model.trends.find({keyword: hashtags[k]}).exec(function(err, result){
+
+           //      console.log(result);
+
+           //      if (err) {
+           //          res.send(err);
+           //      };
+
+           //      if (result == '') {
+
+           //          console.log('create new one',  hashtagkd[k]);
+
+           //          var post_hash = new post_model.trends({
+           //              keyword: post._id,
+           //              hashtag: hashtags[k]
+           //          });
+
+           //          //find keyword if it is present update count, other wise create new trend
+           //          post_hash.save(function(err) {
+           //              if (err)
+           //                  res.send(err);
+           //          });
+
+           //      }
+           //      else{
+           //          console.log('Update old one', hashtags[k]);
+
+           //          post_model.trends
+           //          .findOneAndUpdate({keyword: result[0].keyword}, {$inc :{count: +1}})
+           //          .exec(function(err, results){
+
+           //              console.log(results);
+
+           //              if (err) {
+           //                  res.send(err);
+           //              };
+
+           //              // res.json({
+           //              //     message: results
+           //              // });
+
+           //          })
+                
+           //      }
+                
+           //  });
 
         }
 
@@ -628,3 +683,24 @@ module.exports.setretweet = function(req, res){ //Create new user
     }
     
 }
+
+//Get all post
+module.exports.gethashtaglist = function(req, res) { // get a post 
+    console.log('Show all HashTag');
+
+    // find the hashtag and check for errors
+    post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, result){
+
+        console.log(result);
+
+        if (err) {
+            res.send(err);
+        };
+
+        res.json({
+            message: result
+        });
+
+    });
+
+};

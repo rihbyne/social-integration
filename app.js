@@ -88,7 +88,9 @@ app.get('/secure/getpost/user/mention/:mention_user', post.getmentionuser); // G
 
 app.get('/secure/hashtag/count', post.allhashtagcount); 			    	// Get the count of all hashtag
 app.get('/secure/hashtag/count/:hashtag', post.hashtagcount); 			 	// Get the count of specifiedhashtag
-app.post('/secure/hashtags', post.gethashtag); 								// Get all hashtag keyword 			
+app.post('/secure/hashtags', post.gethashtag); 								// Get all hashtag keyword 		
+app.post('/secure/gethashtaglist', post.gethashtaglist);                              // Get all hashtag keyword          
+	
 app.get('/secure/hashtags/:hashtag', post.gethashposts);					// Get post from hashtag
 
 app.post('/secure/setuser', post.setuser); 									// Set new user 

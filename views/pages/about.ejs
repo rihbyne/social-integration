@@ -33,15 +33,17 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="trend-wrap z-depth-1">
+                  <!--   <div class="trend-wrap z-depth-1">
                         <h5>Trends</h5>
                         <ul>
-                            <% userdetails.allhashtag.forEach(function(userdetail){ %>
-                            <li><a href="#12">#<%= userdetail.hashtag %></a><span>26.7K Tweets</span></li>
+                            <% userdetails.trends.forEach(function(userdetail){ %>
+                            <li><a href="#12">#<%= userdetail.keyword %></a><span><%= userdetail.count %> Tweets</span></li>
                             <% }) %>
                             
                         </ul>
-                    </div>
+                    </div> -->
+                <% include ../partials/trend %>
+
                 </div>
                 <!-- left div -->
                 <div class="col s12 m4 l6">

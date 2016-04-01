@@ -10,6 +10,7 @@ var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
 var post 		        = require('./api/post.js');  
+var mention                = require('./api/mention.js');  
 var path                = require('path');  
 
 
@@ -66,9 +67,7 @@ app.get('/profile', function(req, res) {
 });
 
 // mention
-app.get('/mention', function(req, res) {
-    res.render('pages/mention');
-});
+app.get('/mention/:mention_user', mention.getmentionuser);
 
 // hashtag
 app.get('/hashtag/:hashtag',post.gethashposts);
@@ -84,7 +83,7 @@ app.get('/secure/getpost/:user', post.getuserposts); 						// Get post by userna
 app.get('/secure/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
 app.get('/secure/getpost/:user/:post_id', post.getuserpost); 				// Get single post of user
 
-app.get('/secure/getpost/user/mention/:mention_user', post.getmentionuser); // Get post of user by mention user
+app.get('/secure/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
 app.get('/secure/hashtag/count', post.allhashtagcount); 			    	// Get the count of all hashtag
 app.get('/secure/hashtag/count/:hashtag', post.hashtagcount); 			 	// Get the count of specifiedhashtag

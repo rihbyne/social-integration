@@ -38,10 +38,8 @@ module.exports.getuserdetails = function(req, res) { // get a post
             // console.log(userdetails);
        
         }); 
-
-        // setTimeout(function(){
-            callback(null, userdetails);
-        // }, 1000);
+    
+        callback(null, userdetails);
     }
 
     function tweetcount(callback) {
@@ -60,24 +58,25 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
         });
 
-        // setTimeout(function(){
-            callback(null, userdetails);
-        // }, 1000);
+        callback(null, userdetails);
     }
 
     function trends(callback) {
 
         post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
 
-            console.log(result);
+            // console.log(results);
 
             if (err) {
                 res.send(err);
             };
 
-            res.json({
-                message: results
-            });
+            userdetails.trends = results
+            // res.json({
+            //     message: results
+            // });
+
+            callback(null, trends);
 
         });
     }
@@ -501,51 +500,6 @@ module.exports.setuser = function(req, res){ //Create new user
     });
 
 }
-
-//Get mentionuser's post
-module.exports.getmentionuser = function(req, res) { // get a post 
-    console.log('Show mention user\'s post');
-
-    var post_mention = req.params.mention_user;
-    console.log(post_mention);
-    // find by mention collection using populate and check for errors
-    // post_model.post_mention
-    // .find({
-    //     mention_users: post_mention
-    // })
-    // .populate('post_id')
-    // .exec(function(err, mentionspost) {
-    //     if (err)
-    //         res.send(err);
-    //     if (mentionspost) {
-    //         console.log(mentionspost);
-    //         res.json({
-    //             posts: mentionspost
-    //         });
-    //     } else {
-    //         res.json('No Post Found')
-    //     }
-    // });
-
-    //find by description from post collection
-    post_model.post
-    .find({
-        post_description : new RegExp(post_mention, 'i')
-    })
-    .exec(function(err, mentionspost) {
-        if (err)
-            res.send(err);
-        if (mentionspost) {
-            console.log(mentionspost);
-            res.json({
-                posts: mentionspost
-            });
-        } else {
-            res.json('No Post Found')
-        }
-    });
-
-};
 
 //Get Count of all hashtag
 module.exports.allhashtagcount = function(req, res) { // get a post 

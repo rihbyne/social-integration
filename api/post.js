@@ -27,7 +27,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     function allpost(callback) {
         // save the bear and check for errors
-        post_model.post.find({posted_by:'56fe824fb826ec881d1f87aa'}).sort({created_at: -1}).exec(function(err, allpost) {
+        post_model.post.find({posted_by:'56fa3491c08a9e7812e178ae'}).sort({created_at: -1}).exec(function(err, allpost) {
 
             if (err)
                 res.send(err);
@@ -46,7 +46,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
         post_model.post
         .aggregate([
-            {$match: {'posted_by':'56fe824fb826ec881d1f87aa'}}, 
+            {$match: {'posted_by':'56fa3491c08a9e7812e178ae'}}, 
             {$group: { _id: '$posted_by', count: {$sum: 1}}}
         ])
         .exec(function(err, tweetcount){
@@ -54,7 +54,17 @@ module.exports.getuserdetails = function(req, res) { // get a post
             if (err)
                 res.send(err);
             // console.info(tweetcount);
-            userdetails.tweetcount = tweetcount
+            if (tweetcount == '') {
+
+                userdetails.tweetcount = 0;
+
+            }
+            else{
+
+                userdetails.tweetcount = tweetcount
+
+            }
+            
 
         });
 
@@ -273,6 +283,16 @@ module.exports.setnewpost = function(req, res) { // create a post
     var regexat = /@([^\s]+)/g;
     var regexhash = /#([^\s]+)/g;
 
+    req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').send('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+
     while (match_at = regexat.exec(post_description)) {
         mentionusers.push(match_at[1]);
     }
@@ -383,53 +403,7 @@ module.exports.setnewpost = function(req, res) { // create a post
                 };
                 console.log('Trends updated');
            })
-           // post_model.trends.find({keyword: hashtags[k]}).exec(function(err, result){
-
-           //      console.log(result);
-
-           //      if (err) {
-           //          res.send(err);
-           //      };
-
-           //      if (result == '') {
-
-           //          console.log('create new one',  hashtagkd[k]);
-
-           //          var post_hash = new post_model.trends({
-           //              keyword: post._id,
-           //              hashtag: hashtags[k]
-           //          });
-
-           //          //find keyword if it is present update count, other wise create new trend
-           //          post_hash.save(function(err) {
-           //              if (err)
-           //                  res.send(err);
-           //          });
-
-           //      }
-           //      else{
-           //          console.log('Update old one', hashtags[k]);
-
-           //          post_model.trends
-           //          .findOneAndUpdate({keyword: result[0].keyword}, {$inc :{count: +1}})
-           //          .exec(function(err, results){
-
-           //              console.log(results);
-
-           //              if (err) {
-           //                  res.send(err);
-           //              };
-
-           //              // res.json({
-           //              //     message: results
-           //              // });
-
-           //          })
-                
-           //      }
-                
-           //  });
-
+           
         }
 
         var post_hash = new post_model.post_hashtag({

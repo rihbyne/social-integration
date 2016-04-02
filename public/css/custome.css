@@ -262,3 +262,45 @@ h4.h_tag {
 .social_post .dropdown-content a:hover {
     text-decoration: none;
 }
+.rt-btn:hover{
+   background-color:  #f5f8fa;
+}
+/*parent child hover dependancy*/
+.collection .collection-item.avatar:hover .rt-btn {
+   background-color:  #f5f8fa;
+
+}
+.rt-btn{
+        z-index: 2;
+    position: absolute;
+    background-color: #fff;
+    height: 35px;
+    width: 31px;
+    padding-top: 9px;
+}
+.btn-rt_input span{
+    margin-right: 15px;
+}
+.btn-rt_input{
+/*    z-index: 1;
+    height: 35px;
+    width: 31px;
+    background: url(./images/retweet-action.png) no-repeat 0 0;*/
+
+    z-index: 1;
+    height: 19px;
+    width: 28px;
+    background: url(../images/imageedit_1_4471377551.gif) no-repeat 0 0;
+    background-size: 77px;
+    background-position: -25px -6px;
+    border: 0;
+
+}
+.btn-rt_input:hover {
+    background-position:-25px -27px;
+}
+.rt-count{
+    color: #aab8c2;
+    margin-left: -5px;
+    margin-right: 26px;
+}

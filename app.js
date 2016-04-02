@@ -72,7 +72,14 @@ app.get('/mention/:mention_user', mention.getmentionuser);
 // hashtag
 app.get('/hashtag/:hashtag',post.gethashposts);
 
-
+// login
+app.get('/login', function(req, res) {
+    res.render('pages/login');
+});
+// register
+app.get('/register', function(req, res) {
+    res.render('pages/register');
+});
 
 
 app.get('/secure/getpost', post.getpost); 									// Get all post

@@ -27,7 +27,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     function allpost(callback) {
         // save the bear and check for errors
-        post_model.post.find({posted_by:'56fa3491c08a9e7812e178ae'}).sort({created_at: -1}).exec(function(err, allpost) {
+        post_model.post.find({posted_by:'56fe824fb826ec881d1f87aa'}).sort({created_at: -1}).exec(function(err, allpost) {
 
             if (err)
                 res.send(err);
@@ -46,7 +46,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
         post_model.post
         .aggregate([
-            {$match: {'posted_by':'56fa3491c08a9e7812e178ae'}}, 
+            {$match: {'posted_by':'56fe824fb826ec881d1f87aa'}}, 
             {$group: { _id: '$posted_by', count: {$sum: 1}}}
         ])
         .exec(function(err, tweetcount){

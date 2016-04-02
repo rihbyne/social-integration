@@ -27,7 +27,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     function allpost(callback) {
         // save the bear and check for errors
-        post_model.post.find({posted_by:'56fa3491c08a9e7812e178ae'}).sort({created_at: -1}).exec(function(err, allpost) {
+        post_model.post.find({posted_by:'56ff9d84eca54f680279d56d'}).sort({created_at: -1}).exec(function(err, allpost) {
 
             if (err)
                 res.send(err);
@@ -46,7 +46,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
         post_model.post
         .aggregate([
-            {$match: {'posted_by':'56fa3491c08a9e7812e178ae'}}, 
+            {$match: {'posted_by':'56ff9d84eca54f680279d56d'}}, 
             {$group: { _id: '$posted_by', count: {$sum: 1}}}
         ])
         .exec(function(err, tweetcount){
@@ -289,7 +289,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     if (errors) {
         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-        res.status('400').send('There have been validation errors: ' + util.inspect(errors));
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
 
@@ -555,7 +555,7 @@ module.exports.getuserpostcount = function(req, res) { // get a post
 };
 
 //Set users
-module.exports.setretweet = function(req, res){ //Create new user
+module.exports.setretweet = function(req, res) { //Create new user
 
     var post_id = req.body.post_id;
     var retweetuserid = req.body.retweet_user_id;
@@ -566,86 +566,107 @@ module.exports.setretweet = function(req, res){ //Create new user
     console.log(req.body.post_id);
     console.log(req.body.retweet_user_id);
 
-    post_model.post.find({_id: post_id}).exec(function(err, postdata){
+    post_model.post_retweet.find({
+        post_id: post_id,
+        ret_user_id: retweetuserid
+    }).exec(function(err, retweetdata) {
 
-        console.log('postdata', postdata);
+        if (retweetdata.length !== 0) {
 
-        if (postdata[0] !== '') {
+            console.log('You can not retweet on your own post');
+            return;
 
-            if (postdata[0].posted_by == retweetuserid) {
+            res.json({
+                message: 'You can not retweet twice for same post'
+            });
+           
 
-                console.log('Match Found');
+        } else {
 
-                res.json({
-                    message: 'You can not retweet on your own post'
-                });
+            post_model.post.find({
+                _id: post_id
+            }).exec(function(err, postdata) {
 
-            }
-            else{
+                console.log('postdata', postdata);
 
-                if (tweetstatus == 1) {
+                if (postdata[0] !== '') {
 
-                    var retweet = new post_model.post_retweet({
-                        post_id: post_id,
-                        ret_user_id: retweetuserid
-                    });
+                    if (postdata[0].posted_by == retweetuserid) {
 
-                    retweet.save(function(err) {
-
-                        if (err)
-                            res.send(err);
-
-                        post_model.post
-                            .findByIdAndUpdate(post_id, {
-                                $inc: {
-                                    tweet_count: 1
-                                }
-                            })
-                            .exec(function(err, result) {
-
-                                console.log('query execuated', result);
-                                
-                                if (err) {
-                                    res.send(err);
-                                };
-
-                            })
-
+                        console.log('You can not retweet on your own post');
+                        return;
                         // res.json({
-                        //     message: 'User retweeted'
+                        //     message: 'You can not retweet on your own post'
                         // });
-                        res.render('pages/profile');
 
-                    });
+                    } else {
 
-                } else if (tweetstatus == 2) {
+                        if (tweetstatus == 1) {
 
-                    post_model.post
-                        .findByIdAndUpdate(post_id, {
-                            $inc: {
-                                tweet_count: -1
-                            }
-                        })
-                        .exec(function(err, result) {
+                            var retweet = new post_model.post_retweet({
+                                post_id: post_id,
+                                ret_user_id: retweetuserid
+                            });
 
-                            console.log('query execuated', result);
-                            if (err) {
-                                res.send(err);
-                            };
+                            retweet.save(function(err) {
 
-                        })
+                                if (err)
+                                    res.send(err);
 
-                    res.json({
-                        message: 'Remove tweet'
-                    });
+                                post_model.post
+                                    .findByIdAndUpdate(post_id, {
+                                        $inc: {
+                                            tweet_count: 1
+                                        }
+                                    })
+                                    .exec(function(err, result) {
+
+                                        console.log('query execuated', result);
+
+                                        if (err) {
+                                            res.send(err);
+                                        };
+
+                                    })
+
+                                // res.json({
+                                //     message: 'User retweeted'
+                                // });
+                                res.render('pages/profile');
+
+                            });
+
+                        } else if (tweetstatus == 2) {
+
+                            post_model.post
+                                .findByIdAndUpdate(post_id, {
+                                    $inc: {
+                                        tweet_count: -1
+                                    }
+                                })
+                                .exec(function(err, result) {
+
+                                    console.log('query execuated', result);
+                                    if (err) {
+                                        res.send(err);
+                                    };
+
+                                })
+
+                            res.json({
+                                message: 'Remove tweet'
+                            });
+
+                        }
+                    }
 
                 }
-            }
 
+            });
         }
 
-});
-    
+    })
+
 }
 
 //Get all post

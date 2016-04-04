@@ -79,19 +79,19 @@
                                 </p>
                                 <div class="card-action">
                                     <form action="/secure/setretweet" method="post" name='retweetform' style="display: inline;">
-                                        <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
-                                        <!--                                            <a  class="btn-retweet"><i  class="fa fa-retweet rt-btn"></i>  <input type="submit" class="btn-rt_input"  value="" > <%= userdetail.tweet_count %></a>
-                                        -->
-                                        <input type="submit" class="btn-rt_input"  value="" ><span class="rt-count"> <%= userdetail.tweet_count %></span>
-                                        
-                                        
                                         <input type="hidden" name="tweetstatus" value="1">
                                         <input type="hidden" name="retweet_user_id" value="56ff9e58fd49b4341979e3e6">
                                         <input type="hidden" name="post_id" value="<%= userdetail._id %>">
                                         <!-- <input type="submit" value="Retweet" > -->
+                                        <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
+                                        <!--  <a  class="btn-retweet"><i  class="fa fa-retweet rt-btn"></i>  <input type="submit" class="btn-rt_input"  value="" > <%= userdetail.tweet_count %></a>
+                                        -->
+                                        <input type="submit" class="btn-rt_input"  value="" >
+                                        <span class="rt-count"> <%= userdetail.tweet_count %></span>
                                     </form>
                                     <a href="#" class="btn-like"><i class="fa fa-heart"></i></a>
-                                    <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'><i class="fa fa-ellipsis-h"></i></a>
+                                    <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'>
+                                        <i class="fa fa-ellipsis-h"></i></a>
                                     <!-- Dropdown Structure -->
                                     <ul id='dropdown<%= i %>' class='dropdown-content'>
                                         <li><a href="#!">Share via Direct Message</a></li>

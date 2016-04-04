@@ -1,27 +1,39 @@
 <!-- views/partials/header.ejs -->
 <div class="navbar-fixed">
   <nav class="light-blue lighten-1" role="navigation">
-    <div class="nav-wrapper container ">
-
+    <div class="nav-wrapper">
       <a href="/" class="brand-logo">Searchtrade</a>
-        <div class="input-field  sb">
-          <input id="search" type="search" required>
-          <label for="search"><i class="material-icons">search</i></label>
-          <i class="material-icons">close</i>
-        </div>
+      <div class="input-field  sb">
+        <input id="search" type="search" required>
+        <label for="search"><i class="material-icons">search</i></label>
+        <i class="material-icons">close</i>
+      </div>
       <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
       <ul class="right hide-on-med-and-down">
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/profile">profile</a></li>
-        <li><a href="/user_preferance">User Preferance</a></li>
+        <li><a href="/about">Home</a></li>
+        <li>
+          <a href="" class="dropdown-button" data-activates='dropdown555'> <img src="images/pro_01.jpg" alt="" class="circle uf-pro-p">Sudeep Makwana </a>
+          <ul id='dropdown555' class='dropdown-content'>
+            <li><a href="/user_preferance">User preferance</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Registration</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li><a href="/about">Logout</a></li>
+          </ul>
+        </li>
       </ul>
-
       <ul class="side-nav" id="mobile-demo">
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/profile">profile</a></li>
-        <li><a href="/user_preferance">User Preferance</a></li>
+        <li><a href="/about">Home</a></li>
+        <li>
+          <a href="" class="dropdown-button" data-activates='dropdown556'> <img src="images/pro_01.jpg" alt="" class="circle uf-pro-p"></a>
+          <ul id='dropdown556' class='dropdown-content'>
+            <li><a href="/user_preferance">User preferance</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Registration</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li><a href="/about">Logout</a></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </nav>

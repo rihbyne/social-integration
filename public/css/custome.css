@@ -292,13 +292,17 @@ h4.h_tag {
     width: 28px;
     background: url(../images/imageedit_1_4471377551.gif) no-repeat 0 0;
     background-size: 77px;
-    background-position: -25px -6px;
+    background-position: -25px -4px;
     border: 0;
 
 }
 .btn-rt_input:hover {
-    background-position:-25px -27px;
+    background-position:-25px -25px;
 }
+.btn-rt_done {
+    background-position:-25px -25px;
+}
+
 .rt-count{
     color: #aab8c2;
     margin-left: 2px;
@@ -326,3 +330,5 @@ h4.h_tag {
     float: none;
     margin: 8% 0 1% 18%;
 }
+
+textarea, input { outline: none; }

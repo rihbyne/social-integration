@@ -233,9 +233,9 @@ a.btn-like:hover {
 /*searchbox*/
 
 .sb {
-    max-width: 55%;
     position: absolute;
     left: 25%;
+    width: 50%;
 }
 
 /*Hashtag*/
@@ -332,3 +332,27 @@ h4.h_tag {
 }
 
 textarea, input { outline: none; }
+
+ .uf-pro-p{
+    max-width: 35px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+
+.navbar-fixed .dropdown-content li {
+    min-height: auto;
+}
+.navbar-fixed .dropdown-content li>a, .dropdown-content li>span {
+    font-size: 12px;
+    color: #000;
+    padding: 5px 15px;
+    line-height: auto;
+}
+ul#dropdown555 {
+    margin-top: 38px;
+    margin-left:0px;
+}
+nav .brand-logo {   
+    padding-left: 4%;
+}

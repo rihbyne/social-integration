@@ -233,9 +233,9 @@ a.btn-like:hover {
 /*searchbox*/
 
 .sb {
-    max-width: 55%;
     position: absolute;
     left: 25%;
+    width: 50%;
 }
 
 /*Hashtag*/
@@ -351,7 +351,7 @@ textarea, input { outline: none; }
 }
 ul#dropdown555 {
     margin-top: 38px;
-    margin-left: 49px;
+    margin-left:0px;
 }
 nav .brand-logo {   
     padding-left: 4%;

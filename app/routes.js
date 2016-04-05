@@ -84,8 +84,7 @@ app.post('/secure/setretweet', post.setretweet); 							// Set new user
 app.post('/secure/setuser', post.setuser);                                  // Set new user 
 app.post('/secure/setnewpost', post.setnewpost);                            // Set new post
 app.post('/secure/setretweet', post.setretweet);                            // Set new user 
-app.post('/secure/setlike
-    ', post.setlike);                       // Set like
+app.post('/secure/setlike', post.setlike);                       // Set like
 
 // about page 
 app.get('/about', post.getuserdetails);

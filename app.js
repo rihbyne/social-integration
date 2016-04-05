@@ -45,19 +45,12 @@ app.set('view engine', 'ejs');
 
 
 
-// require('./config/passport')(passport); // pass passport for configuration
+require('./config/passport.js')(passport); // pass passport for configuration
 
 
 // routes ======================================================================
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
-<<<<<<< HEAD
-=======
-app.post('/secure/setuser', post.setuser); 									// Set new user 
-app.post('/secure/setnewpost', post.setnewpost); 							// Set new post
-app.post('/secure/setretweet', post.setretweet); 							// Set new user 
-app.post('/secure/setlike', post.setlike);                                  // Set like
->>>>>>> a205fc400765f4556d22ae7700d370b977b7cd72
 
 // launch ======================================================================
 app.listen(port);

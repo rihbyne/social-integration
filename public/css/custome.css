@@ -356,3 +356,17 @@ ul#dropdown555 {
 nav .brand-logo {   
     padding-left: 4%;
 }
+
+
+/*alert*/
+.alert {
+    border: 0;
+        padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 0;
+    text-align: center;
+}
+.alert.alert-warning {
+    background-color: #ff5722;
+    color: rgba(255,255,255, 0.84);
+}

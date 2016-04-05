@@ -10,7 +10,7 @@
         </header>
         <div  class="container big">
             <div class="row bg-color">
-                <div class="col s12 m4 l3">
+                <div class="col s12 m12 l3">
                     <div class="card">
                         <div class="card-image waves-effect waves-block waves-light">
                             <img class="activator" src="images/CeoXGIuWQAAtrZN.JPG">
@@ -44,8 +44,14 @@
                     </div>
                 </div>
                 <!-- END left div -->
-                <div class="col s12 m4 l6">
+                <div class="col s12 m12 l6">
                     <div class="row">
+                     <p>
+                        <strong>id</strong>: <%= user._id %><br>
+                        <strong>email</strong>: <%= user.email %><br>
+                        <strong>password</strong>: <%= user.password %>
+                    </p>
+                     <!-- <a href="/logout" class="btn btn-default btn-sm">Logout</a> -->
                         <form class="col s12">
                             <div class="row">
                                 <div class="col s12">
@@ -165,7 +171,7 @@
                                             </div>
                                         </div>
                                         <!-- center div post  -->
-                                        <div class="col s12 m4 l3">
+                                        <div class="col s12 m12 l3">
                                             <a href="#">Who to follow</a>
                                             <a href="#1" class="right">view all</a>
                                             <ul class="collection">

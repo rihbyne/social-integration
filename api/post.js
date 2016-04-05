@@ -1,7 +1,8 @@
 var post_model = require('../model/post_model.js');
 var express = require('express');
 var router = express.Router(), // get an instance of the express Router
-	User = require('../model/User.js');
+	User = require('../app/models/user.js');
+
 var util = require('util');
 var async = require('async');
 
@@ -10,7 +11,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
     console.log('Show user details');
 
     var userdetails = new Array();
-    var userid = '57039cb619a54e5c221b83aa';
+    var userid = '57039d4897198e84240cdc27';
     async.parallel([
         allpost,
         tweetcount,
@@ -324,7 +325,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
                 if (err)
                     res.send(err);
-                console.log(userdata.length);
+                console.log(userdata);
                 if (userdata.length !== 0) {
 
                     var data = userdata[0]._id;

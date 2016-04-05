@@ -10,7 +10,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
     console.log('Show user details');
 
     var userdetails = new Array();
-    var userid = '56ff9d66eca54f680279d56c';
+    var userid = '5703ab7749a10fb809e9340d';
     async.parallel([
         allpost,
         tweetcount,
@@ -192,7 +192,7 @@ module.exports.getuserposts = function(req, res) { // get a post
             //use userid to find all post of users
             post_model.post
             .find({posted_by: userid})
-            .populate('posted_by')
+            .populate('posted_by like_link')
             .exec(function(err, result){
 
                 if (err)
@@ -699,6 +699,7 @@ module.exports.setlike = function(req, res) { //Create new user
     var post_id = req.body.post_id;
     var like_user_id = req.body.like_user_id;
     var likestatus = req.body.likestatus;   //
+    var like_user_name= req.body.like_user_name;
 
     console.log('Like Api hitted');
     console.log('Like Status: ', req.body.likestatus);
@@ -728,33 +729,37 @@ module.exports.setlike = function(req, res) { //Create new user
 
             if (postdata.length !== 0) {
 
-                if (postdata[0].posted_by == like_user_id) {
+                // if (postdata[0].posted_by == like_user_id) {
 
-                    console.log('You can not like on your own post');
-                    return;
-                    // res.json({
-                    //     message: 'You can not retweet on your own post'
-                    // });
+                //     console.log('You can not like on your own post');
+                //     return;
+                //     // res.json({
+                //     //     message: 'You can not retweet on your own post'
+                //     // });
 
-                } else {
+                // } else {
 
                         if (likestatus == 1) {
 
                             var likeModel = new post_model.post_like({
                                 post_id: post_id,
-                                like_user_id: like_user_id
+                                like_user_id: like_user_id,
+                                like_user_name: like_user_name
                             });
 
                             likeModel.save(function(err) {
 
                                 if (err)
                                     res.send(err);
-
+                                console.log('_id of like', likeModel._id);
                                 post_model.post
                                     .findByIdAndUpdate(post_id, {
                                         $inc: {
                                             like_count: 1
-                                        }
+                                        }, 
+                                        $push: {"like_link": likeModel._id}
+                                        
+                                        
                                     })
                                     .exec(function(err, result) {
 
@@ -815,7 +820,7 @@ module.exports.setlike = function(req, res) { //Create new user
 
                                 })
 
-                        }
+                        // }
 
                 }
             }

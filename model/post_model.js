@@ -9,6 +9,7 @@ var post = mongoose.Schema({
     post_description:                {type: String},        // post description 
     tweet_count:                     {type: Number, default: 0, min: 0},
     like_count:                      {type: Number, default: 0, min: 0},
+    like_link:                       [{type: String, ref: 'post_like'}],
     created_at:                      {type: Date, default: Date.now},          // created date
     last_update: 				     {type: Date}           // last update date
     
@@ -66,7 +67,8 @@ var post_retweet_schema = mongoose.Schema({
 var post_like_schema = mongoose.Schema({
     
     post_id:                         {type: String},        // post Id
-    like_user_id:                    {type: String}        // posted by     
+    like_user_id:                    {type: String},        // posted by  
+    like_user_name  :                {type: String}
 
 }, { versionKey: false });
 

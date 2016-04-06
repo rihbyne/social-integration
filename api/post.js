@@ -11,20 +11,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
     console.log('Show user details');
 
     var userdetails = new Array();
-    var userid = '57039d4897198e84240cdc27';
-    async.parallel([
-        allpost,
-        tweetcount,
-        trends
-    ], function (err, results){
-        //after 5 seconds, results will be [1, 2]
-        console.log(userdetails);
-
-        res.render('pages/about', {
-            userdetails : userdetails
-        });
-
-    });
+    var userid = req.user._id;
 
     function allpost(callback) {
         // save the bear and check for errors
@@ -46,29 +33,32 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     function tweetcount(callback) {
 
+        console.log('tweetcount ',userid);
+            console.log( 'string user id  '+userid.toString());
+
         post_model.post
         .aggregate([
 
-            {$match: {'posted_by': userid}}, 
+            {$match: {'posted_by': userid.toString()}}, 
+
 
             {$group: { _id: '$posted_by', count: {$sum: 1}}}
         ])
+        
         .exec(function(err, tweetcount){
 
             if (err)
                 res.send(err);
+
             // console.info(tweetcount);
-            if (tweetcount == '') {
+             if (tweetcount.length == 0) {
 
-                userdetails.tweetcount = 0;
-
-            }
-            else{
-
-                userdetails.tweetcount = tweetcount
+                tweetcount = new Array();
+                tweetcount[0] = {count:0};
 
             }
-            
+
+            userdetails.tweetcount = tweetcount            
 
         });
 
@@ -90,10 +80,25 @@ module.exports.getuserdetails = function(req, res) { // get a post
             //     message: results
             // });
 
-            callback(null, trends);
+            callback(null, userdetails);
 
         });
     }
+
+    async.parallel([
+        allpost,
+        tweetcount,
+        trends
+    ], function (err, results){
+        //after 5 seconds, results will be [1, 2]
+        console.log(userdetails);
+
+        res.render('pages/about', {
+            userdetails : userdetails,
+            user: req.user
+        });
+
+    });
 
 };
 
@@ -437,7 +442,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     };
 
-    res.redirect('http://127.0.0.1:4000/about');
+    res.redirect('/about');
 
 };
 

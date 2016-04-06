@@ -10,7 +10,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
     console.log('Show user details');
 
     var userdetails = new Array();
-    var userid = '5703ab7749a10fb809e9340d';
+    var userid = '5703ab8a49a10fb809e9340e';
     async.parallel([
         allpost,
         tweetcount,
@@ -56,18 +56,15 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
             if (err)
                 res.send(err);
-            // console.info(tweetcount);
-            if (tweetcount == '') {
 
-                userdetails.tweetcount = 0;
+            if (tweetcount.length == 0) {
 
-            }
-            else{
-
-                userdetails.tweetcount = tweetcount
+                tweetcount = new Array();
+                tweetcount[0] = {count:0};
 
             }
-            
+
+            userdetails.tweetcount = tweetcount
 
         });
 

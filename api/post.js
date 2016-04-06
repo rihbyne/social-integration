@@ -60,6 +60,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
             if (err)
                 res.send(err);
+
             // console.info(tweetcount);
              if (tweetcount.length == 0) {
 

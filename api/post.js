@@ -10,7 +10,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
     console.log('Show user details');
 
     var userdetails = new Array();
-    var userid = '5703ab8a49a10fb809e9340e';
+    var userid = '5703ab7749a10fb809e9340d';
     async.parallel([
         allpost,
         tweetcount,

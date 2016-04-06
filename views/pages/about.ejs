@@ -50,7 +50,7 @@
                         <div class="col s12">
                             <div class="row">
                                 <form method="post" action="/secure/setnewpost" name="compose_post">
-                                    <input type="hidden" name="username" value="sudeep_dk">
+                                    <input type="hidden" name="username" value="pt">
                                     <div class="input-field col s12 mb-10">
                                         <textarea id="textarea1" type="text" name="post_description" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
                                         <label for="textarea1"></label>
@@ -78,17 +78,10 @@
                                 <p><%= userdetail.post_description %>
                                 </p>
                                 <div class="card-action">
-                                    <form action="/secure/setretweet" method="post" name='retweetform' style="display: inline;">
-                                        <input type="hidden" name="tweetstatus" value="1">
-                                        <input type="hidden" name="retweet_user_id" value="56fe824fb826ec881d1f87aa">
-                                        <input type="hidden" name="post_id" value="<%= userdetail._id %>">
-                                        <!-- <input type="submit" value="Retweet" > -->
-                                        <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
-                                        <!--  <a  class="btn-retweet"><i  class="fa fa-retweet rt-btn"></i>  <input type="submit" class="btn-rt_input"  value="" > <%= userdetail.tweet_count %></a>
-                                        -->
-                                        <input type="submit" class="btn-rt_input"  value="" >
-                                        <span class="rt-count"> <%= userdetail.tweet_count %></span>
-                                    </form>
+                                    <a href="#modalrt<%= i %>" class="modal-trigger btn-retweet">
+                                        <i class="fa fa-retweet rt-btn"></i>
+                                    </a>
+                                     <span class="rt-count"> <%= userdetail.tweet_count %></span>
                                     <a href="#" class="btn-like"><i class="fa fa-heart"></i></a>
                                     <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'>
                                         <i class="fa fa-ellipsis-h"></i></a>
@@ -148,51 +141,58 @@
             <!-- right div suggesion , footer -->
         </div>
     </div>
-    <div id="modal1rt" class="modal">
-        <div class="modal-content">
-            <div class="row">
-                <form method="post" action="/secure/setnewpost" name="compose_post">
-                    <input type="hidden" name="username" value="sudeep_dk">
-                    <h5 class="center-align">Share this post to you follower..?</h5>
-                    <ul class="collection">
-                       <li class="collection-item avatar">
-                                                                <img src="images/pro_03.jpg" alt="" class="circle">
-                                                                <a href="#as"><b class="fullname">Damon Jernstad</b></a><a href="#" class="u_id">@Melissa</a><a href="#" class="post-time">3hr</a><br>
-                                                                <small>
-                                                                Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
-                                                                </small>
-                                                                <p>Tata Steel explores outright sale of UK business
-                                                                    <a href="https://t.co/vmpTXCU5Gd" class="twitter-timeline-link" target="_blank" title="http://forbesindia.com/article/special/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F">
-                                                                        <span class="invisible">http://</span>
-                                                                        <span class="js-display-url">forbesindia.com/article/specia</span>
-                                                                        <span class="invisible">l/tata-steel-explores-outright-sale-of-uk-business/42809/1#ixzz44Mjitk2F</span><span class="tco-ellipsis"><span class="invisible">&nbsp;</span>…</span></a>
-                                                                        <a href="/Tamika" class="p-atreply">
-                                                                        <s>@</s><b>Tamika</b></a>
-                                                                    </p>
-                                                                    <div class="card-action">
-                                                                        <a href="#" class="btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
-                                                                        <a href="#" class="btn-retweet tooltipped" data-position="top" data-delay="50" data-tooltip="retweet"> <i class="fa fa-retweet"></i></a>
-                                                                        <a href="#" class="btn-like tooltipped" data-position="top" data-delay="50" data-tooltip="like"><i class="fa fa-heart"></i></a>
-                                                                        <!-- Dropdown Trigger -->
-                                                                        <a class='dropdown-button right' href='#' data-activates='dropdown3'><i class="fa fa-ellipsis-h"></i></a>
-                                                                        <!-- Dropdown Structure -->
-                                                                        <ul id='dropdown3' class='dropdown-content'>
-                                                                            <li><a href="#!">Share via Direct Message</a></li>
-                                                                            <li><a href="#!">Copy link to Tweet</a></li>
-                                                                            <li><a href="#!">Embed Tweet</a></li>
-                                                                            <li><a href="#!">Pin to your profile page</a></li>
-                                                                            <li><a href="#!">Unpin from profile page</a></li>
-                                                                            <li><a href="#!">Delete Tweet</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </li>
-                    </ul>
-                    <a class="waves-effect waves-light btn right"><i class="material-icons left">repeat</i>Retweet</a>
-                
-            </form>
+
+    <% userdetails.allpost.forEach(function(userdetail, i){ %>
+        <div id="modalrt<%= i %>" class="modal">
+            <div class="modal-content">
+                <div class="row">
+                    
+                      
+                        <h5 class="center-align">Share this post to you follower..?</h5>
+                        <ul class="collection">
+                           <li class="collection-item avatar">
+                            <img src="images/pro_03.jpg" alt="" class="circle">
+                            <a href="#as"><b class="fullname">Damon Jernstad</b></a><a href="#" class="u_id">@Melissa</a><a href="#" class="post-time">3hr</a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <p><%= userdetail.post_description %> </p>
+                                <div class="card-action">
+                                    <a href="#" class="btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
+                                    <a href="#" class="btn-retweet tooltipped" data-position="top" data-delay="50" data-tooltip="retweet"> <i class="fa fa-retweet"></i></a>
+                                    <a href="#" class="btn-like tooltipped" data-position="top" data-delay="50" data-tooltip="like"><i class="fa fa-heart"></i></a>
+                                    <!-- Dropdown Trigger -->
+                                    <a class='dropdown-button right' href='#' data-activates='dropdown3'><i class="fa fa-ellipsis-h"></i></a>
+                                    <!-- Dropdown Structure -->
+                                    <ul id='dropdown3' class='dropdown-content'>
+                                        <li><a href="#!">Share via Direct Message</a></li>
+                                        <li><a href="#!">Copy link to Tweet</a></li>
+                                        <li><a href="#!">Embed Tweet</a></li>
+                                        <li><a href="#!">Pin to your profile page</a></li>
+                                        <li><a href="#!">Unpin from profile page</a></li>
+                                        <li><a href="#!">Delete Tweet</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                        <form action="/secure/setretweet" method="post" name='retweetform' style="display: inline;">
+                             <input type="hidden" name="tweetstatus" value="1">
+                             <input type="hidden" name="retweet_user_id" value="56fe824fb826ec881d1f87aa">
+                             <input type="hidden" name="post_id" value="<%= userdetail._id %>">
+                             <!-- <input type="submit" value="Retweet" > -->
+                             <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
+                             <!--  <a  class="btn-retweet"><i  class="fa fa-retweet rt-btn"></i>  <input type="submit" class="btn-rt_input"  value="" > <%= userdetail.tweet_count %></a>
+                             -->
+                             <input type="submit" class="btn-rt_input"  value="repeat Retweet" >
+                             <span class="rt-count"> <%= userdetail.tweet_count %></span>
+                        </form>
+                        <!-- <a class="waves-effect waves-light btn right"><i class="material-icons left">repeat</i>Retweet</a> -->
+                    
+                    
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    <% }) %>
 <footer>
     <% include ../partials/footer %>
 </footer>

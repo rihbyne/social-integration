@@ -11,7 +11,8 @@ module.exports.getuserdetails = function(req, res) { // get a post
     console.log('Show user details');
 
     var userdetails = new Array();
-    var userid = '57039d4897198e84240cdc27';
+    var userid = req.user._id;
+
     async.parallel([
         allpost,
         tweetcount,
@@ -21,7 +22,8 @@ module.exports.getuserdetails = function(req, res) { // get a post
         console.log(userdetails);
 
         res.render('pages/about', {
-            userdetails : userdetails
+            userdetails : userdetails,
+            user: req.user
         });
 
     });
@@ -41,11 +43,12 @@ module.exports.getuserdetails = function(req, res) { // get a post
        
         }); 
     
-        callback(null, userdetails);
+        callback(null, userdetails, userid);
     }
 
     function tweetcount(callback) {
 
+        console.log('tweetcount ',userid);
         post_model.post
         .aggregate([
 
@@ -58,17 +61,14 @@ module.exports.getuserdetails = function(req, res) { // get a post
             if (err)
                 res.send(err);
             // console.info(tweetcount);
-            if (tweetcount == '') {
+             if (tweetcount.length == 0) {
 
-                userdetails.tweetcount = 0;
-
-            }
-            else{
-
-                userdetails.tweetcount = tweetcount
+                tweetcount = new Array();
+                tweetcount[0] = {count:0};
 
             }
-            
+
+            userdetails.tweetcount = tweetcount            
 
         });
 
@@ -437,7 +437,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     };
 
-    res.redirect('http://127.0.0.1:4000/about');
+    res.redirect('/about');
 
 };
 

@@ -2,7 +2,7 @@
 
 var express  = require('express');
 var app      = express();
-var port     = process.env.PORT || 4000;
+var port     = process.env.PORT || 3500;
 
 
 var mongo               = require('./config/mongo.js');

@@ -17,9 +17,9 @@
                         </div>
                         <div class="card-content">
                             <img src="images/pro_01.jpg" alt="" class="circle user_pro_p">
-                            <span class="card-title activator grey-text text-darken-4">Sudeep B Makwana<i class="material-icons right">more_vert</i></span>
+                            <span class="card-title activator grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%><i class="material-icons right">more_vert</i></span>
                             <p></p>
-                            <p><a href="#">@sudeep_dk</a></p>
+                            <p><a href="#">@<%= user.username %></a></p>
                         </div>
                         <div class="card-reveal">
                             <span class="card-title grey-text text-darken-4">Sudeep B Makwana<i class="material-icons right">close</i></span>
@@ -50,7 +50,7 @@
                         <div class="col s12">
                             <div class="row">
                                 <form method="post" action="/secure/setnewpost" name="compose_post">
-                                    <input type="hidden" name="username" value="sudeep_dk">
+                                    <input type="hidden" name="username" value="<%= user.username %>">
                                     <div class="input-field col s12 mb-10">
                                         <textarea id="textarea1" type="text" name="post_description" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
                                         <label for="textarea1"></label>
@@ -74,7 +74,7 @@
                             <% userdetails.allpost.forEach(function(userdetail, i){ %>
                             <li class="collection-item avatar">
                                 <img src="images/pro_01.jpg" alt="" class="circle">
-                                <a href=""><b class="fullname">Sudeep Makwana</b></a><a href="#" class="u_id">@sudeep_dk</a><a href="#" class="post-time"><%= userdetail.created_at %></a><br>
+                                <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time"><%= userdetail.created_at %></a><br>
                                 <p><%= userdetail.post_description %>
                                 </p>
                                 <div class="card-action">

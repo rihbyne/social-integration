@@ -87,7 +87,7 @@ app.post('/secure/setretweet', post.setretweet);                            // S
 app.post('/secure/setlike', post.setlike);                       // Set like
 
 // about page 
-app.get('/about', post.getuserdetails);
+app.get('/about',isLoggedIn, post.getuserdetails);
 
 
     // =====================================
@@ -145,16 +145,6 @@ app.get('/about', post.getuserdetails);
             user : req.user // get the user out of session and pass to template
         });
     });
-
-    // about page 
-    app.get('/about', function(req,res){
-    // app.get('/about',  function(req,res){
-        res.render('pages/about.ejs', {
-            user : req.user // get the user out of session and pass to template
-        });
-    });
-
-
 
     // =====================================
     // LOGOUT ==============================

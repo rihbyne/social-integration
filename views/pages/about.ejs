@@ -22,7 +22,7 @@
                             <p><a href="#">@<%= user.username %></a></p>
                         </div>
                         <div class="card-reveal">
-                            <span class="card-title grey-text text-darken-4">Sudeep B Makwana<i class="material-icons right">close</i></span>
+                            <span class="card-title grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%></b><i class="material-icons right">close</i></span>
                             <p>I strongly believe that we can change our country's fate we r the future of our country.Full stack programmer. <a href="http://sudeepdk.com ">http://sudeepdk.com</a></p>
                         </div>
                         <div class="card-action t-count">
@@ -177,7 +177,7 @@
                 </ul>
                 <form action="/secure/setretweet" method="post" name='retweetform' style="display: inline;">
                     <input type="hidden" name="tweetstatus" value="1">
-                    <input type="hidden" name="retweet_user_id" value="56fe824fb826ec881d1f87aa">
+                    <input type="hidden" name="retweet_user_id" value="<%= userdetail._id %>">
                     <input type="hidden" name="post_id" value="<%= userdetail._id %>">
                     <!-- <input type="submit" value="Retweet" > -->
                     <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>

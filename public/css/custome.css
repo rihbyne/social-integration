@@ -144,7 +144,7 @@ ul.collection.social_post {
 .card-action a.btn-retweet,
 .card-action a.btn-like {
     color: #aab8c2;
-    margin-right: 8%;
+    margin-right: 3%;
     padding-top: 5px;
     display: inline-block;
 }
@@ -275,8 +275,9 @@ h4.h_tag {
     position: absolute;
     background-color: #fff;
     height: 35px;
-    width: 31px;
+    width: 22px;
     padding-top: 9px;
+        bottom: 2px;
 }
 .btn-rt_input span{
     margin-right: 15px;

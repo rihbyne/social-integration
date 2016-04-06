@@ -13,21 +13,6 @@ module.exports.getuserdetails = function(req, res) { // get a post
     var userdetails = new Array();
     var userid = req.user._id;
 
-    async.parallel([
-        allpost,
-        tweetcount,
-        trends
-    ], function (err, results){
-        //after 5 seconds, results will be [1, 2]
-        console.log(userdetails);
-
-        res.render('pages/about', {
-            userdetails : userdetails,
-            user: req.user
-        });
-
-    });
-
     function allpost(callback) {
         // save the bear and check for errors
 
@@ -43,19 +28,23 @@ module.exports.getuserdetails = function(req, res) { // get a post
        
         }); 
     
-        callback(null, userdetails, userid);
+        callback(null, userdetails);
     }
 
     function tweetcount(callback) {
 
         console.log('tweetcount ',userid);
+            console.log( 'string user id  '+userid.toString());
+
         post_model.post
         .aggregate([
 
-            {$match: {'posted_by': userid}}, 
+            {$match: {'posted_by': userid.toString()}}, 
+
 
             {$group: { _id: '$posted_by', count: {$sum: 1}}}
         ])
+        
         .exec(function(err, tweetcount){
 
             if (err)
@@ -91,10 +80,25 @@ module.exports.getuserdetails = function(req, res) { // get a post
             //     message: results
             // });
 
-            callback(null, trends);
+            callback(null, userdetails);
 
         });
     }
+
+    async.parallel([
+        allpost,
+        tweetcount,
+        trends
+    ], function (err, results){
+        //after 5 seconds, results will be [1, 2]
+        console.log(userdetails);
+
+        res.render('pages/about', {
+            userdetails : userdetails,
+            user: req.user
+        });
+
+    });
 
 };
 

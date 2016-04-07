@@ -12,7 +12,14 @@
       <ul class="right hide-on-med-and-down">
         <li><a href="/about">Home</a></li>
         <li>
-          <a href="" class="dropdown-button" data-activates='dropdown555'> <img src="images/pro_01.jpg" alt="" class="circle uf-pro-p"><%= user.first_name %> <%= user.last_name%></b> </a>
+          <a href="" class="dropdown-button" data-activates='dropdown555'> <img src="images/pro_01.jpg" alt="" class="circle uf-pro-p"> 
+
+            <%# if (user.first_name) { %>
+              <%# user.first_name%>
+            <%# } %>
+
+
+         </a>
           <ul id='dropdown555' class='dropdown-content'>
             <li><a href="/user_preferance">User preferance</a></li>
             <li><a href="/login">Login</a></li>

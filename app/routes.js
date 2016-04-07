@@ -21,7 +21,7 @@ app.get('/user_preferance', function(req, res) {
     res.render('pages/user_preferance');
 });
 
-app.get('/', function(req, res) {
+app.get('/', isLoggedIn, function(req, res) {
     // save the bear and check for errors
     var drinks = [
         { name: 'Bloody Mary', drunkness: 3 },
@@ -32,7 +32,8 @@ app.get('/', function(req, res) {
 
     res.render('pages/index', {
         drinks: drinks,
-        tagline: tagline
+        tagline: tagline,
+         user : req.user,
     });
 
 });
@@ -90,12 +91,6 @@ app.post('/secure/setlike', post.setlike);                       // Set like
 app.get('/about',isLoggedIn, post.getuserdetails);
 
 
-    // =====================================
-    // HOME PAGE (with login links) ========
-    // =====================================
-    app.get('/', function(req, res) {
-        res.render('index.ejs'); // load the index.ejs file
-    });
 
     // =====================================
     // LOGIN ===============================
@@ -140,18 +135,26 @@ app.get('/about',isLoggedIn, post.getuserdetails);
     // =====================================
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
-    app.get('/profile', isLoggedIn, function(req, res) {
+    app.get('/profile', isLoggedIn, post.getuserdetails , function(req, res) {
         res.render('pages/profile.ejs', {
+            userdetails : userdetails,
             user : req.user // get the user out of session and pass to template
         });
     });
+
+    // app.get('/about', isLoggedIn, post.getuserdetails , function(req, res) {
+    //     res.render('pages/about.ejs', {
+    //            userdetails : userdetails,
+    //         user : req.user // get the user out of session and pass to template
+    //     });
+    // });
 
     // =====================================
     // LOGOUT ==============================
     // =====================================+
     app.get('/logout', function(req, res) {
         req.logout();
-        res.redirect('/');
+        res.redirect('/login');
     });
 
 
@@ -166,5 +169,5 @@ function isLoggedIn(req, res, next) {
         return next();
 
     // if they aren't redirect them to the home page
-    res.redirect('/');
+    res.redirect('/login');
 }

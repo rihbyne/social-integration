@@ -1,7 +1,10 @@
 var post_model = require('../model/post_model.js');
 var express = require('express');
 var router = express.Router(), // get an instance of the express Router
-	User = require('../app/models/user.js');
+	User = require('../app/models/user.js'),
+    followers_data = require('../app/models/model.followers'),
+    followers_data = require('../app/models/model.following');
+
 
 var util = require('util');
 var async = require('async');
@@ -97,10 +100,12 @@ module.exports.getuserdetails = function(req, res) { // get a post
             userdetails : userdetails,
             user: req.user
         });
-
+       // res.send(userdetails, req.user);
+       // res.end();
     });
 
 };
+
 
 //Get all post
 module.exports.getpost = function(req, res) { // get a post 

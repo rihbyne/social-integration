@@ -63,10 +63,13 @@
                                             <li><a href="#modal1rt" class="modal-trigger btn-floating red"><i class="material-icons">insert_chart</i></a></li>
                                             <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
                                             <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
-                                            <li><a ><i class="material-icons btn-ico">library_add
+                                           
+                                            <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
+                                            </button></li>
+<!--                                             <li><a ><i class="material-icons btn-ico">library_add
                                             </i> <input class="btn-floating yellow darken-1"  type="submit" value=''></a>
                                         </li>
-                                    </ul>
+ -->                                    </ul>
                                 </div>
                             </form>
                         </div>
@@ -157,13 +160,13 @@
                         Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
                         </small>
                         <p><%= userdetail.post_description %> </p>
-                        <div class="card-action">
+               <!--          <div class="card-action">
                             <a href="#" class="btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
                             <a href="#" class="btn-retweet tooltipped" data-position="top" data-delay="50" data-tooltip="retweet"> <i class="fa fa-retweet"></i></a>
                             <a href="#" class="btn-like tooltipped" data-position="top" data-delay="50" data-tooltip="like"><i class="fa fa-heart"></i></a>
-                            <!-- Dropdown Trigger -->
+                             Dropdown Trigger -
                             <a class='dropdown-button right' href='#' data-activates='dropdown3'><i class="fa fa-ellipsis-h"></i></a>
-                            <!-- Dropdown Structure -->
+                             Dropdown Structure -
                             <ul id='dropdown3' class='dropdown-content'>
                                 <li><a href="#!">Share via Direct Message</a></li>
                                 <li><a href="#!">Copy link to Tweet</a></li>
@@ -172,7 +175,7 @@
                                 <li><a href="#!">Unpin from profile page</a></li>
                                 <li><a href="#!">Delete Tweet</a></li>
                             </ul>
-                        </div>
+                        </div> -->
                     </li>
                 </ul>
                 <form action="/secure/setretweet" method="post" name='retweetform' style="display: inline;">
@@ -180,11 +183,11 @@
                     <input type="hidden" name="retweet_user_id" value="<%= userdetail._id %>">
                     <input type="hidden" name="post_id" value="<%= userdetail._id %>">
                     <!-- <input type="submit" value="Retweet" > -->
-                    <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a>
+                    <!-- <a href="#" class="btn-reply"><i class="fa fa-reply"></i></a> -->
                     <!--  <a  class="btn-retweet"><i  class="fa fa-retweet rt-btn"></i>  <input type="submit" class="btn-rt_input"  value="" > <%= userdetail.tweet_count %></a>
                     -->
-                    <input type="submit" class="btn-rt_input"  value="repeat Retweet" >
-                    <span class="rt-count"> <%= userdetail.tweet_count %></span>
+                    <button  type="submit" class="waves-effect waves-light light-blue lighten-1 btn right"  value="" ><i class="material-icons left">repeat</i>Retweet</button>
+                    <!-- <span class="rt-count"> <%= userdetail.tweet_count %></span> -->
                 </form>
                 
                 

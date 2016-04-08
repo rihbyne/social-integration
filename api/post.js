@@ -107,6 +107,25 @@ module.exports.getuserdetails = function(req, res) { // get a post
 };
 
 
+module.exports.Trendsdk = function(req, res) {
+        console.log('dktrend api hitted')
+        post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
+
+            // console.log(results);
+
+            if (err) {
+                res.send(err);
+            };
+            var TD = results
+            res.json({
+                trends_data: results
+            });
+         console.log('data' + TD);   
+    });
+};
+
+
+
 //Get all post
 module.exports.getpost = function(req, res) { // get a post 
     console.log('Show all post');
@@ -444,6 +463,7 @@ module.exports.setnewpost = function(req, res) { // create a post
             if (err)
                 res.send(err);
         });
+    res.redirect('/about');
 
     };
 
@@ -646,7 +666,7 @@ module.exports.setretweet = function(req, res) { //Create new user
                                 // res.json({
                                 //     message: 'User retweeted'
                                 // });
-                                res.render('pages/profile');
+                                res.redirect('/about');
 
                             });
 

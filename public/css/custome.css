@@ -373,3 +373,10 @@ nav .brand-logo {
     background-color: #ff5722;
     color: rgba(255,255,255, 0.84);
 }
+
+
+/*modal */
+
+.modal-content .collection {
+    border: none;
+}

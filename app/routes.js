@@ -135,19 +135,11 @@ app.get('/about',isLoggedIn, post.getuserdetails);
     // =====================================
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
-    app.get('/profile', isLoggedIn, post.getuserdetails , function(req, res) {
+    app.get('/profile', isLoggedIn,  function(req, res) {
         res.render('pages/profile.ejs', {
-            userdetails : userdetails,
             user : req.user // get the user out of session and pass to template
         });
     });
-
-    // app.get('/about', isLoggedIn, post.getuserdetails , function(req, res) {
-    //     res.render('pages/about.ejs', {
-    //            userdetails : userdetails,
-    //         user : req.user // get the user out of session and pass to template
-    //     });
-    // });
 
     // =====================================
     // LOGOUT ==============================

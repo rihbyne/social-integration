@@ -30,7 +30,16 @@ app.use(expressValidator());
 
 
 // required for passport
-app.use(session({ secret: 'searchtrade' })); // session secret
+//app.use(session({ secret: 'searchtrade' })); // session secret
+
+ app.use(cookieParser());
+  app.use(session({
+      secret: 'searchtrade',
+//      store: new MongoStore({db: 'user_session'}),
+//	  store: new MongoStore({db: 'user_session'}),
+      resave: true,
+      saveUninitialized: true
+  }));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session

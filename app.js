@@ -10,7 +10,8 @@ var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
 var post 		        = require('./api/post.js');  
-var mention                = require('./api/mention.js');  
+var follow              = require('./api/follow-following.js');  
+var mention             = require('./api/mention.js');  
 var path                = require('path');  
 
 
@@ -82,27 +83,31 @@ app.get('/register', function(req, res) {
 });
 
 
-app.get('/secure/getpost', post.getpost); 									// Get all post
+app.get('/getpost', post.getpost); 									// Get all post
 
-app.get('/secure/getpost/post/:post_title', post.getsinglepost); 			// Get post by post title
+app.get('/getpost/post/:post_title', post.getsinglepost); 			// Get post by post title
 
-app.get('/secure/getpost/:user', post.getuserposts); 						// Get post by username
-app.get('/secure/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
-app.get('/secure/getpost/:user/:post_id', post.getuserpost); 				// Get single post of user
+app.get('/getpost/:user', post.getuserposts); 						// Get post by username
+app.get('/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
+app.get('/getpost/:user/:post_id', post.getuserpost); 				// Get single post of user
 
-app.get('/secure/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
+app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
-app.get('/secure/hashtag/count', post.allhashtagcount); 			    	// Get the count of all hashtag
-app.get('/secure/hashtag/count/:hashtag', post.hashtagcount); 			 	// Get the count of specifiedhashtag
-app.post('/secure/hashtags', post.gethashtag); 								// Get all hashtag keyword 		
-app.post('/secure/gethashtaglist', post.gethashtaglist);                              // Get all hashtag keyword          
+app.get('/hashtag/count', post.allhashtagcount); 			    	// Get the count of all hashtag
+app.get('/hashtag/count/:hashtag', post.hashtagcount); 			 	// Get the count of specifiedhashtag
+app.post('/hashtags', post.gethashtag); 								// Get all hashtag keyword 		
+app.post('/gethashtaglist', post.gethashtaglist);                              // Get all hashtag keyword          
 	
-app.get('/secure/hashtags/:hashtag', post.gethashposts);					// Get post from hashtag
+app.get('/hashtags/:hashtag', post.gethashposts);					// Get post from hashtag
 
-app.post('/secure/setuser', post.setuser); 									// Set new user 
-app.post('/secure/setnewpost', post.setnewpost); 							// Set new post
-app.post('/secure/setretweet', post.setretweet); 							// Set new user 
-app.post('/secure/setlike', post.setlike);                                  // Set like
+app.post('/setuser', post.setuser); 									// Set new user 
+app.post('/setnewpost', post.setnewpost); 							// Set new post
+app.post('/setretweet', post.setretweet); 							// Set new user 
+app.post('/setlike', post.setlike);                                  // Set like
+app.post('/setfollower', follow.setfollower);                          // Set follower
+app.get('/:user_name/followers', follow.getfollower);                          // Set follower
+// app.post('/:user_name/follower/:unlink_follower', follow.unlink_follower);                          // Set follower
+
 
 server.listen(4000, function(){
 	console.log('Connected To server at port 4000 with socket');

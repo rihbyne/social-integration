@@ -189,7 +189,7 @@ module.exports.getuserposts = function(req, res) { // get a post
             //use userid to find all post of users
             post_model.post
             .find({posted_by: userid})
-            .populate('posted_by like_link')
+            .populate('posted_by like_by_users')
             .exec(function(err, result){
 
                 if (err)
@@ -433,7 +433,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     };
 
-    res.redirect('http://127.0.0.1:4000/about');
+    res.redirect('/about');
 
 };
 
@@ -559,10 +559,10 @@ module.exports.setretweet = function(req, res) { //Create new user
 
     var post_id = req.body.post_id;
     var retweetuserid = req.body.retweet_user_id;
-    var tweetstatus = req.body.tweetstatus;
+    // var tweetstatus = req.body.tweetstatus;
 
     console.log('Retweet Api hitted');
-    console.log(req.body.tweetstatus);
+    // console.log(req.body.tweetstatus);
     console.log(req.body.post_id);
     console.log(req.body.retweet_user_id);
 
@@ -573,13 +573,46 @@ module.exports.setretweet = function(req, res) { //Create new user
 
         if (retweetdata.length !== 0) {
 
-            console.log('You can not retweet on your own post');
-            return;
+            console.log('You can not retweet twice for same post');
 
-            res.json({
-                message: 'You can not retweet twice for same post'
-            });
-           
+            post_model.post_retweet
+            .find({$and: [{post_id : post_id}, {retweet_user_id : retweet_user_id}]})
+            .remove()
+            .exec(err, function(err, result) {
+
+                console.log('Retweet document removed');
+               
+                if (err) {
+                    res.send(err);
+                    return;
+                };
+
+                if (result !== '') {
+
+                    post_model.post
+                    .findByIdAndUpdate(post_id, {
+                        $inc: {
+                            tweet_count: -1
+                        }
+                    })
+                    .exec(function(err, result) {
+
+                        console.log('Retweet count decrease by 1', result);
+
+                        if (err) {
+                            res.send(err);
+                        };
+
+                    })
+                
+                }
+
+            })
+
+            return;
+            // res.json({
+            //     message: 'Remove tweet'
+            // });
 
         } else {
 
@@ -593,76 +626,51 @@ module.exports.setretweet = function(req, res) { //Create new user
 
                     if (postdata[0].posted_by == retweetuserid) {
 
-                        console.log('You can not retweet on your own post');
-                        return;
-                        // res.json({
-                        //     message: 'You can not retweet on your own post'
-                        // });
+                        console.log('You can not tweet on your own post');
+                        return;                        
 
-                    } else {
+                    } 
+                    else{
 
-                        if (tweetstatus == 1) {
+                        var retweet = new post_model.post_retweet({
+                            post_id: post_id,
+                            ret_user_id: retweetuserid
+                        });
 
-                            var retweet = new post_model.post_retweet({
-                                post_id: post_id,
-                                ret_user_id: retweetuserid
-                            });
+                        retweet.save(function(err) {
 
-                            retweet.save(function(err) {
-
-                                if (err)
-                                    res.send(err);
-
-                                post_model.post
-                                    .findByIdAndUpdate(post_id, {
-                                        $inc: {
-                                            tweet_count: 1
-                                        }
-                                    })
-                                    .exec(function(err, result) {
-
-                                        console.log('query execuated', result);
-
-                                        if (err) {
-                                            res.send(err);
-                                        };
-
-                                    })
-
-                                // res.json({
-                                //     message: 'User retweeted'
-                                // });
-                                res.render('pages/profile');
-
-                            });
-
-                        } else if (tweetstatus == 2) {
+                            if (err)
+                                res.send(err);
 
                             post_model.post
                                 .findByIdAndUpdate(post_id, {
                                     $inc: {
-                                        tweet_count: -1
+                                        tweet_count: 1
                                     }
                                 })
                                 .exec(function(err, result) {
 
-                                    console.log('query execuated', result);
+                                    console.log('User retweeted\n', result);
+
                                     if (err) {
                                         res.send(err);
                                     };
 
                                 })
 
-                            res.json({
-                                message: 'Remove tweet'
-                            });
+                            // res.json({
+                            //     message: 'User retweeted'
+                            // });
+                            res.render('pages/profile');
 
-                        }
+                        });
+
                     }
 
                 }
 
             });
+        
         }
 
     })
@@ -695,14 +703,15 @@ module.exports.setlike = function(req, res) { //Create new user
 
     var post_id = req.body.post_id;
     var like_user_id = req.body.like_user_id;
-    var likestatus = req.body.likestatus;   //
+    // var likestatus = req.body.likestatus;  
     var like_user_name= req.body.like_user_name;
 
     console.log('Like Api hitted');
-    console.log('Like Status: ', req.body.likestatus);
+    // console.log('Like Status: ', req.body.likestatus);
     console.log('Post Id: ', req.body.post_id);
     console.log('Like User Id: ', req.body.like_user_id);
 
+    /*This case will run for the second time -- To remove like*/
     post_model.post_like.find({
         post_id: post_id,
         like_user_id: like_user_id
@@ -715,115 +724,111 @@ module.exports.setlike = function(req, res) { //Create new user
             // res.json({
             //     message: 'You can not like twice for same post'
             // });
-           likestatus = 2; // chanaged lke status
+            post_model.post_like
+            .find({$and: [{post_id : post_id}, {like_user_id : like_user_id}]})
+            .remove()
+            .exec(err, function(err, result) {
+
+                console.log('Unlike document removed');
+               
+                if (err) {
+                    res.send(err);
+                    return;
+                };
+
+                if (result !== '') {
+
+                    post_model.post
+                    .findByIdAndUpdate(post_id, {
+                        $inc: {
+                            like_count: -1
+                        }
+                    })
+                    .exec(function(err, result) {
+
+                        console.log('Like count decrease by 1\n', result);
+                       
+                        if (err) {
+                            res.send(err);
+                            return;
+                        };
+
+                        res.json({
+                             message: 'Remove Like'
+                        });
+                        
+                    })
+                    
+                };
+
+            })
+  
         } 
+        else{
+        /*This case will run for the first time -- To set like*/
+            post_model.post.find({
+                _id: post_id
+            }).exec(function(err, postdata) {
 
-        post_model.post.find({
-            _id: post_id
-        }).exec(function(err, postdata) {
+                console.log('postdata\n', postdata);
+                console.log(postdata.length);
+                if (postdata.length !== 0) {
 
-            console.log('postdata\n', postdata);
+                        // if (postdata[0].posted_by == like_user_id) {
 
-            if (postdata.length !== 0) {
+                        //     console.log('You can not like on your own post');
+                        //     return;
+                        //     // res.json({
+                        //     //     message: 'You can not retweet on your own post'
+                        //     // });
 
-                // if (postdata[0].posted_by == like_user_id) {
+                        // } else {
 
-                //     console.log('You can not like on your own post');
-                //     return;
-                //     // res.json({
-                //     //     message: 'You can not retweet on your own post'
-                //     // });
 
-                // } else {
+                    var likeModel = new post_model.post_like({
+                        post_id: post_id,
+                        like_user_id: like_user_id,
+                        like_user_name: like_user_name
+                    });
 
-                        if (likestatus == 1) {
+                    likeModel.save(function(err) {
 
-                            var likeModel = new post_model.post_like({
-                                post_id: post_id,
-                                like_user_id: like_user_id,
-                                like_user_name: like_user_name
-                            });
+                        if (err)
+                            res.send(err);
+                        console.log('_id of like', likeModel._id);
+                        post_model.post
+                            .findByIdAndUpdate(post_id, {
+                                $inc: {
+                                    like_count: 1
+                                }, 
+                                $push: {"like_by_users": likeModel._id}
+                                
+                                
+                            })
+                            .exec(function(err, result) {
 
-                            likeModel.save(function(err) {
+                                console.log('New like added and modified like count \n', result);
 
-                                if (err)
+                                if (err) {
                                     res.send(err);
-                                console.log('_id of like', likeModel._id);
-                                post_model.post
-                                    .findByIdAndUpdate(post_id, {
-                                        $inc: {
-                                            like_count: 1
-                                        }, 
-                                        $push: {"like_link": likeModel._id}
-                                        
-                                        
-                                    })
-                                    .exec(function(err, result) {
+                                };
 
-                                        console.log('New like added and modified like count \n', result);
+                            })
 
-                                        if (err) {
-                                            res.send(err);
-                                        };
+                        // res.json({
+                        //     message: 'User retweeted'
+                        // });
+                        res.render('pages/profile');
 
-                                    })
-
-                                // res.json({
-                                //     message: 'User retweeted'
-                                // });
-                                res.render('pages/profile');
-
-                            });
-
-                        } else if (likestatus == 2) {
-                              
-                                post_model.post_like
-                                .find({$and: [{post_id : post_id}, {like_user_id : like_user_id}]})
-                                .remove()
-                                .exec(err, function(err, result) {
-
-                                    console.log('Unlike document removed');
-                                   
-                                    if (err) {
-                                        res.send(err);
-                                        return;
-                                    };
-
-                                    if (result !== '') {
-
-                                        post_model.post
-                                        .findByIdAndUpdate(post_id, {
-                                            $inc: {
-                                                like_count: -1
-                                            }
-                                        })
-                                        .exec(function(err, result) {
-
-                                            console.log('Like count decrease by 1', result);
-                                           
-                                            if (err) {
-                                                res.send(err);
-                                                return;
-                                            };
-
-                                            res.json({
-                                                 message: 'Remove Like'
-                                            });
-
-                                        })
-                                    
-                                    };
-
-
-                                })
-
-                        // }
+                    });
 
                 }
-            }
 
-        });
-        
+            });
+            
+
+        }
+    
     });
 
 }

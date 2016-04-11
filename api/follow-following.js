@@ -1,4 +1,4 @@
-var post_followers = require('../app/models/model.followers.js');
+var user_followers = require('../app/models/model.followers.js');
 var users = require('../model/User.js');
 
 var util = require('util');
@@ -17,8 +17,6 @@ module.exports.getfollower = function(req, res) {
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
-
-    
 
     users
     .find({username: user_name})
@@ -121,16 +119,20 @@ module.exports.setfollower = function(req, res) {
 
 }
 
-// module.exports.unlink_follower = function(req, res){
+module.exports.unlink_follower = function(req, res){
 
-// console.info('Unlink');
+    console.info('Unlink api called');
     
-//     var user_name = req.body.user_name;
-//     var unlink_follower = req.body.unlink_follower;
+    var user_name = req.body.user_name;
+    var unlink_follower = req.body.unlink_follower;
 
-//     post_followers
-//     .find($and:[{user: user_id}, {follower: unlink_follower}])
-//     .remove().exec(funtion(err, result));
+    user_followers
+    .find({$and:[{user: user_id}, {follower: unlink_follower}]})
+    .remove().exec(function(err, result){
 
-//     console.info('Removed follower');
-// }
+        console.info('Removed follower');    
+    
+    });
+
+    
+}

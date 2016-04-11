@@ -106,7 +106,8 @@ app.post('/setretweet', post.setretweet); 							// Set new user
 app.post('/setlike', post.setlike);                                  // Set like
 app.post('/setfollower', follow.setfollower);                          // Set follower
 app.get('/:user_name/followers', follow.getfollower);                          // Set follower
-// app.post('/:user_name/follower/:unlink_follower', follow.unlink_follower);                          // Set follower
+app.post('/:user_name/follower/:unlink_follower', follow.unlink_follower);                          // Set follower
+app.post('/unlink_follower', follow.unlink_follower);                          // Set follower
 
 
 server.listen(4000, function(){

@@ -8,7 +8,7 @@ var user_followers_schema = mongoose.Schema({
             type: String
         },
         follower_since: {
-            type: Date, Default: Date.now()
+            type: Date, default: Date.now
         }
     },
     {

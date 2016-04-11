@@ -104,12 +104,17 @@ app.post('/setuser', post.setuser); 									// Set new user
 app.post('/setnewpost', post.setnewpost); 							// Set new post
 app.post('/setretweet', post.setretweet); 							// Set new user 
 app.post('/setlike', post.setlike);                                  // Set like
+
 app.post('/setfollower', follow.setfollower);                          // Set follower
-app.get('/:user_name/followers', follow.getfollower);                          // Set follower
-app.post('/:user_name/follower/:unlink_follower', follow.unlink_follower);                          // Set follower
+app.get('/:user_name/follower', follow.getfollower);                          // Set follower
 app.post('/unlink_follower', follow.unlink_follower);                          // Set follower
+
+app.post('/setfollowing', follow.setfollowing);                          // Set follower
+app.get('/:user_name/following', follow.getFollowing);                          // Set follower
+app.post('/unlink_following', follow.unlink_following);                          // Set follower
 
 
 server.listen(4000, function(){
 	console.log('Connected To server at port 4000 with socket');
 });
+

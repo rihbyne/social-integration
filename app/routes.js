@@ -2,6 +2,7 @@ var notification        = require('../api/notification.js');
 var mailer              = require('../api/mail.js');                     // Mail Functionality
 var post                = require('../api/post.js');  
 var mention                = require('../api/mention.js');  
+var follow              = require('../api/follow-following.js');  
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -86,6 +87,15 @@ app.post('/secure/setuser', post.setuser);                                  // S
 app.post('/secure/setnewpost', post.setnewpost);                            // Set new post
 app.post('/secure/setretweet', post.setretweet);                            // Set new user 
 app.post('/secure/setlike', post.setlike);                       // Set like
+
+                             
+app.post('/setfollower', follow.setfollower);                          // Set follower
+app.get('/:user_name/followers', follow.getfollower);                          // Set follower
+app.post('/:user_name/follower/:unlink_follower', follow.unlink_follower);                          // Set follower
+app.post('/unlink_follower', follow.unlink_follower);                          // Set follower
+
+
+
 
 // about page 
 app.get('/about',isLoggedIn, post.getuserdetails);

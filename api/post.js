@@ -15,7 +15,6 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     var userdetails = new Array();
     var userid = req.user._id;
-
     function allpost(callback) {
         // save the bear and check for errors
 
@@ -763,7 +762,7 @@ module.exports.setlike = function(req, res) { //Create new user
             .remove()
             .exec(err, function(err, result) {
 
-                console.log('Unlike document removed');
+                console.log('Unlike document removed', result);
                
                 if (err) {
                     res.send(err);

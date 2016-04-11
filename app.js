@@ -15,6 +15,11 @@ var flash    = require('connect-flash');
 var expressValidator 	= require('express-validator');
 var server              = require('http').Server(app);
 var bodyParser          = require('body-parser');
+var notification        = require('./api/notification.js');  
+var mailer              = require('./api/mail.js');                     // Mail Functionality
+var post 		        = require('./api/post.js');  
+var follow              = require('./api/follow-following.js');  
+var mention             = require('./api/mention.js');  
 var path                = require('path');  
 
 var morgan       = require('morgan');
@@ -51,9 +56,6 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/node_modules')));
 
 app.set('view engine', 'ejs');  
-
-
-
 require('./config/passport.js')(passport); // pass passport for configuration
 
 

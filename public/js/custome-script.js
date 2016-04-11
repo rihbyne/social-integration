@@ -19,4 +19,7 @@
 
       // modal
        $('.modal-trigger').leanModal();   
+
+       // show count is RT more then 0
+       $( ".btn-retweet span:contains(0)" ).css( "display", "none" );
   })

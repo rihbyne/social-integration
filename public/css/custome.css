@@ -124,6 +124,9 @@ ul.collection.social_post {
 
 
 /*dropdown */
+.dropdown-content.active {
+    opacity: 1 !important;
+}
 
 .social_post .dropdown-content li>a,
 .dropdown-content li>span {
@@ -147,11 +150,12 @@ ul.collection.social_post {
     margin-right: 8%;
     padding-top: 5px;
     display: inline-block;
+    width: 57px;
 }
-.card-action a.btn-retweet {
+/*.card-action a.btn-retweet {
     margin-right: 3%
 }
-a.btn-reply:hover {
+*/a.btn-reply:hover {
     color: #000;
 }
 
@@ -307,10 +311,14 @@ h4.h_tag {
 }
 
 .rt-count{
-    color: #aab8c2;
+/*    color: #aab8c2;
     margin-left: 2px;
     margin-right: 8%;
     font-size: 12px;
+*/
+    color: #aab8c2;
+    font-size: 13px;
+    padding-left: 23px;
 }
 
 /*login*/
@@ -379,4 +387,19 @@ nav .brand-logo {
 
 .modal-content .collection {
     border: none;
+}
+
+/*following */
+.card-title.handle {
+    bottom: -17px !Important;
+    font-size: 15px;
+}
+.card-title.f-status {
+    bottom: -17px !important;
+    font-size: 15px;
+    left: auto !important;
+    right: 0;
+}
+.card.small .card-image {
+    max-height: 38%;
 }

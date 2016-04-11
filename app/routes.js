@@ -22,6 +22,12 @@ app.get('/user_preferance', function(req, res) {
     res.render('pages/user_preferance');
 });
 
+
+// user preferance page 
+app.get('/following', function(req, res) {
+    res.render('pages/following');
+});
+
 app.get('/', isLoggedIn, function(req, res) {
     // save the bear and check for errors
     var drinks = [
@@ -152,6 +158,15 @@ app.get('/about',isLoggedIn, post.getuserdetails);
             user : req.user // get the user out of session and pass to template
         });
     });
+
+
+    app.get('/following', isLoggedIn ,function(req, res) {
+          res.render('pages/following.ejs', {
+            user : req.user // get the user out of session and pass to template
+        });
+    });
+    
+
 
     // =====================================
     // LOGOUT ==============================

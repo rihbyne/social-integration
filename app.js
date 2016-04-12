@@ -12,6 +12,9 @@ var mailer              = require('./api/mail.js');                     // Mail 
 var post 		        = require('./api/post.js');  
 var follow              = require('./api/follow-following.js');  
 var mention             = require('./api/mention.js');  
+var hashtag             = require('./api/hashtag.js');  
+var like                = require('./api/like.js');  
+var retweet             = require('./api/retweet.js');  
 var path                = require('path');  
 
 
@@ -71,7 +74,7 @@ app.get('/profile', function(req, res) {
 app.get('/mention/:mention_user', mention.getmentionuser);
 
 // hashtag
-app.get('/hashtag/:hashtag',post.gethashposts);
+app.get('/hashtag/:hashtag',hashtag.gethashposts);
 
 // login
 app.get('/login', function(req, res) {
@@ -93,17 +96,17 @@ app.get('/getpost/:user/:post_id', post.getuserpost); 				// Get single post of 
 
 app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
-app.get('/hashtag/count', post.allhashtagcount); // Get the count of all hashtag
-app.get('/hashtag/count/:hashtag', post.hashtagcount); 			 	// Get the count of specifiedhashtag
-app.post('/hashtags', post.gethashtag); 								// Get all hashtag keyword 		
-app.post('/gethashtaglistcount', post.gethashtaglist);                    // Get all hashtag keyword          
+app.get('/hashtag/count', hashtag.allhashtagcount); // Get the count of all hashtag
+app.get('/hashtag/count/:hashtag', hashtag.hashtagcount); 			 	// Get the count of specifiedhashtag
+app.post('/hashtags', hashtag.gethashtag); 								// Get all hashtag keyword 		
+app.post('/gethashtaglistcount', hashtag.gethashtaglist);                    // Get all hashtag keyword          
 	
-app.get('/hashtags/:hashtag', post.gethashposts);					// Get post from hashtag
+app.get('/hashtags/:hashtag', hashtag.gethashposts);					// Get post from hashtag
 
 app.post('/setuser', post.setuser); 									// Set new user 
 app.post('/setnewpost', post.setnewpost); 							// Set new post
-app.post('/setretweet', post.setretweet); 							// Set new user 
-app.post('/setlike', post.setlike);                                  // Set like
+app.post('/setretweet', retweet.setretweet); 							// Set new user 
+app.post('/setlike', like.setlike);                                  // Set like
 
 app.post('/setfollower', follow.setfollower);                          // Set follower
 app.get('/:user_name/follower', follow.getfollower);                          // Set follower

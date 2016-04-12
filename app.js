@@ -93,10 +93,10 @@ app.get('/getpost/:user/:post_id', post.getuserpost); 				// Get single post of 
 
 app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
-app.get('/hashtag/count', post.allhashtagcount); 			    	// Get the count of all hashtag
+app.get('/hashtag/count', post.allhashtagcount); // Get the count of all hashtag
 app.get('/hashtag/count/:hashtag', post.hashtagcount); 			 	// Get the count of specifiedhashtag
 app.post('/hashtags', post.gethashtag); 								// Get all hashtag keyword 		
-app.post('/gethashtaglist', post.gethashtaglist);                              // Get all hashtag keyword          
+app.post('/gethashtaglistcount', post.gethashtaglist);                    // Get all hashtag keyword          
 	
 app.get('/hashtags/:hashtag', post.gethashposts);					// Get post from hashtag
 

@@ -154,6 +154,7 @@ module.exports.gethashposts = function(req, res) { // get a post
             res.send(err);
 
         // res.json(hashs);
+        console.log('Hashtag Result : \n', hashs);
 
         res.render('pages/hashtag', {
             hashtags : hashs,
@@ -166,59 +167,113 @@ module.exports.gethashposts = function(req, res) { // get a post
 
 //Get all post
 module.exports.getuserposts = function(req, res) { // get a post 
-    
+    var finalObj = new Array;
+    var finalObj1;
     console.log('Show all posts for single user');
-    
-    var username = req.params.user;   // find posts of user and check for errors
 
-    console.log('user ',req.params.user);
+    var username = req.params.user; // find posts of user and check for errors
+
+    console.log('user ', req.params.user);
 
     //find id of user from user collection
     User
-    .find({username: username})
+    .find({
+        username: username
+    })
     .exec(function(err, userdata) {
 
         if (err)
             res.send(err);
-        
-        else if(userdata.length !== 0)
-        {
+
+        else if (userdata.length !== 0) {
             userid = userdata[0]._id;
             // console.log(userid);
 
             //use userid to find all post of users
             post_model.post
-            .find({posted_by: userid})
-            .populate('posted_by like_by_users')
-            .exec(function(err, result){
+                .find({
+                    posted_by: userid
+                }, {
+                    _id: 0
+                })
+                .populate('posted_by like_by_users')
+                .sort({
+                    created_at: -1
+                })
+                .limit(10)
+                .exec(function(err, result) {
 
-                if (err)
-                    res.send(err);
+                    if (err)
+                        res.send(err);
 
-                else if(result.length == 0)
-                {
-                    res.json({
-                        message: 'No post found'
-                    });
-                }
-                else{
+                    else if (result.length == 0) {
+                        res.json({
+                            message: 'No post found'
+                        });
+                    } else {
 
-                    res.json({
-                        posts: result
-                    });
-                }
-               
+                        //show recent 10 retweeted post
+                        // if (result[0].tweet_count !== 0) {      //check tweet count if not zero then proceed
 
-            });
+                        // console.info('Retweet count', result[0].tweet_count);
 
-        }
-        else{
+                        post_model.post_retweet
+                            .find({
+                                ret_user_id: userid
+                            }, {
+                                _id: 0
+                            })
+                            .select('post_id')
+                            .populate('post_id')
+                            .sort({
+                                retweet_at: -1
+                            })
+                            .limit(10)
+                            .exec(function(err, retweetpostids) {
+
+                                async.each(retweetpostids,
+                                   
+                                    function(retweetpostid, callback) {
+
+                                        finalObj.push(retweetpostid['post_id'])
+                                        
+                                    },
+                                    // 3rd param is the function to call when everything's done
+                                    function(err) {
+                                        // All tasks are done now
+                                    }
+                                );
+
+                                var finalObj1 = result.concat(finalObj);
+
+                                console.info('\n\n', finalObj1);
+                                // sortOut(finalObj1, function(){
+
+                                    // var finalObjResult = JSON.stringify(finalObjResult);
+
+                                    // console.info('\n\n', finalObjResult);
+
+                                // })
+                                                       
+                                   res.json({
+                                    posts: finalObj1
+                                });
+
+                            })
+
+                        // };
+
+                    }
+
+                });
+
+        } else {
             res.json({
                 message: 'No user found'
             })
         }
 
-    });
+    }); 
 
 };
 
@@ -558,7 +613,7 @@ module.exports.getuserpostcount = function(req, res) { // get a post
 module.exports.setretweet = function(req, res) { //Create new user
 
     var post_id = req.body.post_id;
-    var retweetuserid = req.body.retweet_user_id;
+    var retweet_user_id = req.body.retweet_user_id;
     // var tweetstatus = req.body.tweetstatus;
 
     console.log('Retweet Api hitted');
@@ -622,7 +677,7 @@ module.exports.setretweet = function(req, res) { //Create new user
 
                 console.log('postdata', postdata);
 
-                if (postdata[0] !== '') {
+                if (postdata.length !== 0) {
 
                     if (postdata[0].posted_by == retweetuserid) {
 
@@ -832,3 +887,12 @@ module.exports.setlike = function(req, res) { //Create new user
     });
 
 }
+
+// var sortOut = function(finalObj1, res){
+
+//     finalObj1.sort(function comp(a, b) {
+//         console.info('function comp');
+//         return new Date(a.created_at.date).getTime() - new Date(b.created_at.date).getTime();
+//     });
+
+// }

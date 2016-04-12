@@ -273,17 +273,21 @@ module.exports.unlink_following = function(req, res){
 
     console.info('unlink following api called');
     
-    var user_name = req.body.user_name;
+    var user_id = req.body.user_id;
+    // var user_name = req.body.user_name;
     var unlink_following = req.body.unlink_following;
 
-    users
-    .find({usernames: {$in: [user_name, unlink_following]}})
-    .select('_id')
-    .exec(function(err, result){
+    // users
+    // .find({usernames: {$in: [user_name, unlink_following]}})
+    // .select('_id')
+    // .exec(function(err, result){
+
+    // var user_id = result[0]._id;
+    // var following_id = result[1]._id;
 
         console.info(result);
          user_followers
-        .find({$and:[{user: result[0]._id}, {follower: result[1]._id}] })
+        .find({$and:[{user: user_id}, {follower: unlink_following}] })
         .remove().exec(function(err, result){
 
             console.info('Removed following');    
@@ -295,6 +299,6 @@ module.exports.unlink_following = function(req, res){
 
         });
 
-    });
+    // });
     
 }

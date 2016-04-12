@@ -104,7 +104,16 @@ app.get('/:user_name/followers', follow.getfollower);                          /
 app.post('/:user_name/follower/:unlink_follower', follow.unlink_follower);                          // Set follower
 app.post('/unlink_follower', follow.unlink_follower);                          // Set follower
 
+
+
+app.post('/setfollowing', follow.setfollowing);                          // Set follower
+app.get('/:user_name/following', follow.getFollowing);                          // Set follower
+app.post('/unlink_following', follow.unlink_following);                          // Set follower
+
+
 app.post('/setfollowing_f', f_follow.setfollowing);                          // Set follower
+app.get('/:user_name/following_f', f_follow.getfollowing);                          // Set follower
+app.get('/:user_name/followers_f', f_follow.getfollowers);                          // Set follower
 
 
 

@@ -18,7 +18,6 @@ var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
 var post 		        = require('./api/post.js');  
-var follow              = require('./api/follow-following.js');  
 var mention             = require('./api/mention.js');  
 var path                = require('path');  
 

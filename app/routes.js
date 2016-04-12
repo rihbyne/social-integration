@@ -4,6 +4,10 @@ var post                = require('../api/post.js');
 var mention                = require('../api/mention.js');  
 var follow              = require('../api/follow-following.js');  
 
+var f_follow              = require('../api/F_following.js');  
+
+
+
 // app/routes.js
 module.exports = function(app, passport) {
 
@@ -100,6 +104,7 @@ app.get('/:user_name/followers', follow.getfollower);                          /
 app.post('/:user_name/follower/:unlink_follower', follow.unlink_follower);                          // Set follower
 app.post('/unlink_follower', follow.unlink_follower);                          // Set follower
 
+app.post('/setfollowing_f', f_follow.setfollowing);                          // Set follower
 
 
 

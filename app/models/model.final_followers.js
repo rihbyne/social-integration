@@ -3,10 +3,12 @@ var mongoose = require('mongoose');
 var user_final_followers_schema = mongoose.Schema({
         user_id: {
             type: String,
-            ref: "User"
+            ref: "User" ,
+              required: [true, 'Why no user_id?']
         },
         following_id: {
-            type: String
+            type: String ,
+              required: [true, 'Why no following_id?']
         },
         follower_since: {
             type: Date,

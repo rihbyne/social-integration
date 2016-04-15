@@ -354,7 +354,7 @@ textarea, input { outline: none; }
 .navbar-fixed .dropdown-content li {
     min-height: auto;
 }
-.navbar-fixed .dropdown-content li>a, .dropdown-content li>span {
+.navbar-fixed .dropdown-content li>a {
     font-size: 12px;
     color: #000;
     padding: 5px 15px;
@@ -403,3 +403,11 @@ nav .brand-logo {
 .card.small .card-image {
     max-height: 38%;
 }
+
+/*profile span nav */
+.pro-nav-info  {
+    display: block!Important;
+    font-size: 11px !important;
+    color: #A9A9A9 !Important;
+}
+

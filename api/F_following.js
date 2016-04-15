@@ -162,42 +162,43 @@ module.exports.getfollowers = function(req, res) {
 
 }
 
-module.exports.unlink_follower = function(req, res) {
+// old dk code
+// module.exports.unlink_follower = function(req, res) {
 
 
-    var user_name = req.body.user_name;
-    var unlink_follower = req.body.unlink_follower;
+//     var user_name = req.body.user_name;
+//     var unlink_follower = req.body.unlink_follower;
 
-         //validation for blank variables
-    req.checkBody('user_name', 'User id is mandatory').notEmpty();
-    req.checkBody('unlink_follower', 'following_id is mandatory').notEmpty();
+//          //validation for blank variables
+//     req.checkBody('user_name', 'User id is mandatory').notEmpty();
+//     req.checkBody('unlink_follower', 'following_id is mandatory').notEmpty();
 
-    var errors = req.validationErrors();
+//     var errors = req.validationErrors();
 
-    if (errors) {
-        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-        return;
-    }
+//     if (errors) {
+//         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+//         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+//         return;
+//     }
 
-    console.info('unlink_follower api called');
-    user_final_followers_schema
-        .findOneAndRemove({
-            following_id: unlink_follower,
-            user_id: user_name
-        })
-        .exec(function(err, result) {
-            if (err) {
-                  res.json({
-                    errors: err
-                })
-            } else {
-                res.json({
-                    message: 'Removed follower'
-                })
-            }
-        })
-}
+//     console.info('unlink_follower api called');
+//     user_final_followers_schema
+//         .findOneAndRemove({
+//             following_id: unlink_follower,
+//             user_id: user_name
+//         })
+//         .exec(function(err, result) {
+//             if (err) {
+//                   res.json({
+//                     errors: err
+//                 })
+//             } else {
+//                 res.json({
+//                     message: 'Removed follower'
+//                 })
+//             }
+//         })
+// }
 module.exports.unlink_following = function(req, res) {
  
     console.info('unlink_followings api called');
@@ -205,7 +206,7 @@ module.exports.unlink_following = function(req, res) {
     var unlink_followings = req.body.unlink_followings;
 
         //validation for blank variables
-    req.checkBody('user_id', 'User id is mandatory').notEmpty();
+    req.checkBody('user_name', 'User id is mandatory').notEmpty();
     req.checkBody('unlink_followings', 'unlink_followings is mandatory').notEmpty();
 
     var errors = req.validationErrors();
@@ -227,7 +228,7 @@ module.exports.unlink_following = function(req, res) {
                 console.log("found err" + err);
             } else {
                 res.json({
-                    message: 'Removed follower'
+                    message: 'Removed following'
                 })
             }
         })

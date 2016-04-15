@@ -82,15 +82,18 @@ module.exports = function(app, passport) {
     // });
 
 
-    app.get('/secure/getpost', post.getpost); // Get all post
+    // user home timeline post API
+    app.get('/gethomepost/:user', userhome.getuserhomeposts);                       // Get post by username
 
-    app.get('/secure/getpost/post/:post_title', post.getsinglepost); // Get post by post title
+    app.get('/getpost', post.getpost); // Get all post
 
-    app.get('/secure/getpost/:user', post.getuserposts); // Get post by username
-    app.get('/secure/getpost/count/:user', post.getuserpostcount); // Get post count by username
-    app.get('/secure/getpost/:user/:post_id', post.getuserpost); // Get single post of user
+    app.get('/getpost/post/:post_title', post.getsinglepost); // Get post by post title
 
-    app.get('/secure/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
+    app.get('/getpost/:user', post.getuserposts); // Get post by username
+    app.get('/getpost/count/:user', post.getuserpostcount); // Get post count by username
+    app.get('/getpost/:user/:post_id', post.getuserpost); // Get single post of user
+
+    app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
     app.get('/hashtag/count', hashtag.allhashtagcount); // Get the count of all hashtag
     app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);               // Get the count of specifiedhashtag

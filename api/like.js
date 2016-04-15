@@ -1,3 +1,5 @@
+var post_model = require('../model/post_model.js');
+
 //Set postlike
 module.exports.setlike = function(req, res) { //Create new user
 

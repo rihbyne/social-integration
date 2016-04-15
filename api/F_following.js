@@ -1,4 +1,5 @@
-var user_final_followers_schema = require('../app/models/model.final_followers.js');
+var user_final_followers_schema = require('../app/models/model.final_followers.js'),
+    users = require('../app/models/user.js');
 
 
 var util = require('util');

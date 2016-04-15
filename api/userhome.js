@@ -1,4 +1,4 @@
-var user = require('../model/User.js');
+var user = require('../app/models/user.js');
 var async = require('async');
 var post_model = require('../model/post_model.js');
 var user_followers = require('../app/models/model.final_followers.js');

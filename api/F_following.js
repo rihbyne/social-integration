@@ -1,5 +1,5 @@
 var user_final_followers_schema = require('../app/models/model.final_followers.js');
-var users = require('../app/models/user.js');
+
 
 var util = require('util');
 
@@ -45,6 +45,7 @@ module.exports.setfollowing = function(req, res) {
 
         if (result.length !== 0) {
 
+
             console.info('User already following');
 
             res.json({
@@ -55,6 +56,7 @@ module.exports.setfollowing = function(req, res) {
         } else {
 
             var following_idModel = new user_final_followers_schema({
+
                 user_id: user_id,
                 following_id: following_id
             });
@@ -64,10 +66,13 @@ module.exports.setfollowing = function(req, res) {
                     res.send(err);
             });
 
+
             console.info('following/followers set saved');
 
             res.json({
                 message: 'following/followers set'
+
+
             })
         }
 
@@ -134,6 +139,7 @@ module.exports.getfollowers = function(req, res) {
     }
 
     users
+
         .find({
             username: user_name
         })

@@ -18,7 +18,13 @@ var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
 var post 		        = require('./api/post.js');  
+
 var mention             = require('./api/mention.js');  
+var hashtag             = require('./api/hashtag.js');  
+var like                = require('./api/like.js');  
+var retweet             = require('./api/retweet.js');  
+var f_follow            = require('./api/F_following.js');  
+var userhome            = require('./api/userhome.js');  
 var path                = require('path');  
 
 var morgan       = require('morgan');
@@ -51,11 +57,14 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 
 
 
+
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/node_modules')));
 
 app.set('view engine', 'ejs');  
 require('./config/passport.js')(passport); // pass passport for configuration
+
+
 
 
 // routes ======================================================================

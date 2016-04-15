@@ -165,92 +165,115 @@ module.exports.getsinglepost = function(req, res) { // get a post
 
 };
 
-//Get posts of hashtag
-module.exports.gethashposts = function(req, res) { // get a post 
-
-    console.log('Show posts of hashtag');
-
-    var hashtag = req.params.hashtag;
-
-    console.log('Hashtag : ', hashtag);
-    // get the post and check for errors
-    
-    post_model.post_hashtag
-    .find({
-        hashtag: hashtag
-    })
-    .populate('post_id')
-    .exec(function(err, hashs) {
-
-        if (err)
-            res.send(err);
-
-        // res.json(hashs);
-
-        res.render('pages/hashtag', {
-            hashtags : hashs,
-            hashtagelement: hashtag
-        });
-
-    });
-
-};
-
 //Get all post
 module.exports.getuserposts = function(req, res) { // get a post 
-    
+    var finalObj = new Array;
+    var finalObj1;
     console.log('Show all posts for single user');
-    
-    var username = req.params.user;   // find posts of user and check for errors
 
-    console.log('user ',req.params.user);
+    var username = req.params.user; // find posts of user and check for errors
+
+    console.log('user ', req.params.user);
 
     //find id of user from user collection
     User
-    .find({username: username})
+    .find({
+        username: username
+    })
     .exec(function(err, userdata) {
 
         if (err)
             res.send(err);
-        
-        else if(userdata.length !== 0)
-        {
+
+        else if (userdata.length !== 0) {
             userid = userdata[0]._id;
             // console.log(userid);
 
             //use userid to find all post of users
             post_model.post
-            .find({posted_by: userid})
-            .populate('posted_by like_by_users')
-            .exec(function(err, result){
+                .find({
+                    posted_by: userid
+                }, {
+                    _id: 0
+                })
+                .populate('posted_by like_by_users')
+                .sort({
+                    created_at: -1
+                })
+                .limit(10)
+                .exec(function(err, result) {
 
-                if (err)
-                    res.send(err);
+                    if (err)
+                        res.send(err);
 
-                else if(result.length == 0)
-                {
-                    res.json({
-                        message: 'No post found'
-                    });
-                }
-                else{
+                    else if (result.length == 0) {
+                        res.json({
+                            message: 'No post found'
+                        });
+                    } else {
 
-                    res.json({
-                        posts: result
-                    });
-                }
-               
+                        //show recent 10 retweeted post
+                        // if (result[0].tweet_count !== 0) {      //check tweet count if not zero then proceed
 
-            });
+                        // console.info('Retweet count', result[0].tweet_count);
 
-        }
-        else{
+                        post_model.post_retweet
+                            .find({
+                                ret_user_id: userid
+                            }, {
+                                _id: 0
+                            })
+                            .select('post_id')
+                            .populate('post_id')
+                            .sort({
+                                retweet_at: -1
+                            })
+                            .limit(10)
+                            .exec(function(err, retweetpostids) {
+
+                                async.each(retweetpostids,
+                                   
+                                    function(retweetpostid, callback) {
+
+                                        finalObj.push(retweetpostid['post_id'])
+                                        
+                                    },
+                                    // 3rd param is the function to call when everything's done
+                                    function(err) {
+                                        // All tasks are done now
+                                    }
+                                );
+
+                                var finalObj1 = result.concat(finalObj);
+
+                                console.info('\n\n', finalObj1);
+                                // sortOut(finalObj1, function(){
+
+                                    // var finalObjResult = JSON.stringify(finalObjResult);
+
+                                    // console.info('\n\n', finalObjResult);
+
+                                // })
+                                                       
+                                   res.json({
+                                    posts: finalObj1
+                                });
+
+                            })
+
+                        // };
+
+                    }
+
+                });
+
+        } else {
             res.json({
                 message: 'No user found'
             })
         }
 
-    });
+    }); 
 
 };
 
@@ -277,24 +300,6 @@ module.exports.getuserpost = function(req, res) { // get a post
         res.json({
             posts: userposts
         });
-    });
-
-};
-
-//Get all post
-module.exports.gethashtag = function(req, res) { // get a post 
-    console.log('Show all HashTag');
-
-    // find the hashtag and check for errors
-    post_model.post_hashtag.find(function(err, allhashtag) {
-
-        if (err)
-            res.send(err);
-
-        res.json({
-            posts: allhashtag
-        });
-
     });
 
 };
@@ -338,6 +343,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     var post = new post_model.post({
 
+        username: username,
         post_title: post_title,
         post_description: post_description,
         created_at: Date.now(),
@@ -473,7 +479,6 @@ module.exports.setnewpost = function(req, res) { // create a post
 //Set users
 module.exports.setuser = function(req, res){ //Create new user
 
-    var W_user_id = req.body.W_user_id;
     var first_name = req.body.first_name;
     var last_name = req.body.last_name;
     var email = req.body.email;
@@ -490,7 +495,6 @@ module.exports.setuser = function(req, res){ //Create new user
     }
 
     var setuser = new User({
-        W_user_id : W_user_id,
         first_name : first_name,
         last_name : last_name,
         email : email,
@@ -498,8 +502,8 @@ module.exports.setuser = function(req, res){ //Create new user
     });
 
     setuser.save(function(err) {
-        if (err)
-            res.send(err);
+        // if (err)
+        //     res.send(err);
         res.json({
             message: 'Users Inserted'
         });
@@ -507,56 +511,6 @@ module.exports.setuser = function(req, res){ //Create new user
     });
 
 }
-
-//Get Count of all hashtag
-module.exports.allhashtagcount = function(req, res) { // get a post 
-
-    console.log('Show count of all HashTag');
-
-    // show count of post and check for errors
-    post_model.post_hashtag.aggregate(
-        {$group: 
-         { _id: 0, count: { $sum: 1 } } 
-    },function(err, allhashtag) {
-
-        if (err)
-            res.send(err);
-
-        res.json({
-            posts: allhashtag
-        });
-
-    });
-
-};
-
-//Get Count of specified hashtag
-module.exports.hashtagcount = function(req, res) { // get a post 
-
-    console.log('Show count of HashTag');
-
-    var hashtagkeywd = req.params.hashtag;
-    // show count of post and check for errors
-    post_model.post_hashtag.aggregate({
-        $group: 
-            { _id: {
-                hashtag: hashtagkeywd
-                }, count: { 
-        $sum: 1 
-            } 
-        } 
-    },function(err, allhashtag) {
-
-        if (err)
-            res.send(err);
-
-        res.json({
-            posts: allhashtag
-        });
-
-    });
-
-};
 
 //Get Count of post of specified user
 module.exports.getuserpostcount = function(req, res) { // get a post 
@@ -587,281 +541,11 @@ module.exports.getuserpostcount = function(req, res) { // get a post
 
 };
 
-//Set users
-module.exports.setretweet = function(req, res) { //Create new user
+// var sortOut = function(finalObj1, res){
 
-    var post_id = req.body.post_id;
-    var retweetuserid = req.body.retweet_user_id;
-    // var tweetstatus = req.body.tweetstatus;
+//     finalObj1.sort(function comp(a, b) {
+//         console.info('function comp');
+//         return new Date(a.created_at.date).getTime() - new Date(b.created_at.date).getTime();
+//     });
 
-    console.log('Retweet Api hitted');
-    // console.log(req.body.tweetstatus);
-    console.log(req.body.post_id);
-    console.log(req.body.retweet_user_id);
-
-    post_model.post_retweet.find({
-        post_id: post_id,
-        ret_user_id: retweetuserid
-    }).exec(function(err, retweetdata) {
-
-        if (retweetdata.length !== 0) {
-
-            console.log('You can not retweet twice for same post');
-
-            post_model.post_retweet
-            .find({$and: [{post_id : post_id}, {retweet_user_id : retweet_user_id}]})
-            .remove()
-            .exec(err, function(err, result) {
-
-                console.log('Retweet document removed');
-               
-                if (err) {
-                    res.send(err);
-                    return;
-                };
-
-                if (result !== '') {
-
-                    post_model.post
-                    .findByIdAndUpdate(post_id, {
-                        $inc: {
-                            tweet_count: -1
-                        }
-                    })
-                    .exec(function(err, result) {
-
-                        console.log('Retweet count decrease by 1', result);
-
-                        if (err) {
-                            res.send(err);
-                        };
-
-                    })
-                
-                }
-
-            })
-
-            return;
-            // res.json({
-            //     message: 'Remove tweet'
-            // });
-
-        } else {
-
-            post_model.post.find({
-                _id: post_id
-            }).exec(function(err, postdata) {
-
-                console.log('postdata', postdata);
-
-                if (postdata[0] !== '') {
-
-                    if (postdata[0].posted_by == retweetuserid) {
-
-                        console.log('You can not tweet on your own post');
-                        return;                        
-
-                    } 
-                    else{
-
-                        var retweet = new post_model.post_retweet({
-                            post_id: post_id,
-                            ret_user_id: retweetuserid
-                        });
-
-                        retweet.save(function(err) {
-
-                            if (err)
-                                res.send(err);
-
-                            post_model.post
-                                .findByIdAndUpdate(post_id, {
-                                    $inc: {
-                                        tweet_count: 1
-                                    }
-                                })
-                                .exec(function(err, result) {
-
-                                    console.log('User retweeted\n', result);
-
-                                    if (err) {
-                                        res.send(err);
-                                    };
-
-                                })
-
-                            // res.json({
-                            //     message: 'User retweeted'
-                            // });
-                            res.render('pages/profile');
-
-                        });
-
-                    }
-
-                }
-
-            });
-        
-        }
-
-    })
-
-}
-
-//Get all post
-module.exports.gethashtaglist = function(req, res) { // get a post 
-    console.log('Show all HashTag');
-
-    // find the hashtag and check for errors
-    post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, result){
-
-        console.log(result);
-
-        if (err) {
-            res.send(err);
-        };
-
-        res.json({
-            message: result
-        });
-
-    });
-
-};
-
-//Set postlike
-module.exports.setlike = function(req, res) { //Create new user
-
-    var post_id = req.body.post_id;
-    var like_user_id = req.body.like_user_id;
-    // var likestatus = req.body.likestatus;  
-    var like_user_name= req.body.like_user_name;
-
-    console.log('Like Api hitted');
-    // console.log('Like Status: ', req.body.likestatus);
-    console.log('Post Id: ', req.body.post_id);
-    console.log('Like User Id: ', req.body.like_user_id);
-
-    /*This case will run for the second time -- To remove like*/
-    post_model.post_like.find({
-        post_id: post_id,
-        like_user_id: like_user_id
-    }).exec(function(err, likedata) {
-
-        if (likedata.length !== 0) {
-
-            console.log('You can not like twice for same post');
-            console.log('Make it unlike. changed like status');
-            // res.json({
-            //     message: 'You can not like twice for same post'
-            // });
-            post_model.post_like
-            .find({$and: [{post_id : post_id}, {like_user_id : like_user_id}]})
-            .remove()
-            .exec(err, function(err, result) {
-
-                console.log('Unlike document removed', result);
-               
-                if (err) {
-                    res.send(err);
-                    return;
-                };
-
-                if (result !== '') {
-
-                    post_model.post
-                    .findByIdAndUpdate(post_id, {
-                        $inc: {
-                            like_count: -1
-                        }
-                    })
-                    .exec(function(err, result) {
-
-                        console.log('Like count decrease by 1\n', result);
-                       
-                        if (err) {
-                            res.send(err);
-                            return;
-                        };
-
-                        res.json({
-                             message: 'Remove Like'
-                        });
-                        
-                    })
-                    
-                };
-
-            })
-  
-        } 
-        else{
-        /*This case will run for the first time -- To set like*/
-            post_model.post.find({
-                _id: post_id
-            }).exec(function(err, postdata) {
-
-                console.log('postdata\n', postdata);
-                console.log(postdata.length);
-                if (postdata.length !== 0) {
-
-                        // if (postdata[0].posted_by == like_user_id) {
-
-                        //     console.log('You can not like on your own post');
-                        //     return;
-                        //     // res.json({
-                        //     //     message: 'You can not retweet on your own post'
-                        //     // });
-
-                        // } else {
-
-
-                    var likeModel = new post_model.post_like({
-                        post_id: post_id,
-                        like_user_id: like_user_id,
-                        like_user_name: like_user_name
-                    });
-
-                    likeModel.save(function(err) {
-
-                        if (err)
-                            res.send(err);
-                        console.log('_id of like', likeModel._id);
-                        post_model.post
-                            .findByIdAndUpdate(post_id, {
-                                $inc: {
-                                    like_count: 1
-                                }, 
-                                $push: {"like_by_users": likeModel._id}
-                                
-                                
-                            })
-                            .exec(function(err, result) {
-
-                                console.log('New like added and modified like count \n', result);
-
-                                if (err) {
-                                    res.send(err);
-                                };
-
-                            })
-
-                        // res.json({
-                        //     message: 'User retweeted'
-                        // });
-                        res.render('pages/profile');
-
-                    });
-
-                }
-
-            });
-            
-
-        }
-    
-    });
-
-}
+// }

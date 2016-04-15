@@ -17,14 +17,14 @@ var server              = require('http').Server(app);
 var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
-var post 		        = require('./api/post.js');  
+// var post 		        = require('./api/post.js');  
 
-var mention             = require('./api/mention.js');  
-var hashtag             = require('./api/hashtag.js');  
-var like                = require('./api/like.js');  
-var retweet             = require('./api/retweet.js');  
-var f_follow            = require('./api/F_following.js');  
-var userhome            = require('./api/userhome.js');  
+// var mention             = require('./api/mention.js');  
+// var hashtag             = require('./api/hashtag.js');  
+// var like                = require('./api/like.js');  
+// var retweet             = require('./api/retweet.js');  
+// var f_follow            = require('./api/F_following.js');  
+// var userhome            = require('./api/userhome.js');  
 var path                = require('path');  
 
 var morgan       = require('morgan');

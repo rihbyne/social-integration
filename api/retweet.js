@@ -1,3 +1,5 @@
+var post_model = require('../model/post_model.js');
+
 //Set users
 module.exports.setretweet = function(req, res) { //Create new user
 
@@ -12,7 +14,7 @@ module.exports.setretweet = function(req, res) { //Create new user
 
     post_model.post_retweet.find({
         post_id: post_id,
-        ret_user_id: retweetuserid
+        ret_user_id: retweet_user_id
     }).exec(function(err, retweetdata) {
 
         if (retweetdata.length !== 0) {
@@ -68,7 +70,7 @@ module.exports.setretweet = function(req, res) { //Create new user
 
                 if (postdata.length !== 0) {
 
-                    if (postdata[0].posted_by == retweetuserid) {
+                    if (postdata[0].posted_by == retweet_user_id) {
 
                         console.log('You can not tweet on your own post');
                         return;                        
@@ -78,7 +80,7 @@ module.exports.setretweet = function(req, res) { //Create new user
 
                         var retweet = new post_model.post_retweet({
                             post_id: post_id,
-                            ret_user_id: retweetuserid
+                            ret_user_id: retweet_user_id
                         });
 
                         retweet.save(function(err) {

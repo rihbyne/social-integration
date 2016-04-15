@@ -10,11 +10,13 @@ var bodyParser          = require('body-parser');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
 var post 		        = require('./api/post.js');  
-var follow              = require('./api/follow-following.js');  
+// var follow              = require('./api/follow-following.js');  
 var mention             = require('./api/mention.js');  
 var hashtag             = require('./api/hashtag.js');  
 var like                = require('./api/like.js');  
 var retweet             = require('./api/retweet.js');  
+var f_follow            = require('./api/F_following.js');  
+var userhome            = require('./api/userhome.js');  
 var path                = require('path');  
 
 
@@ -91,6 +93,7 @@ app.get('/getpost', post.getpost); 									// Get all post
 app.get('/getpost/post/:post_title', post.getsinglepost); 			// Get post by post title
 
 app.get('/getpost/:user', post.getuserposts); 						// Get post by username
+app.get('/gethomepost/:user', userhome.getuserhomeposts);                       // Get post by username
 app.get('/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
 app.get('/getpost/:user/:post_id', post.getuserpost); 				// Get single post of user
 
@@ -108,13 +111,19 @@ app.post('/setnewpost', post.setnewpost); 							// Set new post
 app.post('/setretweet', retweet.setretweet); 							// Set new user 
 app.post('/setlike', like.setlike);                                  // Set like
 
-app.post('/setfollower', follow.setfollower);                          // Set follower
-app.get('/:user_name/follower', follow.getfollower);                          // Set follower
-app.post('/unlink_follower', follow.unlink_follower);                          // Set follower
+// app.post('/setfollower', follow.setfollower);                          // Set follower
+// app.get('/:user_name/follower', follow.getfollower);                          // Set follower
+// app.post('/unlink_follower', follow.unlink_follower);                          // Set follower
 
-app.post('/setfollowing', follow.setfollowing);                          // Set follower
-app.get('/:user_name/following', follow.getFollowing);                          // Set follower
-app.post('/unlink_following', follow.unlink_following);                          // Set follower
+// app.post('/setfollowing', follow.setfollowing);                          // Set follower
+// app.get('/:user_name/following', follow.getFollowing);                          // Set follower
+// app.post('/unlink_following', follow.unlink_following);                          // Set follower
+
+
+app.post('/setfollowing_f', f_follow.setfollowing);                          // Set follower
+app.get('/:user_name/following_f', f_follow.getfollowing);                          // Set follower
+app.get('/:user_name/followers_f', f_follow.getfollowers);                          // Set follower
+
 
 
 server.listen(4000, function(){

@@ -1,13 +1,14 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose')
+, Schema = mongoose.Schema;
+var post_model = require('./post_model.js');
 
 var User_schema = new mongoose.Schema({
 
-    // _id 		: {type: String, ref:'post'},
-    W_user_id	:   {type: String},          // user Id from wallet user table 
+    // _id 		: 	{type: Schema.Types.ObjectId, ref:'post'},
     first_name	: 	{type: String},          // First Name of User
     last_name	: 	{type: String},          // Last Name of Use
     email 		:   {type: String},
-    username	: 	{type: String}
+    username	: 	{type: String, ref:'post'}
 
 }, { versionKey: false });
 

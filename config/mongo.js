@@ -15,3 +15,5 @@ mongoose.connection.on('connected', function () {
   console.log('Mongoose default connection open to ' + dbURI);
   console.log("Connected to " + db_server + " DB!");
 }); 
+
+mongoose.set('debug', true);

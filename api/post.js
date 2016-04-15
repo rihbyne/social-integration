@@ -11,6 +11,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 
     var userdetails = new Array();
     var userid = '570b339ebd8f92580e1565dd';
+    
     async.parallel([
         allpost,
         tweetcount,
@@ -311,6 +312,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 
     var post = new post_model.post({
 
+        username: username,
         post_title: post_title,
         post_description: post_description,
         created_at: Date.now(),
@@ -445,7 +447,6 @@ module.exports.setnewpost = function(req, res) { // create a post
 //Set users
 module.exports.setuser = function(req, res){ //Create new user
 
-    var W_user_id = req.body.W_user_id;
     var first_name = req.body.first_name;
     var last_name = req.body.last_name;
     var email = req.body.email;
@@ -462,7 +463,6 @@ module.exports.setuser = function(req, res){ //Create new user
     }
 
     var setuser = new User({
-        W_user_id : W_user_id,
         first_name : first_name,
         last_name : last_name,
         email : email,
@@ -470,8 +470,8 @@ module.exports.setuser = function(req, res){ //Create new user
     });
 
     setuser.save(function(err) {
-        if (err)
-            res.send(err);
+        // if (err)
+        //     res.send(err);
         res.json({
             message: 'Users Inserted'
         });

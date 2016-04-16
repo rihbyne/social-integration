@@ -1,6 +1,6 @@
 var post_model = require('../model/post_model.js');
 
-//Set users
+//Set retweet
 module.exports.setretweet = function(req, res) { //Create new user
 
     var post_id = req.body.post_id;
@@ -120,5 +120,25 @@ module.exports.setretweet = function(req, res) { //Create new user
         }
 
     })
+
+}
+
+//Get Retweet
+module.exports.getretweet = function(req, res) { //get new like
+
+    var post_id = req.params.post_id;
+
+    post_model
+    .post_retweet
+    .find({post_id: post_id})
+    .exec(function(err, getRetweetResult){
+        console.info(getRetweetResult.length);
+        console.info(getRetweetResult);
+
+        res.json({
+            count: getRetweetResult.length,
+            retweetinfo :getRetweetResult
+        })
+    });
 
 }

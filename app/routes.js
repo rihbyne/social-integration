@@ -106,6 +106,8 @@ module.exports = function(app, passport) {
     app.post('/setnewpost', post.setnewpost);                           // Set new post
     app.post('/setretweet', retweet.setretweet);                            // Set new user 
     app.post('/setlike', like.setlike);                                  // Set like
+    app.get('/getlike/:post_id', like.getlike);                                  // Get like by post
+    app.get('/getretweet/:post_id', retweet.getretweet);                                  // Get Retweet by post
 
     // Set follower
 

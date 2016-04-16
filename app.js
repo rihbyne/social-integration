@@ -124,7 +124,8 @@ app.post('/setfollowing_f', f_follow.setfollowing);                          // 
 app.get('/:user_name/following_f', f_follow.getfollowing);                          // Set follower
 app.get('/:user_name/followers_f', f_follow.getfollowers);                          // Set follower
 
-
+app.get('/follower/count/:user_id', f_follow.getCountFollower);                          // count follower
+app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
 
 server.listen(4000, function(){
 	console.log('Connected To server at port 4000 with socket');

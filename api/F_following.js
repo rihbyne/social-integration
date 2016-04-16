@@ -260,7 +260,7 @@ module.exports.getCountFollower = function(req, res){
         return;
     }
 
-    user
+    users
     .count({_id: user_id}, function (err, usercount){ 
 
         if(usercount>0){
@@ -308,7 +308,7 @@ module.exports.getCountFollowing = function(req, res){
         return;
     }
 
-    user
+    users
     .count({_id: following_id}, function (err, usercount){ 
 
         if(usercount>0){

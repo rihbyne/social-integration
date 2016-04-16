@@ -1,5 +1,6 @@
-var user_final_followers_schema = require('../app/models/model.final_followers.js');
-var users = require('../app/models/user.js');
+var user_final_followers_schema = require('../app/models/model.final_followers.js'),
+    users = require('../app/models/user.js');
+
 
 var util = require('util');
 
@@ -45,6 +46,7 @@ module.exports.setfollowing = function(req, res) {
 
         if (result.length !== 0) {
 
+
             console.info('User already following');
 
             res.json({
@@ -55,6 +57,7 @@ module.exports.setfollowing = function(req, res) {
         } else {
 
             var following_idModel = new user_final_followers_schema({
+
                 user_id: user_id,
                 following_id: following_id
             });
@@ -64,10 +67,13 @@ module.exports.setfollowing = function(req, res) {
                     res.send(err);
             });
 
+
             console.info('following/followers set saved');
 
             res.json({
                 message: 'following/followers set'
+
+
             })
         }
 
@@ -118,6 +124,7 @@ module.exports.getfollowing = function(req, res) {
         })
 
 }
+
 module.exports.getfollowers = function(req, res) {
 
     var user_name = req.params.user_name;
@@ -134,6 +141,7 @@ module.exports.getfollowers = function(req, res) {
     }
 
     users
+
         .find({
             username: user_name
         })
@@ -232,5 +240,102 @@ module.exports.unlink_following = function(req, res) {
                 })
             }
         })
+}
+
+
+
+//Get Count of Follwer
+module.exports.getCountFollower = function(req, res){
+
+    var user_id = req.params.user_id;
+
+    //validation for blank variables
+    req.checkParams('user_id', 'User name is mandatory').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+
+    users
+    .count({_id: user_id}, function (err, usercount){ 
+
+        if(usercount>0){
+
+            user_final_followers_schema
+            .count({user_id : user_id}, function(err, followercount) {
+               
+                if (err)
+                    res.send(err);
+               
+                console.log('Count is ' + followercount);
+                
+                res.json({
+                    FollowerCount: followercount
+                });
+
+            });
+
+        }
+        else{
+
+            res.json({
+                Result: 'No user with this id'
+            });
+        }
+
+    }); 
+
+}
+
+
+//Get Count of Follwing
+module.exports.getCountFollowing = function(req, res){
+
+    var following_id = req.params.following_id;
+
+    //validation for blank variables
+    req.checkParams('following_id', 'User name is mandatory').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+
+    users
+    .count({_id: following_id}, function (err, usercount){ 
+
+        if(usercount>0){
+
+            user_final_followers_schema
+            .count({following_id : following_id}, function(err, followingcount) {
+               
+                if (err)
+                    res.send(err);
+               
+                console.log('Count is ' + followingcount);
+                
+                res.json({
+                    Followingcount: followingcount
+                });
+
+            });
+
+        }
+        else{
+
+            res.json({
+                Result: 'No user with this id'
+            });
+        }
+
+    }); 
+
 }
 

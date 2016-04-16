@@ -4,7 +4,8 @@ var User = require('../app/models/user.js');
 // Post Schema
 var post = mongoose.Schema({
     
-    posted_by:                       {type: String, ref:'User'},       // posted by 
+    posted_by:                       {type: mongoose.Schema.ObjectId},       // posted by 
+    username:   {type: String, ref:'User'},
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     tweet_count:                     {type: Number, default: 0, min: 0},
@@ -47,19 +48,13 @@ var post_hashtag_links = mongoose.Schema({
 
 }, { versionKey: false });
 
-// retweet Schema
-var post_hashtag_links = mongoose.Schema({
-    
-    post_id:                         {type: Array},        // post Id
-    post_hashtag:                    {type: String, ref:'post_hashtag'}        // posted by     
-
-}, { versionKey: false });
 
 // retweet Schema
 var post_retweet_schema = mongoose.Schema({
     
-    post_id:                         {type: String},        // post Id
-    ret_user_id:                     {type: String}        // posted by     
+    post_id:                         {type: String, ref:'post'},        // post Id
+    ret_user_id:                     {type: String},         // Retweet by   
+    retweet_at :                     {type: Date, default: Date.now}  
 
 }, { versionKey: false });
 

@@ -134,3 +134,5 @@ module.exports.setlike = function(req, res) { //Create new user
     });
 
 }
+
+// module.exports.getLike = 

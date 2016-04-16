@@ -117,6 +117,10 @@ module.exports = function(app, passport) {
     app.post('/unlink_followings_f', f_follow.unlink_following); // Set follower
 
 
+    app.get('/follower/count/:user_id', f_follow.getCountFollower);                          // count follower
+    app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
+
+
 
     // about page 
     app.get('/about', isLoggedIn, post.getuserdetails);

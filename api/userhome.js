@@ -24,73 +24,46 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
             getRetweetPostsByUserId
         ],
         function (err, result) {
+                
+            console.info(result);
+
+            var profilePosts;
+
             if (err) {
 
-                console.error(result);
+                if (result[0] === 0) {
+                    console.info('Own posts are zero');
+                    var profilePosts = result[1]
+                }
 
+                if (result[1] === 0) {
+                    console.info('Retweet posts are zero');
+                    var profilePosts = result[0]
+                }
                 // res.json({
                 //     message: result
                 // });
-                return;
+                // return;
 
+            }
+            else{
+
+                var profilePosts = result[0].concat(result[1]);//Got two result , concent two results
+                    function custom_sort(a, b) {
+                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                }
+
+                profilePosts.sort(custom_sort);
+                
             };
 
-            var result = result[0].concat(result[1]);//Got two result , concent two results
-
-            function custom_sort(a, b) {
-                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-            }
-
-            result.sort(custom_sort);
-            
-            console.info(result);
+            // console.info(result[0]+''+result[1]);
 
             res.json({
-                ProfilePosts: result
+                ProfilePosts: profilePosts
             });
 
         });
-
-        // console.info(result1);
-
-        //Get Follower Post
-        // getMyFollowerids(userid, function(err, myFollowers){
-
-        //     if (err) {
-
-        //         console.error(myFollowers);
-
-        //         // res.json({
-        //         //     message: result
-        //         // });
-        //         return;
-
-        //     };
-
-        //     // var userid = myFollowers
-        //     //using async series function get all post 
-        //     async.parallel([
-        //         getPostByUserId,
-        //         getRetweetPostsByUserId
-        //     ],
-        //     function (err, result) {
-        //         if (err) {
-
-        //             console.error(result);
-
-        //             // res.json({
-        //             //     message: result
-        //             // });
-        //             return;
-
-        //         };
-
-        //         console.info(result);
-        //         // result1 = result;
-
-        //     });
-
-        // });
 
     });
     
@@ -115,7 +88,7 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
 
             else if (result.length == 0) {
 
-                callback(true, 'No post found');
+                callback(null, []);//No post found
 
             } else {
 
@@ -143,12 +116,14 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
         .limit(10)
         .exec(function(err, retweetpostids) {
 
+            // console.info('Retweet Post: ',retweetpostids);
+
             if (err)
                 res.send(err);
 
             else if (retweetpostids.length == 0) {
 
-                callback(true, 'No post found');
+                 callback(null, []);//No post found
 
             } else {
 
@@ -157,16 +132,20 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
                     function(retweetpostid, callback) {
 
                         finalObj.push(retweetpostid['post_id'])
-                        
+                        // console.info(finalObj);
+                        return callback(finalObj);
                     },
                     // 3rd param is the function to call when everything's done
                     function(err) {
+
                         // All tasks are done now
                     }
+
                 );
 
                 callback(null, finalObj);
             }
+
 
         });
 
@@ -304,7 +283,45 @@ var getUserId =function(username, res){
 
 // };
 // }
-
-            
-
                     
+
+// console.info(result1);
+
+        //Get Follower Post
+        // getMyFollowerids(userid, function(err, myFollowers){
+
+        //     if (err) {
+
+        //         console.error(myFollowers);
+
+        //         // res.json({
+        //         //     message: result
+        //         // });
+        //         return;
+
+        //     };
+
+        //     // var userid = myFollowers
+        //     //using async series function get all post 
+        //     async.parallel([
+        //         getPostByUserId,
+        //         getRetweetPostsByUserId
+        //     ],
+        //     function (err, result) {
+        //         if (err) {
+
+        //             console.error(result);
+
+        //             // res.json({
+        //             //     message: result
+        //             // });
+        //             return;
+
+        //         };
+
+        //         console.info(result);
+        //         // result1 = result;
+
+        //     });
+
+        // });

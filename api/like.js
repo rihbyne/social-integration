@@ -1,7 +1,7 @@
 var post_model = require('../model/post_model.js');
 
 //Set postlike
-module.exports.setlike = function(req, res) { //Create new like
+var setlike = function(req, res) { //Create new like
 
     var post_id = req.body.post_id;
     var like_user_id = req.body.like_user_id;
@@ -138,7 +138,7 @@ module.exports.setlike = function(req, res) { //Create new like
 
 }
 
-module.exports.getlike = function(req, res) { //get new like
+var getlike = function(req, res) { //get new like
 
     var post_id = req.params.post_id;
 
@@ -156,3 +156,8 @@ module.exports.getlike = function(req, res) { //get new like
     });
 
 }
+
+module.exports = ({
+    getlike : getlike,
+    setlike : setlike
+})

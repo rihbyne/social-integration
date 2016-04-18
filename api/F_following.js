@@ -4,7 +4,7 @@ var user_final_followers_schema = require('../app/models/model.final_followers.j
 
 var util = require('util');
 
-module.exports.setfollowing = function(req, res) {
+var setfollowing = function(req, res) {
 
     var user_id = req.body.user_id;
     var following_id = req.body.following_id;
@@ -81,7 +81,7 @@ module.exports.setfollowing = function(req, res) {
 
 }
 
-module.exports.getfollowing = function(req, res) {
+var getfollowing = function(req, res) {
 
     var user_name = req.params.user_name;
 
@@ -125,7 +125,7 @@ module.exports.getfollowing = function(req, res) {
 
 }
 
-module.exports.getfollowers = function(req, res) {
+var getfollowers = function(req, res) {
 
     var user_name = req.params.user_name;
 
@@ -170,44 +170,7 @@ module.exports.getfollowers = function(req, res) {
 
 }
 
-// old dk code
-// module.exports.unlink_follower = function(req, res) {
-
-
-//     var user_name = req.body.user_name;
-//     var unlink_follower = req.body.unlink_follower;
-
-//          //validation for blank variables
-//     req.checkBody('user_name', 'User id is mandatory').notEmpty();
-//     req.checkBody('unlink_follower', 'following_id is mandatory').notEmpty();
-
-//     var errors = req.validationErrors();
-
-//     if (errors) {
-//         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-//         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-//         return;
-//     }
-
-//     console.info('unlink_follower api called');
-//     user_final_followers_schema
-//         .findOneAndRemove({
-//             following_id: unlink_follower,
-//             user_id: user_name
-//         })
-//         .exec(function(err, result) {
-//             if (err) {
-//                   res.json({
-//                     errors: err
-//                 })
-//             } else {
-//                 res.json({
-//                     message: 'Removed follower'
-//                 })
-//             }
-//         })
-// }
-module.exports.unlink_following = function(req, res) {
+var unlink_following = function(req, res) {
  
     console.info('unlink_followings api called');
     var user_name = req.body.user_name;
@@ -242,10 +205,8 @@ module.exports.unlink_following = function(req, res) {
         })
 }
 
-
-
 //Get Count of Follwer
-module.exports.getCountFollower = function(req, res){
+var getCountFollower = function(req, res){
 
     var user_id = req.params.user_id;
 
@@ -291,9 +252,8 @@ module.exports.getCountFollower = function(req, res){
 
 }
 
-
 //Get Count of Follwing
-module.exports.getCountFollowing = function(req, res){
+var getCountFollowing = function(req, res){
 
     var following_id = req.params.following_id;
 
@@ -338,4 +298,53 @@ module.exports.getCountFollowing = function(req, res){
     }); 
 
 }
+
+module.exports = ({
+    setfollowing : setfollowing,
+    getfollowing : getfollowing,
+    getfollowers : getfollowers,
+    unlink_following : unlink_following,
+    getCountFollower : getCountFollower,
+    getCountFollowing : getCountFollowing
+
+})
+
+// old dk code
+// var unlink_follower = function(req, res) {
+
+
+//     var user_name = req.body.user_name;
+//     var unlink_follower = req.body.unlink_follower;
+
+//          //validation for blank variables
+//     req.checkBody('user_name', 'User id is mandatory').notEmpty();
+//     req.checkBody('unlink_follower', 'following_id is mandatory').notEmpty();
+
+//     var errors = req.validationErrors();
+
+//     if (errors) {
+//         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+//         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+//         return;
+//     }
+
+//     console.info('unlink_follower api called');
+//     user_final_followers_schema
+//         .findOneAndRemove({
+//             following_id: unlink_follower,
+//             user_id: user_name
+//         })
+//         .exec(function(err, result) {
+//             if (err) {
+//                   res.json({
+//                     errors: err
+//                 })
+//             } else {
+//                 res.json({
+//                     message: 'Removed follower'
+//                 })
+//             }
+//         })
+// }
+
 

@@ -3,7 +3,7 @@ var async = require('async');
 var post_model = require('../model/post_model.js');
 var user_followers = require('../app/models/model.final_followers.js');
     //Get all post
-module.exports.getuserhomeposts = function(req, res) { // get a post 
+var getuserhomeposts = function(req, res) { // get a post 
 
     console.log('Show all posts for single user on home page');
 
@@ -325,3 +325,8 @@ var getUserId =function(username, res){
         //     });
 
         // });
+
+
+module.exports = ({
+    getuserhomeposts : getuserhomeposts
+})

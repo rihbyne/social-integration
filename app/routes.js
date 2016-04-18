@@ -127,11 +127,9 @@ module.exports = function(app, passport) {
     app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
 
     // about page 
-    app.get('/about', isLoggedIn, post.getuserdetails);
+    app.use('/about', isLoggedIn, post.getuserdetails);
 
     app.get('/api/Trendsdk', post.Trendsdk);
-
-
 
     // =====================================
     // LOGIN ===============================
@@ -203,11 +201,11 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
+    app.get('/getreply/:postId', reply.getreply);
+    app.post('/setreply', reply.setreply);
+    app.post('/setblockuser', blockuser.setblockuser);
+    app.get('/getblockuser/:userId', blockuser.getblockuser);
 
-
-app.use('/setreply', reply);
-app.use('/setblockuser', blockuser.setblockuser);
-app.use('/getblockuser/:userId', blockuser.getblockuser);
 };
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

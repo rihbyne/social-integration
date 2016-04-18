@@ -3,6 +3,8 @@ var mailer = require('../api/mail.js'); // Mail Functionality
 var post = require('../api/post.js');
 var mention = require('../api/mention.js');
 // var follow              = require('../api/follow-following.js');  
+var express = require('express');
+var router = express.Router();
 
 var f_follow = require('../api/F_following.js');
 
@@ -12,6 +14,8 @@ var retweet             = require('../api/retweet.js');
 // var f_follow            = require('../api/F_following.js');  
 var userhome            = require('../api/userhome.js');  
 var path                = require('path');  
+var reply = require('../api/reply.js');
+var blockuser = require('../api/blockuser.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -122,8 +126,6 @@ module.exports = function(app, passport) {
     app.get('/follower/count/:user_id', f_follow.getCountFollower);                          // count follower
     app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
 
-
-
     // about page 
     app.get('/about', isLoggedIn, post.getuserdetails);
 
@@ -203,7 +205,8 @@ module.exports = function(app, passport) {
 
 
 
-
+app.use('/setreply', reply);
+app.use('/setblockuser', blockuser);
 };
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {
@@ -215,3 +218,4 @@ function isLoggedIn(req, res, next) {
     // if they aren't redirect them to the home page
     res.redirect('/login');
 }
+

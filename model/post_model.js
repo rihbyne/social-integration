@@ -8,6 +8,11 @@ var post = mongoose.Schema({
     username:   {type: String, ref:'User'},
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
+    post_reply:                      [{
+                                      reply : String,
+                                      reply_from: String,
+                                      reply_at : { type: Date, default: Date.now }
+                                     }],
     tweet_count:                     {type: Number, default: 0, min: 0},
     like_count:                      {type: Number, default: 0, min: 0},
     like_by_users:                   [{type: String, ref: 'post_like'}],

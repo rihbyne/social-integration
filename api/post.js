@@ -122,8 +122,6 @@ module.exports.Trendsdk = function(req, res) {
     });
 };
 
-
-
 //Get all post
 module.exports.getpost = function(req, res) { // get a post 
     console.log('Show all post');
@@ -337,6 +335,10 @@ module.exports.setnewpost = function(req, res) { // create a post
         hashtags.push(match_hash[1]);
     }
 
+    // while (match_url = regexat.exec(post_description)) {
+    //     urls.push(match_url[1]);
+    // }
+
     console.log('Mention Users : ', mentionusers);
     console.log('Hash Tags : ', hashtags);
 
@@ -548,3 +550,4 @@ module.exports.getuserpostcount = function(req, res) { // get a post
 //     });
 
 // }
+

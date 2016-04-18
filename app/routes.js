@@ -206,7 +206,8 @@ module.exports = function(app, passport) {
 
 
 app.use('/setreply', reply);
-app.use('/setblockuser', blockuser);
+app.use('/setblockuser', blockuser.setblockuser);
+app.use('/getblockuser/:userId', blockuser.getblockuser);
 };
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

@@ -411,3 +411,24 @@ nav .brand-logo {
     color: #A9A9A9 !Important;
 }
 
+
+/*like btn */
+
+.frm-inline {
+    display: inline;
+}
+.btn-like {
+    background: none;
+    border: 0;
+    color: #aab8c2;
+}
+.btn-like:hover {
+    color: red;
+}
+.btn-like:focus , .btn-like:active , .btn-like:visited {
+    outline: none;
+    background-color: transparent;
+}
+.btn-like .rt-count{
+    padding-left: 10px;
+}

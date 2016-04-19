@@ -22,4 +22,5 @@
 
        // show count is RT more then 0
        $( ".btn-retweet span:contains(0)" ).css( "display", "none" );
+       $( ".btn-like span:contains(0)" ).css( "display", "none" );
   })

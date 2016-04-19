@@ -3,17 +3,15 @@ var post_model = require('../model/post_model.js');
 //update reply to post
 var setreply =  function(req, res){
 
+    var reply = req.body.reply;
+    var replyBy = req.body.reply_by;
     var post_id = req.body.post_id;
-    var posted_by = req.body.posted_by;
-    var username = req.body.username; 
-    var post_description = req.body.post_description;
 
     //blank validation
 
     var post_reply = {
-        posted_by : posted_by,
-        username : username,
-        post_description : post_description
+        reply : reply,
+        reply_by : replyBy
     }
 
     post_model.post

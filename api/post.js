@@ -9,7 +9,7 @@ var router = express.Router(), // get an instance of the express Router
 var util = require('util');
 var async = require('async');
 //Get all post
-module.exports.getuserdetails = function(req, res) { // get a post 
+var getuserdetails = function(req, res) { // get a post 
     console.log('Show user details');
 
     var userdetails = new Array();
@@ -105,7 +105,7 @@ module.exports.getuserdetails = function(req, res) { // get a post
 };
 
 
-module.exports.Trendsdk = function(req, res) {
+var Trendsdk = function(req, res) {
         console.log('dktrend api hitted')
         post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
 
@@ -122,10 +122,8 @@ module.exports.Trendsdk = function(req, res) {
     });
 };
 
-
-
 //Get all post
-module.exports.getpost = function(req, res) { // get a post 
+var getpost = function(req, res) { // get a post 
     console.log('Show all post');
 
     // save the bear and check for errors
@@ -141,7 +139,7 @@ module.exports.getpost = function(req, res) { // get a post
 };
 
 //Get single post
-module.exports.getsinglepost = function(req, res) { // get a post 
+var getsinglepost = function(req, res) { // get a post 
     console.log('Show single post');
     var post_title = req.params.post_title;
     console.log(post_title);
@@ -165,7 +163,7 @@ module.exports.getsinglepost = function(req, res) { // get a post
 };
 
 //Get all post
-module.exports.getuserposts = function(req, res) { // get a post 
+var getuserposts = function(req, res) { // get a post 
     var finalObj = new Array;
     var finalObj1;
     console.log('Show all posts for single user');
@@ -195,7 +193,7 @@ module.exports.getuserposts = function(req, res) { // get a post
                 }, {
                     _id: 0
                 })
-                .populate('posted_by like_by_users')
+                .populate('posted_by')
                 .sort({
                     created_at: -1
                 })
@@ -277,7 +275,7 @@ module.exports.getuserposts = function(req, res) { // get a post
 };
 
 //Get single post of user
-module.exports.getuserpost = function(req, res) { // get a post 
+var getuserpost = function(req, res) { // get a post 
 
     console.log('Show single posts for single user');
 
@@ -304,7 +302,7 @@ module.exports.getuserpost = function(req, res) { // get a post
 };
 
 //Set new post
-module.exports.setnewpost = function(req, res) { // create a post 
+var setnewpost = function(req, res) { // create a post 
 
     console.log('Add post');
 
@@ -336,6 +334,10 @@ module.exports.setnewpost = function(req, res) { // create a post
     while (match_hash = regexhash.exec(post_description)) {
         hashtags.push(match_hash[1]);
     }
+
+    // while (match_url = regexat.exec(post_description)) {
+    //     urls.push(match_url[1]);
+    // }
 
     console.log('Mention Users : ', mentionusers);
     console.log('Hash Tags : ', hashtags);
@@ -476,7 +478,7 @@ module.exports.setnewpost = function(req, res) { // create a post
 };
 
 //Set users
-module.exports.setuser = function(req, res){ //Create new user
+var setuser = function(req, res){ //Create new user
 
     var first_name = req.body.first_name;
     var last_name = req.body.last_name;
@@ -512,7 +514,7 @@ module.exports.setuser = function(req, res){ //Create new user
 }
 
 //Get Count of post of specified user
-module.exports.getuserpostcount = function(req, res) { // get a post 
+var getuserpostcount = function(req, res) { // get a post 
 
     console.log('Show count of HashTag');
 
@@ -548,3 +550,15 @@ module.exports.getuserpostcount = function(req, res) { // get a post
 //     });
 
 // }
+
+module.exports = ({
+    getuserdetails : getuserdetails,
+    getpost : getpost,
+    getsinglepost : getsinglepost,
+    getuserposts : getuserposts,
+    getuserpost : getuserpost,
+    setnewpost : setnewpost,
+    setuser : setuser,
+    getuserpostcount : getuserpostcount,
+    Trendsdk : Trendsdk
+})

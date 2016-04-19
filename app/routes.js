@@ -3,6 +3,8 @@ var mailer = require('../api/mail.js'); // Mail Functionality
 var post = require('../api/post.js');
 var mention = require('../api/mention.js');
 // var follow              = require('../api/follow-following.js');  
+var express = require('express');
+var router = express.Router();
 
 var f_follow = require('../api/F_following.js');
 
@@ -12,6 +14,8 @@ var retweet             = require('../api/retweet.js');
 // var f_follow            = require('../api/F_following.js');  
 var userhome            = require('../api/userhome.js');  
 var path                = require('path');  
+var reply = require('../api/reply.js');
+var blockuser = require('../api/blockuser.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -106,6 +110,8 @@ module.exports = function(app, passport) {
     app.post('/setnewpost', post.setnewpost);                           // Set new post
     app.post('/setretweet', retweet.setretweet);                            // Set new user 
     app.post('/setlike', like.setlike);                                  // Set like
+    app.get('/getlike/:post_id', like.getlike);                                  // Get like by post
+    app.get('/getretweet/:post_id', retweet.getretweet);                                  // Get Retweet by post
 
     // Set follower
 
@@ -120,15 +126,10 @@ module.exports = function(app, passport) {
     app.get('/follower/count/:user_id', f_follow.getCountFollower);                          // count follower
     app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
 
-
-    app.get('/:user_name' , userhome.user_hometimeline);
-        
     // about page 
-    app.get('/about', isLoggedIn, post.getuserdetails);
+    app.use('/about', isLoggedIn, post.getuserdetails);
 
     app.get('/api/Trendsdk', post.Trendsdk);
-
-
 
     // =====================================
     // LOGIN ===============================
@@ -200,8 +201,10 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
-
-
+    app.get('/getreply/:postId', reply.getreply);
+    app.post('/setreply', reply.setreply);
+    app.post('/setblockuser', blockuser.setblockuser);
+    app.get('/getblockuser/:userId', blockuser.getblockuser);
 
 };
 // route middleware to make sure a user is logged in
@@ -214,3 +217,4 @@ function isLoggedIn(req, res, next) {
     // if they aren't redirect them to the home page
     res.redirect('/login');
 }
+

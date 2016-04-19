@@ -1,7 +1,7 @@
 var post_model = require('../model/post_model.js');
 
 //Set postlike
-module.exports.setlike = function(req, res) { //Create new user
+var setlike = function(req, res) { //Create new like
 
     var post_id = req.body.post_id;
     var like_user_id = req.body.like_user_id;
@@ -125,6 +125,9 @@ module.exports.setlike = function(req, res) { //Create new user
                     });
 
                 }
+                else{
+                    console.info('No Post Found');
+                }
 
             });
             
@@ -135,4 +138,26 @@ module.exports.setlike = function(req, res) { //Create new user
 
 }
 
-// module.exports.getLike = 
+var getlike = function(req, res) { //get new like
+
+    var post_id = req.params.post_id;
+
+    post_model
+    .post_like
+    .find({post_id: post_id})
+    .exec(function(err, getLikeResult){
+        console.info(getLikeResult.length);
+        console.info(getLikeResult);
+
+        res.json({
+            count: getLikeResult.length,
+            likeinfo :getLikeResult
+        })
+    });
+
+}
+
+module.exports = ({
+    getlike : getlike,
+    setlike : setlike
+})

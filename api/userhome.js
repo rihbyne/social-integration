@@ -2,38 +2,8 @@ var user = require('../app/models/user.js');
 var async = require('async');
 var post_model = require('../model/post_model.js');
 var user_followers = require('../app/models/model.final_followers.js');
-
-
-// user home time line by dk
-// logged in user tweet and retweet User 
-// var user_hometimeline = function(req , res) {
-module.exports.user_hometimeline = function(req, res) { // get a post 
-    console.log('user_hometimeline  APi hitted');
-    var username_home = req.params.user_name;
-    console.log(username_home);
-
-    post_model.post
-        .find({
-          posted_by : username_home 
-        })
-        .populate('posted_by')
-        .populate('post_id') // <--
-        .exec(function(err, resultdk) {
-        if (err){
-
-        }
-        // var data = resultdk;
-        // return (data);
-        res.json({
-            data :resultdk
-        })
-    })
-
-
-};
-
-//Get all post
-module.exports.getuserhomeposts = function(req, res) { // get a post 
+    //Get all post
+var getuserhomeposts = function(req, res) { // get a post 
 
     console.log('Show all posts for single user on home page');
 
@@ -44,161 +14,140 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
     var result1, result2;
 
     //Get My Post
-    getUserId(username, function(userid) {
+    getUserId(username, function(userid){
 
         console.info(userid);
 
         //using async series function get all post 
         async.parallel([
-                getPostByUserId,
-                getRetweetPostsByUserId
-            ],
-            function(err, result) {
-                if (err) {
+            getPostByUserId,
+            getRetweetPostsByUserId
+        ],
+        function (err, result) {
+                
+            console.info(result);
 
-                    console.error(result);
+            var profilePosts;
 
-                    // res.json({
-                    //     message: result
-                    // });
-                    return;
+            if (err) {
 
-                };
+                if (result[0] === 0) {
+                    console.info('Own posts are zero');
+                    var profilePosts = result[1]
+                }
 
-                var result = result[0].concat(result[1]); //Got two result , concent two results
+                if (result[1] === 0) {
+                    console.info('Retweet posts are zero');
+                    var profilePosts = result[0]
+                }
+                // res.json({
+                //     message: result
+                // });
+                // return;
 
-                function custom_sort(a, b) {
+            }
+            else{
+
+                var profilePosts = result[0].concat(result[1]);//Got two result , concent two results
+                    function custom_sort(a, b) {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 }
 
-                result.sort(custom_sort);
+                profilePosts.sort(custom_sort);
+                
+            };
 
-                console.info(result);
+            // console.info(result[0]+''+result[1]);
 
-                res.json({
-                    ProfilePosts: result
-                });
-
+            res.json({
+                ProfilePosts: profilePosts
             });
 
-        // console.info(result1);
-
-        //Get Follower Post
-        // getMyFollowerids(userid, function(err, myFollowers){
-
-        //     if (err) {
-
-        //         console.error(myFollowers);
-
-        //         // res.json({
-        //         //     message: result
-        //         // });
-        //         return;
-
-        //     };
-
-        //     // var userid = myFollowers
-        //     //using async series function get all post 
-        //     async.parallel([
-        //         getPostByUserId,
-        //         getRetweetPostsByUserId
-        //     ],
-        //     function (err, result) {
-        //         if (err) {
-
-        //             console.error(result);
-
-        //             // res.json({
-        //             //     message: result
-        //             // });
-        //             return;
-
-        //         };
-
-        //         console.info(result);
-        //         // result1 = result;
-
-        //     });
-
-        // });
+        });
 
     });
-
-    function getPostByUserId(callback) {
+    
+    function getPostByUserId(callback){
 
         //use userid to find all post of users
         post_model.post
-            .find({
-                posted_by: userid
-            }, {
-                _id: 0
-            })
+        .find({
+            posted_by: userid
+        }, {
+            _id: 0
+        })
         // .populate('posted_by like_by_users')
         .sort({
             created_at: -1
         })
-            .limit(10)
-            .exec(function(err, result) {
+        .limit(10)
+        .exec(function(err, result) {
 
-                if (err)
-                    res.send(err);
+            if (err)
+                res.send(err);
 
-                else if (result.length == 0) {
+            else if (result.length == 0) {
 
-                    callback(true, 'No post found');
+                callback(null, []);//No post found
 
-                } else {
+            } else {
 
-                    callback(null, result);
-                }
+                callback(null, result);
+            }
 
-            });
+        });
 
     }
 
     function getRetweetPostsByUserId(callback) {
 
-        var finalObj = new Array;
+    var finalObj = new Array;
         post_model.post_retweet
-            .find({
-                ret_user_id: userid
-            }, {
-                _id: 0
-            })
-            .select('post_id')
-            .populate('post_id')
-            .sort({
-                retweet_at: -1
-            })
-            .limit(10)
-            .exec(function(err, retweetpostids) {
+        .find({
+            ret_user_id: userid
+        }, {
+            _id: 0
+        })
+        .select('post_id')
+        .populate('post_id')
+        .sort({
+            retweet_at: -1
+        })
+        .limit(10)
+        .exec(function(err, retweetpostids) {
 
-                if (err)
-                    res.send(err);
+            // console.info('Retweet Post: ',retweetpostids);
 
-                else if (retweetpostids.length == 0) {
+            if (err)
+                res.send(err);
 
-                    callback(true, 'No post found');
+            else if (retweetpostids.length == 0) {
 
-                } else {
+                 callback(null, []);//No post found
 
-                    async.each(retweetpostids,
+            } else {
 
-                        function(retweetpostid, callback) {
+                async.each(retweetpostids,
+                               
+                    function(retweetpostid, callback) {
 
-                            finalObj.push(retweetpostid['post_id'])
+                        finalObj.push(retweetpostid['post_id'])
+                        // console.info(finalObj);
+                        return callback(finalObj);
+                    },
+                    // 3rd param is the function to call when everything's done
+                    function(err) {
 
-                        },
-                        // 3rd param is the function to call when everything's done
-                        function(err) {
-                            // All tasks are done now
-                        }
-                    );
+                        // All tasks are done now
+                    }
 
-                    callback(null, finalObj);
-                }
+                );
 
-            });
+                callback(null, finalObj);
+            }
+
+
+        });
 
     }
 
@@ -206,36 +155,29 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
 }
 
 //find id of user from user collection
-var getUserId = function(username, res) {
+var getUserId =function(username, res){
 
     user
-        .find({
-            username: username
-        }).
+    .find({
+        username: username
+    }).
     select('_id')
-        .exec(function(err, userdata) {
+    .exec(function(err, userdata) {
 
-            if (err)
-                res.send(err);
+        if (err)
+            res.send(err);
 
-            else if (userdata.length !== 0) {
+        else if (userdata.length !== 0) {
 
-                userid = userdata[0]._id;
+            userid = userdata[0]._id;
 
-                return res(userid);
-            }
+            return res(userid);
+        }
 
-        });
+    });
 
 }
 
-
-
-
-
-// module.exports = {
-//     user_hometimeline : user_hometimeline
-// };
 // var getPostByUserId = function(userid, res){
 
 //     //use userid to find all post of users
@@ -332,7 +274,7 @@ var getUserId = function(username, res) {
 // }
 //show recent 10 retweeted post
 // var getMyretweet = function(req, res){
-
+            
 
 
 // console.info('Retweet count', result[0].tweet_count);
@@ -341,3 +283,50 @@ var getUserId = function(username, res) {
 
 // };
 // }
+                    
+
+// console.info(result1);
+
+        //Get Follower Post
+        // getMyFollowerids(userid, function(err, myFollowers){
+
+        //     if (err) {
+
+        //         console.error(myFollowers);
+
+        //         // res.json({
+        //         //     message: result
+        //         // });
+        //         return;
+
+        //     };
+
+        //     // var userid = myFollowers
+        //     //using async series function get all post 
+        //     async.parallel([
+        //         getPostByUserId,
+        //         getRetweetPostsByUserId
+        //     ],
+        //     function (err, result) {
+        //         if (err) {
+
+        //             console.error(result);
+
+        //             // res.json({
+        //             //     message: result
+        //             // });
+        //             return;
+
+        //         };
+
+        //         console.info(result);
+        //         // result1 = result;
+
+        //     });
+
+        // });
+
+
+module.exports = ({
+    getuserhomeposts : getuserhomeposts
+})

@@ -1,5 +1,5 @@
 //Get all post
-module.exports.gethashtag = function(req, res) { // get a post 
+var gethashtag = function(req, res) { // get a post 
     console.log('Show all HashTag');
 
     // find the hashtag and check for errors
@@ -17,7 +17,7 @@ module.exports.gethashtag = function(req, res) { // get a post
 };
 
 //Get Count of all hashtag
-module.exports.allhashtagcount = function(req, res) { // get a post 
+var allhashtagcount = function(req, res) { // get a post 
 
     console.log('Show count of all HashTag');
 
@@ -39,7 +39,7 @@ module.exports.allhashtagcount = function(req, res) { // get a post
 };
 
 //Get Count of specified hashtag
-module.exports.hashtagcount = function(req, res) { // get a post 
+var hashtagcount = function(req, res) { // get a post 
 
     console.log('Show count of HashTag');
 
@@ -68,7 +68,7 @@ module.exports.hashtagcount = function(req, res) { // get a post
 
 
 //Get all post
-module.exports.gethashtaglist = function(req, res) { // get a post 
+var gethashtaglist = function(req, res) { // get a post 
     console.log('Show all HashTag');
 
     // find the hashtag and check for errors
@@ -89,7 +89,7 @@ module.exports.gethashtaglist = function(req, res) { // get a post
 };
 
 //Get posts of hashtag
-module.exports.gethashposts = function(req, res) { // get a post 
+var gethashposts = function(req, res) { // get a post 
 
     console.log('Show posts of hashtag');
 
@@ -119,3 +119,11 @@ module.exports.gethashposts = function(req, res) { // get a post
     });
 
 };
+
+module.exports = ({
+    gethashtag : gethashtag,
+    allhashtagcount : allhashtagcount,
+    hashtagcount : hashtagcount,
+    gethashtaglist : gethashtaglist,
+    gethashposts : gethashposts
+})

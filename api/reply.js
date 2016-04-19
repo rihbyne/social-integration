@@ -22,7 +22,7 @@ var setreply =  function(req, res){
         };
         console.info(result);
         res.json({
-            blockUserDetails: result
+            replyUserDetails: result
         })
     });
 
@@ -35,7 +35,7 @@ var getreply = function(req, res){
     post_model.post
     .find({_id : postId})
     .select('post_reply')
-    .sort({reply_at : -1})
+    .sort({reply_from : 1})
     .exec(function(err, result){
         if (err) {
             res.send(err)

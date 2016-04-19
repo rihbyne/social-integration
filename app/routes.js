@@ -87,7 +87,7 @@ module.exports = function(app, passport) {
 
 
     // user home timeline post API
-    app.get('/gethomepost/:user', userhome.getuserhomeposts);                       // Get post by username
+    app.get('/gethomepost/:username', userhome.getuserhomeposts);                       // Get post by username
 
     app.get('/getpost', post.getpost); // Get all post
 
@@ -205,7 +205,8 @@ module.exports = function(app, passport) {
     app.post('/setreply', reply.setreply);
     app.post('/setblockuser', blockuser.setblockuser);
     app.get('/getblockuser/:userId', blockuser.getblockuser);
-
+    
+    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);
 };
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

@@ -1,11 +1,13 @@
-var mongoose        = require('mongoose');           // For Mongoose
+var mongoose        = require('mongoose'),
+Schema = mongoose.Schema          // For Mongoose
 var User = require('../app/models/user.js');
 
 // Post Schema
 var post = mongoose.Schema({
     
-    posted_by:                       {type: mongoose.Schema.ObjectId},       // posted by 
-    username:   {type: String, ref:'User'},
+    // [{ type: Schema.ObjectId, ref: 'Story' }]
+    posted_by:                       {type: Schema.ObjectId , ref:'User'},       // posted by 
+    username:   {type: String},
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     tweet_count:                     {type: Number, default: 0, min: 0},

@@ -2,7 +2,37 @@ var user = require('../app/models/user.js');
 var async = require('async');
 var post_model = require('../model/post_model.js');
 var user_followers = require('../app/models/model.final_followers.js');
-    //Get all post
+
+
+// user home time line by dk
+// logged in user tweet and retweet User 
+// var user_hometimeline = function(req , res) {
+module.exports.user_hometimeline = function(req, res) { // get a post 
+    console.log('user_hometimeline  APi hitted');
+    var username_home = req.params.user_name;
+    console.log(username_home);
+
+    post_model.post
+        .find({
+          posted_by : username_home 
+        })
+        .populate('posted_by')
+        .populate('post_id') // <--
+        .exec(function(err, resultdk) {
+        if (err){
+
+        }
+        // var data = resultdk;
+        // return (data);
+        res.json({
+            data :resultdk
+        })
+    })
+
+
+};
+
+//Get all post
 module.exports.getuserhomeposts = function(req, res) { // get a post 
 
     console.log('Show all posts for single user on home page');
@@ -14,42 +44,42 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
     var result1, result2;
 
     //Get My Post
-    getUserId(username, function(userid){
+    getUserId(username, function(userid) {
 
         console.info(userid);
 
         //using async series function get all post 
         async.parallel([
-            getPostByUserId,
-            getRetweetPostsByUserId
-        ],
-        function (err, result) {
-            if (err) {
+                getPostByUserId,
+                getRetweetPostsByUserId
+            ],
+            function(err, result) {
+                if (err) {
 
-                console.error(result);
+                    console.error(result);
 
-                // res.json({
-                //     message: result
-                // });
-                return;
+                    // res.json({
+                    //     message: result
+                    // });
+                    return;
 
-            };
+                };
 
-            var result = result[0].concat(result[1]);//Got two result , concent two results
+                var result = result[0].concat(result[1]); //Got two result , concent two results
 
-            function custom_sort(a, b) {
-                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-            }
+                function custom_sort(a, b) {
+                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                }
 
-            result.sort(custom_sort);
-            
-            console.info(result);
+                result.sort(custom_sort);
 
-            res.json({
-                ProfilePosts: result
+                console.info(result);
+
+                res.json({
+                    ProfilePosts: result
+                });
+
             });
-
-        });
 
         // console.info(result1);
 
@@ -93,82 +123,82 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
         // });
 
     });
-    
-    function getPostByUserId(callback){
+
+    function getPostByUserId(callback) {
 
         //use userid to find all post of users
         post_model.post
-        .find({
-            posted_by: userid
-        }, {
-            _id: 0
-        })
+            .find({
+                posted_by: userid
+            }, {
+                _id: 0
+            })
         // .populate('posted_by like_by_users')
         .sort({
             created_at: -1
         })
-        .limit(10)
-        .exec(function(err, result) {
+            .limit(10)
+            .exec(function(err, result) {
 
-            if (err)
-                res.send(err);
+                if (err)
+                    res.send(err);
 
-            else if (result.length == 0) {
+                else if (result.length == 0) {
 
-                callback(true, 'No post found');
+                    callback(true, 'No post found');
 
-            } else {
+                } else {
 
-                callback(null, result);
-            }
+                    callback(null, result);
+                }
 
-        });
+            });
 
     }
 
     function getRetweetPostsByUserId(callback) {
 
-    var finalObj = new Array;
+        var finalObj = new Array;
         post_model.post_retweet
-        .find({
-            ret_user_id: userid
-        }, {
-            _id: 0
-        })
-        .select('post_id')
-        .populate('post_id')
-        .sort({
-            retweet_at: -1
-        })
-        .limit(10)
-        .exec(function(err, retweetpostids) {
+            .find({
+                ret_user_id: userid
+            }, {
+                _id: 0
+            })
+            .select('post_id')
+            .populate('post_id')
+            .sort({
+                retweet_at: -1
+            })
+            .limit(10)
+            .exec(function(err, retweetpostids) {
 
-            if (err)
-                res.send(err);
+                if (err)
+                    res.send(err);
 
-            else if (retweetpostids.length == 0) {
+                else if (retweetpostids.length == 0) {
 
-                callback(true, 'No post found');
+                    callback(true, 'No post found');
 
-            } else {
+                } else {
 
-                async.each(retweetpostids,
-                               
-                    function(retweetpostid, callback) {
+                    async.each(retweetpostids,
 
-                        finalObj.push(retweetpostid['post_id'])
-                        
-                    },
-                    // 3rd param is the function to call when everything's done
-                    function(err) {
-                        // All tasks are done now
-                    }
-                );
+                        function(retweetpostid, callback) {
 
-                callback(null, finalObj);
-            }
+                            finalObj.push(retweetpostid['post_id'])
 
-        });
+                        },
+                        // 3rd param is the function to call when everything's done
+                        function(err) {
+                            // All tasks are done now
+                        }
+                    );
+
+                    callback(null, finalObj);
+                }
+
+            });
 
     }
 
@@ -176,29 +206,36 @@ module.exports.getuserhomeposts = function(req, res) { // get a post
 }
 
 //find id of user from user collection
-var getUserId =function(username, res){
+var getUserId = function(username, res) {
 
     user
-    .find({
-        username: username
-    }).
+        .find({
+            username: username
+        }).
     select('_id')
-    .exec(function(err, userdata) {
+        .exec(function(err, userdata) {
 
-        if (err)
-            res.send(err);
+            if (err)
+                res.send(err);
 
-        else if (userdata.length !== 0) {
+            else if (userdata.length !== 0) {
 
-            userid = userdata[0]._id;
+                userid = userdata[0]._id;
 
-            return res(userid);
-        }
+                return res(userid);
+            }
 
-    });
+        });
 
 }
 
+
+
+
+
+// module.exports = {
+//     user_hometimeline : user_hometimeline
+// };
 // var getPostByUserId = function(userid, res){
 
 //     //use userid to find all post of users
@@ -295,7 +332,7 @@ var getUserId =function(username, res){
 // }
 //show recent 10 retweeted post
 // var getMyretweet = function(req, res){
-            
+
 
 
 // console.info('Retweet count', result[0].tweet_count);
@@ -304,7 +341,3 @@ var getUserId =function(username, res){
 
 // };
 // }
-
-            
-
-                    

@@ -121,7 +121,8 @@ module.exports = function(app, passport) {
     app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
 
 
-
+    app.get('/:user_name' , userhome.user_hometimeline);
+        
     // about page 
     app.get('/about', isLoggedIn, post.getuserdetails);
 

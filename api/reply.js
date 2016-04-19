@@ -4,14 +4,14 @@ var post_model = require('../model/post_model.js');
 var setreply =  function(req, res){
 
     var reply = req.body.reply;
-    var replyfrom = req.body.replyfrom;
+    var replyBy = req.body.reply_by;
     var post_id = req.body.post_id;
 
     //blank validation
 
     var post_reply = {
         reply : reply,
-        reply_from : replyfrom
+        reply_by : replyBy
     }
 
     post_model.post

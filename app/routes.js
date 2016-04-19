@@ -20,15 +20,12 @@ var blockuser = require('../api/blockuser.js');
 // app/routes.js
 module.exports = function(app, passport) {
 
-
     app.post('/secure/sendVerificationEmail', notification.sendVerificationEmail);
     app.post('/secure/sendforgotpassword', notification.sendforgotpassword);
     app.post('/secure/changePassEmail', notification.changePassEmail);
     app.post('/secure/resettedConfirmation', notification.resettedConfirmation);
     app.post('/secure/sendMail', mailer.sendPHPmail);
     app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
-
-
 
     // user preferance page 
     app.get('/user_preferance', function(req, res) {
@@ -69,12 +66,6 @@ module.exports = function(app, passport) {
     //     res.render('pages/profile');
     // });
 
-    // mention
-    app.get('/mention/:mention_user', mention.getmentionuser);
-
-    // hashtag
-    // app.get('/hashtag/:hashtag', post.gethashposts);
-
     // // login
     // app.get('/login', function(req, res) {
     //     res.render('pages/login');
@@ -86,51 +77,7 @@ module.exports = function(app, passport) {
     // });
 
 
-    // user home timeline post API
-    app.get('/gethomepost/:username', userhome.getuserhomeposts);                       // Get post by username
-
-    app.get('/getpost', post.getpost); // Get all post
-
-    app.get('/getpost/post/:post_title', post.getsinglepost); // Get post by post title
-
-    app.get('/getpost/:user', post.getuserposts); // Get post by username
-    app.get('/getpost/count/:user', post.getuserpostcount); // Get post count by username
-    app.get('/getpost/:user/:post_id', post.getuserpost); // Get single post of user
-
-    app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
-
-    app.get('/hashtag/count', hashtag.allhashtagcount); // Get the count of all hashtag
-    app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);               // Get the count of specifiedhashtag
-    app.post('/hashtags', hashtag.gethashtag);                              // Get all hashtag keyword      
-    app.post('/gethashtaglistcount', hashtag.gethashtaglist);                    // Get all hashtag keyword          
-        
-    app.get('/hashtags/:hashtag', hashtag.gethashposts);                    // Get post from hashtag
-
-    app.post('/setuser', post.setuser);                                     // Set new user 
-    app.post('/setnewpost', post.setnewpost);                           // Set new post
-    app.post('/setretweet', retweet.setretweet);                            // Set new user 
-    app.post('/setlike', like.setlike);                                  // Set like
-    app.get('/getlike/:post_id', like.getlike);                                  // Get like by post
-    app.get('/getretweet/:post_id', retweet.getretweet);                                  // Get Retweet by post
-
-    // Set follower
-
-    // dk
-    app.post('/setfollowing_f', f_follow.setfollowing); // Set follower
-    app.get('/:user_name/following_f', f_follow.getfollowing); // Set followings
-    app.get('/:user_name/followers_f', f_follow.getfollowers); // Set follower
-    // app.post('/unlink_follower_f', f_follow.unlink_follower);                          // Set follower
-    app.post('/unlink_followings_f', f_follow.unlink_following); // Set follower
-
-
-    app.get('/follower/count/:user_id', f_follow.getCountFollower);                          // count follower
-    app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
-
-    // about page 
-    app.use('/about', isLoggedIn, post.getuserdetails);
-
-    app.get('/api/Trendsdk', post.Trendsdk);
-
+    
     // =====================================
     // LOGIN ===============================
     // =====================================
@@ -151,7 +98,6 @@ module.exports = function(app, passport) {
         failureRedirect: '/login', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
-
 
     // =====================================
     // SIGNUP ==============================
@@ -191,8 +137,6 @@ module.exports = function(app, passport) {
         });
     });
 
-
-
     // =====================================
     // LOGOUT ==============================
     // =====================================+
@@ -201,12 +145,47 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
-    app.get('/getreply/:postId', reply.getreply);
-    app.post('/setreply', reply.setreply);
-    app.post('/setblockuser', blockuser.setblockuser);
-    app.get('/getblockuser/:userId', blockuser.getblockuser);
-    
-    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);
+    app.use('/about', isLoggedIn, post.getuserdetails);// about page
+    app.get('/mention/:mention_user', mention.getmentionuser); //Get Mention User Details
+    app.get('/gethomepost/:username', userhome.getuserhomeposts);  // user home timeline post API
+
+    app.get('/getpost', post.getpost); // Get all post
+    app.get('/getpost/:user', post.getuserposts); // Get post by username
+    app.get('/getpost/:user/:post_id', post.getuserpost); // Get single post of user
+    app.get('/getpost/count/:user', post.getuserpostcount); // Get post count by username
+    app.get('/getpost/post/:post_title', post.getsinglepost); // Get post by post title
+    app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
+
+    app.post('/hashtags', hashtag.gethashtag);                              // Get all hashtag keyword
+    app.get('/hashtags/:hashtag', hashtag.gethashposts);                    // Get post from hashtag
+    app.get('/hashtag/count', hashtag.allhashtagcount); // Get the count of all hashtag
+    app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);               // Get the count of specifiedhashtag
+    app.post('/gethashtaglistcount', hashtag.gethashtaglist);                    // Get all hashtag keyword
+
+    app.post('/setuser', post.setuser);                                     // Set new user
+    app.post('/setnewpost', post.setnewpost);                           // Set new post
+    app.post('/setretweet', retweet.setretweet);                            // Set new user
+    app.post('/setlike', like.setlike);                                  // Set like
+    app.get('/getlike/:post_id', like.getlike);                                  // Get like by post
+    app.get('/getretweet/:post_id', retweet.getretweet);                                  // Get Retweet by post
+
+    app.post('/setfollowing_f', f_follow.setfollowing); // Set follower// dk
+    app.get('/following_f/:user_name', f_follow.getfollowing); // Set followings
+    app.get('/followers_f/:user_name', f_follow.getfollowers); // Set follower
+    // app.post('/unlink_follower_f', f_follow.unlink_follower);                          // Set follower
+    app.post('/unlink_followings_f', f_follow.unlink_following); // Set follower
+    app.get('/follower/count/:user_id', f_follow.getCountFollower);                          // count follower
+    app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
+
+    app.get('/api/Trendsdk', post.Trendsdk);//trend keyword
+    app.get('/getreply/:postId', reply.getreply);//Get reply
+    app.post('/setreply', reply.setreply); //Set reply
+
+    app.post('/setblockuser', blockuser.setblockuser);//Set block user
+    app.get('/getblockuser/:userId', blockuser.getblockuser);//get block user
+
+    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);//tweet, retweet & reply post
+
 };
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

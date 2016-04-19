@@ -72,7 +72,7 @@ var getuserhomeposts = function(req, res) { // get a post
 
 var getpostsrtreply = function(req, res) { // get a post 
 
-    console.log('Show all posts for single user on home page');
+    console.log('Show all posts for single user on process._stopProfilerIdleNotifier(); page');
 
     var username = req.params.username; // find posts of user and check for errors
 
@@ -93,7 +93,7 @@ var getpostsrtreply = function(req, res) { // get a post
         ],
         function (err, result) {
                 
-            console.info(result);
+            //console.info(result);
 
             var profilePosts;
 
@@ -116,7 +116,7 @@ var getpostsrtreply = function(req, res) { // get a post
             }
             else{
 
-                var profilePosts = result[0].concat(result[1]);//Got two result , concent two results
+                var profilePosts = result[0].concat(result[1]).concat(result[2]);//Got two result , concent two results
                
                 function custom_sort(a, b) {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -188,9 +188,7 @@ function getRetweetPostsByUserId(callback) {
         .limit(10)
         .exec(function(err, retweetpostids) {
 
-            console.info('Retweet Post: ',retweetpostids);
-            // retweetpostids['post_id'].created_at = retweetpostids['retweet_at']
-            // console.info(retweetpostids['post_id'].created_at+' '+retweetpostids['retweet_at']);
+            //console.info('Retweet Post: ',retweetpostids);
 
             if (err)
                 res.send(err);
@@ -206,7 +204,7 @@ function getRetweetPostsByUserId(callback) {
                     function(retweetpostid, callback) {
 
                         retweetpostid['post_id'].created_at = retweetpostid['retweet_at'];
-                        
+
                         finalObj.push(retweetpostid['post_id'])
                         // console.info(finalObj);
                         return callback(finalObj);
@@ -225,35 +223,59 @@ function getRetweetPostsByUserId(callback) {
 
         });
 
-} 
+}
 
 function getReplyByUserId(callback){
+
+    var replyResultArray = new Array;
 
     //use userid to find all post of users
     post_model.post
     .find({
-        'post_reply.reply_from': userid
+        'post_reply.reply_by': userid
     }, {
         _id: 0
     })
-    .select('post_reply')
+    .select('posted_by post_reply')
     // .populate('posted_by like_by_users')
     .sort({
         reply_at: -1
     })
     .limit(10)
-    .exec(function(err, result) {
+    .lean().exec(function(err, postReplyResult) {
 
         if (err)
             res.send(err);
 
-        else if (result.length == 0) {
+        else if (postReplyResult.length == 0) {
 
             callback(null, []);//No post found
 
         } else {
+            // console.info(postReplyResult);
 
-            callback(null, result['post_reply']);
+                async.each(postReplyResult,
+                               
+                    function(postReplyOne, callback) {
+                       console.info(postReplyOne);
+                        postReplyOne['post_reply'][0]['created_at'] = postReplyOne['post_reply'][0]['reply_at'];
+                        postReplyOne['post_reply'][0]['posted_by'] = postReplyOne['posted_by']  
+                        // console.info(postReplyOne['post_reply'][0]);
+                        replyResultArray.push(postReplyOne['post_reply'][0]);
+
+                        console.info(replyResultArray);
+                        return callback(replyResultArray);
+
+                    },
+                    // 3rd param is the function to call when everything's done
+                    function(err) {
+
+                        // All tasks are done now
+                    }
+
+                );
+
+            callback(null, replyResultArray);
         }
 
     });

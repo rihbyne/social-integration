@@ -193,7 +193,7 @@ var getuserposts = function(req, res) { // get a post
                 }, {
                     _id: 0
                 })
-                .populate('posted_by')
+                // .populate('posted_by')
                 .sort({
                     created_at: -1
                 })

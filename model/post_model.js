@@ -5,12 +5,12 @@ var User = require('../app/models/user.js');
 var post = mongoose.Schema({
     
     posted_by:                       {type: mongoose.Schema.ObjectId},       // posted by 
-    username:   {type: String, ref:'User'},
+    username:                        {type: String, ref:'User'},
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     post_reply:                      [{
-                                      reply : String,
-                                      reply_from: String,
+                                      reply_by: String,
+                                      reply_msg : String,                                      
                                       reply_at : { type: Date, default: Date.now }
                                      }],
     tweet_count:                     {type: Number, default: 0, min: 0},

@@ -40,7 +40,7 @@ var setmuteuser = function(req, res) {
 
 }
 
-var getblockuser = function(req, res){
+var getmuteuser = function(req, res){
 
 	var userId = req.params.userId;
     var blockStatus = req.params.blockStatus;
@@ -64,6 +64,6 @@ var getblockuser = function(req, res){
 }
 
 module.exports = ({
-	setblockuser : setblockuser,
-	getblockuser : getblockuser
+	setmuteuser : setmuteuser,
+	getmuteuser : getmuteuser
 });

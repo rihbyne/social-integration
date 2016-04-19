@@ -8,7 +8,8 @@ var router = express.Router(), // get an instance of the express Router
 
 var util = require('util');
 var async = require('async');
-//Get all post
+
+//Get all post and other details
 var getuserdetails = function(req, res) { // get a post 
     console.log('Show user details');
 
@@ -104,7 +105,6 @@ var getuserdetails = function(req, res) { // get a post
 
 };
 
-
 var Trendsdk = function(req, res) {
         console.log('dktrend api hitted')
         post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
@@ -122,7 +122,7 @@ var Trendsdk = function(req, res) {
     });
 };
 
-//Get all post
+//Get all post 
 var getpost = function(req, res) { // get a post 
     console.log('Show all post');
 
@@ -138,7 +138,7 @@ var getpost = function(req, res) { // get a post
 
 };
 
-//Get single post
+//Get single post of user
 var getsinglepost = function(req, res) { // get a post 
     console.log('Show single post');
     var post_title = req.params.post_title;
@@ -162,7 +162,7 @@ var getsinglepost = function(req, res) { // get a post
 
 };
 
-//Get all post
+//Get all post of user
 var getuserposts = function(req, res) { // get a post 
     var finalObj = new Array;
     var finalObj1;

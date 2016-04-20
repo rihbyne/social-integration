@@ -232,11 +232,11 @@ function getReplyByUserId(callback){
     //use userid to find all post of users
     post_model.post
     .find({
-        'post_reply.posted_by': userid
+        'post_reply.reply_by': userid
     }, {
         _id: 0
     })
-    .select('post_reply')
+    .select('posted_by post_reply')
     // .populate('posted_by like_by_users')
     .sort({
         reply_at: -1
@@ -258,8 +258,8 @@ function getReplyByUserId(callback){
                                
                     function(postReplyOne, callback) {
                        console.info(postReplyOne);
-                        // postReplyOne['post_reply'][0]['created_at'] = postReplyOne['post_reply'][0]['reply_at'];
-                        // postReplyOne['post_reply'][0]['posted_by'] = postReplyOne['posted_by']  
+                        postReplyOne['post_reply'][0]['created_at'] = postReplyOne['post_reply'][0]['reply_at'];
+                        postReplyOne['post_reply'][0]['posted_by'] = postReplyOne['posted_by']  
                         // console.info(postReplyOne['post_reply'][0]);
                         replyResultArray.push(postReplyOne['post_reply'][0]);
 

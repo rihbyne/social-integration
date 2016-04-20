@@ -59,8 +59,9 @@ var setlike = function(req, res) { //Create new like
                         //      message: 'Remove Like'
                         // });
                         // res.render('pages/about');
-                        // req.route('pages/about');
+
                         res.redirect('about');
+                        
                     })
                     
                 };
@@ -142,26 +143,52 @@ var setlike = function(req, res) { //Create new like
 
 }
 
-var getlike = function(req, res) { //get new like
+var getLikeByPost = function(req, res) { //get new like
 
     var post_id = req.params.post_id;
 
     post_model
     .post_like
     .find({post_id: post_id})
-    .exec(function(err, getLikeResult){
-        console.info(getLikeResult.length);
-        console.info(getLikeResult);
+    .exec(function(err, postLikeResult){
+
+        console.info(postLikeResult.length+ '\n' +postLikeResult);
 
         res.json({
-            count: getLikeResult.length,
-            likeinfo :getLikeResult
+            count: postLikeResult.length,
+            likeinfo :postLikeResult
         })
+
+    });
+
+}
+
+var getLikeByUser = function(req, res) { //get new like
+
+    var user_id = req.params.user_id;
+
+    post_model
+    .post_like
+    .find({like_user_id: user_id})
+    .exec(function(err, userlikeResult){
+
+        console.info(userlikeResult.length+ '\n' +userlikeResult);
+
+        if (err) {
+            res.send(err);
+        };
+
+        res.json({
+            count: userlikeResult.length,
+            result : userlikeResult
+        })
+
     });
 
 }
 
 module.exports = ({
-    getlike : getlike,
-    setlike : setlike
+    getLikeByUser : getLikeByUser,
+    getLikeByPost : getLikeByPost,
+    setlike       : setlike
 })

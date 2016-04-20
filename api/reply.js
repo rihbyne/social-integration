@@ -24,7 +24,7 @@ var setreply =  function(req, res){
         };
         if (postresult.length == 0) {//if not found in post...serarch in reply_post and update
             post_model.post
-            .find({'post_reply.$._id': post_id})
+            .find({'post_reply._id': post_id})
             .exec(function(err, replyresult){
                 if (err) {
                     res.send(err)
@@ -32,13 +32,17 @@ var setreply =  function(req, res){
                 console.info('Found in reply ',replyresult);
 
                 post_model.post
-                .update({'post_reply._id': post_id}, {$push: {'post_reply.post_reply': post_reply}}, {setDefaultsOnInsert: true})
+                .update({'post_reply._id': post_id  }, {$push: {'post_reply.$.post_reply': post_reply}}, {setDefaultsOnInsert: true})
                 .exec(function(err, result){
+                    if (err) {
+                        console.info(err);
+                    };
                     console.info(result);
 
                 });
 
             })
+
         }
         else{ //update in post
 
@@ -46,23 +50,14 @@ var setreply =  function(req, res){
             post_model.post
             .update({_id: post_id}, {$push: {post_reply: post_reply}}, {setDefaultsOnInsert: true})
             .exec(function(err, result){
+                if (err) {
+                    console.info(err);
+                };
                 console.info(result);
             });
         };
 
     })
-
-    // post_model.post
-    // .findOneAndUpdate({_id: post_id}, {$push: {"post_reply": post_reply}}, {setDefaultsOnInsert: true})
-    // .exec(function(err, result){
-    //     if (err) {
-    //         res.send(err)
-    //     };
-    //     console.info(result);
-    //     res.json({
-    //         replyUserDetails: result
-    //     })
-    // });
 
 };
 

@@ -147,35 +147,39 @@ module.exports = function(app, passport) {
 
     app.use('/about', isLoggedIn, post.getuserdetails);// about page
     app.get('/mention/:mention_user', mention.getmentionuser); //Get Mention User Details
-    app.get('/gethomepost/:username', userhome.getuserhomeposts);  // user home timeline post API
+    app.get('/gethomepost/:username', userhome.getuserhomeposts);           // user home timeline post API
 
-    app.get('/getpost', post.getpost); // Get all post
-    app.get('/getpost/:user', post.getuserposts); // Get post by username
-    app.get('/getpost/:user/:post_id', post.getuserpost); // Get single post of user
-    app.get('/getpost/count/:user', post.getuserpostcount); // Get post count by username
-    app.get('/getpost/post/:post_title', post.getsinglepost); // Get post by post title
+    app.get('/getpost', post.getpost);                                      // Get all post
+    app.get('/getpost/:user', post.getuserposts);                           // Get post by username
+    app.get('/getpost/:user/:post_id', post.getuserpost);                   // Get single post of user
+    app.get('/getpost/count/:user', post.getuserpostcount);                 // Get post count by username
+    app.get('/getpost/post/:post_title', post.getsinglepost);               // Get post by post title
     app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
     app.post('/hashtags', hashtag.gethashtag);                              // Get all hashtag keyword
     app.get('/hashtags/:hashtag', hashtag.gethashposts);                    // Get post from hashtag
-    app.get('/hashtag/count', hashtag.allhashtagcount); // Get the count of all hashtag
+    app.get('/hashtag/count', hashtag.allhashtagcount);                     // Get the count of all hashtag
     app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);               // Get the count of specifiedhashtag
     app.post('/gethashtaglistcount', hashtag.gethashtaglist);                    // Get all hashtag keyword
 
     app.post('/setuser', post.setuser);                                     // Set new user
-    app.post('/setnewpost', post.setnewpost);                           // Set new post
+    app.post('/setnewpost', post.setnewpost);                               // Set new post
     app.post('/setretweet', retweet.setretweet);                            // Set new user
-    app.post('/setlike', like.setlike);                                  // Set like
-    app.get('/getlike/:post_id', like.getlike);                                  // Get like by post
-    app.get('/getretweet/:post_id', retweet.getretweet);                                  // Get Retweet by post
+   
+    app.post('/setlike', like.setlike);                                     // Set like
+    app.get('/like/post/:post_id', like.getLikeByPost);                       // Get like by post
+    app.get('/like/user/:user_id', like.getLikeByUser);                       // Get like by User
 
-    app.post('/setfollowing_f', f_follow.setfollowing); // Set follower// dk
-    app.get('/following_f/:user_name', f_follow.getfollowing); // Set followings
-    app.get('/followers_f/:user_name', f_follow.getfollowers); // Set follower
+
+    app.get('/getretweet/:post_id', retweet.getretweet);                     // Get Retweet by post
+
+    app.post('/setfollowing_f', f_follow.setfollowing);                     // Set follower// dk
+    app.get('/following_f/:user_name', f_follow.getfollowing);              // Set followings
+    app.get('/followers_f/:user_name', f_follow.getfollowers);                          // Set follower
     // app.post('/unlink_follower_f', f_follow.unlink_follower);                          // Set follower
-    app.post('/unlink_followings_f', f_follow.unlink_following); // Set follower
-    app.get('/follower/count/:user_id', f_follow.getCountFollower);                          // count follower
-    app.get('/following/count/:following_id', f_follow.getCountFollowing);                          // count follower
+    app.post('/unlink_followings_f', f_follow.unlink_following);            // Set follower
+    app.get('/follower/count/:user_id', f_follow.getCountFollower);         // count follower
+    app.get('/following/count/:following_id', f_follow.getCountFollowing);   // count follower
 
     app.get('/api/Trendsdk', post.Trendsdk);//trend keyword
     app.get('/getreply/:postId', reply.getreply);//Get reply

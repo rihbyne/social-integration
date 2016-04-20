@@ -103,6 +103,24 @@ var getuserdetails = function(req, res) { // get a post
         });
     }
 
+    async.parallel([
+        allpost,
+        tweetcount,
+        trends
+    ], function (err, results){
+        //after 5 seconds, results will be [1, 2]
+        console.log(userdetails);
+        
+        res.redirect('about');
+
+        // res.render('pages/about', {
+        //     userdetails : userdetails,
+        //     user: req.user
+        // });
+       // res.send(userdetails, req.user);
+       // res.end();
+    });
+
 };
 
 var Trendsdk = function(req, res) {
@@ -193,7 +211,7 @@ var getuserposts = function(req, res) { // get a post
                 }, {
                     _id: 0
                 })
-                // .populate('posted_by')
+                .populate('posted_by')
                 .sort({
                     created_at: -1
                 })

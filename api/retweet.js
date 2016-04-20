@@ -1,7 +1,7 @@
 var post_model = require('../model/post_model.js');
 
 //Set retweet
-module.exports.setretweet = function(req, res) { //Create new user
+module.exports.setretweet = function(req, res , done) { //Create new user
 
     var post_id = req.body.post_id;
     var retweet_user_id = req.body.retweet_user_id;
@@ -19,6 +19,10 @@ module.exports.setretweet = function(req, res) { //Create new user
 
         if (retweetdata.length !== 0) {
 
+        //     return (null, false, req.flash('RTMessagetwise', 'You can not retweet twice for same post.'));
+        // res.render('pages/about', {
+        //     message: req.flash('RTMessagetwise')
+        // });
             console.log('You can not retweet twice for same post');
 
             post_model.post_retweet
@@ -72,8 +76,10 @@ module.exports.setretweet = function(req, res) { //Create new user
 
                     if (postdata[0].posted_by == retweet_user_id) {
 
-                        console.log('You can not tweet on your own post');
-                        return;                        
+                        console.log('You can not RE-tweet on your own post');
+                        // return;                        
+                          // return done(null, false, req.flash('RTMessageownpost', 'You can not tweet on your own post'));
+                        res.redirect('about');
 
                     } 
                     else{
@@ -102,12 +108,17 @@ module.exports.setretweet = function(req, res) { //Create new user
                                         res.send(err);
                                     };
 
+                                  res.redirect('about');
+
+
                                 })
 
                             // res.json({
                             //     message: 'User retweeted'
                             // });
-                            res.render('pages/profile');
+                            // res.render('pages/profile');
+                        res.redirect('about');
+
 
                         });
 

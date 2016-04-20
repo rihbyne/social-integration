@@ -55,10 +55,12 @@ var setlike = function(req, res) { //Create new like
                             return;
                         };
 
-                        res.json({
-                             message: 'Remove Like'
-                        });
-                        
+                        // res.json({
+                        //      message: 'Remove Like'
+                        // });
+                        // res.render('pages/about');
+                        // req.route('pages/about');
+                        res.redirect('about');
                     })
                     
                 };
@@ -120,7 +122,9 @@ var setlike = function(req, res) { //Create new like
                         // res.json({
                         //     message: 'User retweeted'
                         // });
-                        res.render('pages/profile');
+                        // res.render('pages/about');
+                        // req.route('pages/about');
+                        res.redirect('about');
 
                     });
 

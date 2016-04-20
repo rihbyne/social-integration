@@ -50,24 +50,29 @@
                             <strong>id</strong>: <%= user._id %><br>
                             <strong>email</strong>: <%= user.email %><br>
                             <strong>password</strong>: <%= user.password %><br>
-                            <strong>password</strong>: <%= user.first_name %><br>
-                            <strong>password</strong>: <%= user.last_name %><br?
+                            <strong>F_name</strong>: <%= user.first_name %><br>
+                            <strong>L_name</strong>: <%= user.last_name %><br>
+                            <strong>username</strong>: <%= user.username %><br>
                         </p>
                         <!-- <a href="/logout" class="btn btn-default btn-sm">Logout</a> -->
                         <form class="col s12">
                             <div class="row">
                                 <div class="col s12">
                                     <ul class="tabs">
-                                        <li class="tab col s3"><a class="active" href="#test1">TWEETS <br><span>744</span></a></li>
-                                        <li class="tab col s3"><a href="#test2">FOLLOWING
+                                        <li class="tab col s3"><a class="active" href="/">TWEETS <br><span>744</span></a></li>
+                                        <li class="tab col s3"><a href="/following" target="_blank">FOLLOWING
                                             <span>491</span></a></li>
-                                            <li class="tab col s3 "><a href="#test3">FOLLOWERS
+                                            <li class="tab col s3 "><a href="/followers">FOLLOWERS
                                                 <span>151</span></a></li>
-                                                <li class="tab col s3"><a href="#test4">LIKES
+                                                <li class="tab col s3"><a href="likes">LIKES
                                                     <span>482</span></a></li>
                                                 </ul>
                                             </div>
                                             <div id="test1" class="col s12">
+                                                <ul class="link-pro-tabs">
+                                                    <li><a href="/following">tweets</a></li>
+                                                    <li><a href="/following">tweets&reply</a></li>
+                                                </ul>
                                                 <ul class="collection social_post">
                                                     <li class="collection-item avatar">
                                                         <img src="images/pro_01.jpg" alt="" class="circle">
@@ -165,52 +170,7 @@
                                                                 </li>
                                                             </ul>
                                                         </div>
-                                                        <div id="test2" class="col s12">
-                                                            <!-- following tabs -->
-                                                            <div class="row">
-                                                                <div class="col s12 m6">
-                                                                    <div class="card small">
-                                                                        <div class="card-image">
-                                                                            <img src="images/CeoXGIuWQAAtrZN.jpg">
-                                                                            <span class="card-title">Sudeep Makwana</span>
-                                                                            <span class="card-title handle">@sudeep_dk</span>
-                                                                            <span class="right card-title f-status">follows you</span>
-                                                                        </div>
-                                                                        <div class="card-content">
-                                                                            <p>I strongly believe that we can change our country's fate we r the future of our country.Full stack programmer. http://wegotjob.in </p><br>
-
-                                                                        </div>
-                                                                        <div class="card-action">
-                                                                            <button class="btn waves-effect waves-light red light-red lighten-1 " type="submit" name="action">following
-                                                                            <i class="material-icons right">user</i>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                 <div class="col s12 m6">
-                                                                    <div class="card small">
-                                                                        <div class="card-image">
-                                                                            <img src="images/CeoXGIuWQAAtrZN.jpg">
-                                                                            <span class="card-title">Sudeep Makwana</span>
-                                                                            <span class="card-title handle">@sudeep_dk</span>
-                                                                            <span class="right card-title f-status">follows you</span>
-                                                                        </div>
-                                                                        <div class="card-content">
-                                                                            <p>I strongly believe that we can change our country's fate we r the future of our country.Full stack programmer. http://wegotjob.in </p><br>
-
-                                                                        </div>
-                                                                        <div class="card-action">
-                                                                            <button class="btn waves-effect waves-light red light-red lighten-1 " type="submit" name="action">following
-                                                                            <i class="material-icons right">user</i>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <!-- end following tab -->
-                                                        </div>
-                                                        <div id="test3" class="col s12">Test 3</div>
-                                                        <div id="test4" class="col s12">Test 4</div>
+                                                       
                                                     </div>
                                                 </form>
                                             </div>

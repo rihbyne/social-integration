@@ -5,7 +5,6 @@ var router = express.Router(), // get an instance of the express Router
     followers_data = require('../app/models/model.followers'),
     followers_data = require('../app/models/model.following');
 
-
 var util = require('util');
 var async = require('async');
 
@@ -15,6 +14,23 @@ var getuserdetails = function(req, res) { // get a post
 
     var userdetails = new Array();
     var userid = req.user._id;
+
+    async.parallel([
+        allpost,
+        tweetcount,
+        trends
+    ], function (err, results){
+        //after 5 seconds, results will be [1, 2]
+        console.log(userdetails);
+
+        res.render('pages/about', {
+            userdetails : userdetails,
+            user: req.user
+        });
+       // res.send(userdetails, req.user);
+       // res.end();
+    });
+
     function allpost(callback) {
         // save the bear and check for errors
 
@@ -86,22 +102,6 @@ var getuserdetails = function(req, res) { // get a post
 
         });
     }
-
-    async.parallel([
-        allpost,
-        tweetcount,
-        trends
-    ], function (err, results){
-        //after 5 seconds, results will be [1, 2]
-        console.log(userdetails);
-
-        res.render('pages/about', {
-            userdetails : userdetails,
-            user: req.user
-        });
-       // res.send(userdetails, req.user);
-       // res.end();
-    });
 
 };
 

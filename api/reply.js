@@ -17,16 +17,52 @@ var setreply =  function(req, res){
     }
 
     post_model.post
-    .findOneAndUpdate({_id: post_id}, {$push: {"post_reply": post_reply}}, {setDefaultsOnInsert: true})
-    .exec(function(err, result){
+    .find({_id: post_id})
+    .exec(function(err, postresult){
         if (err) {
             res.send(err)
         };
-        console.info(result);
-        res.json({
-            replyUserDetails: result
-        })
-    });
+        if (postresult.length == 0) {//if not found in post...serarch in reply_post and update
+            post_model.post
+            .find({'post_reply.$._id': post_id})
+            .exec(function(err, replyresult){
+                if (err) {
+                    res.send(err)
+                };
+                console.info('Found in reply ',replyresult);
+
+                post_model.post
+                .update({'post_reply._id': post_id}, {$push: {'post_reply.post_reply': post_reply}}, {setDefaultsOnInsert: true})
+                .exec(function(err, result){
+                    console.info(result);
+
+                });
+
+            })
+        }
+        else{ //update in post
+
+            console.info('Found in post ',postresult);
+            post_model.post
+            .update({_id: post_id}, {$push: {post_reply: post_reply}}, {setDefaultsOnInsert: true})
+            .exec(function(err, result){
+                console.info(result);
+            });
+        };
+
+    })
+
+    // post_model.post
+    // .findOneAndUpdate({_id: post_id}, {$push: {"post_reply": post_reply}}, {setDefaultsOnInsert: true})
+    // .exec(function(err, result){
+    //     if (err) {
+    //         res.send(err)
+    //     };
+    //     console.info(result);
+    //     res.json({
+    //         replyUserDetails: result
+    //     })
+    // });
 
 };
 

@@ -1,151 +1,147 @@
-var post_model = require('../model/post_model.js');
-var express = require('express');
-var router = express.Router(), // get an instance of the express Router
-    User = require('../app/models/user.js'),
-    followers_data = require('../app/models/model.followers'),
-    followers_data = require('../app/models/model.following');
 
-var util = require('util');
-var async = require('async');
+// Packages
+var util 						= require('util');
+var async 						= require('async');
+var express 					= require('express');
+var router 						= express.Router(); 						// get an instance of the express Router
+
+// Pages
+var post_model 					= require('../model/post_model.js');
+    User 						= require('../app/models/user.js'),
+    followers_data 				= require('../app/models/model.followers'),
+    followers_data 				= require('../app/models/model.following'),
+	user_final_followers_schema = require('../app/models/model.final_followers.js');
+
 
 //Get all post and other details
-var getuserdetails = function(req, res) { // get a post 
-    console.log('Show user details');
+
+// Get Details
+var getuserdetails = function(req, res) { 
 
     var userdetails = new Array();
-    var userid = req.user._id;
-
-    async.parallel([
+    var user_id 		= req.user._id;
+	
+	async.parallel([
         allpost,
         tweetcount,
-        trends
+        trends,
+		following,
+		followers
     ], function (err, results){
-        //after 5 seconds, results will be [1, 2]
-        console.log(userdetails);
 
-        res.render('pages/about', {
-            userdetails : userdetails,
-            user: req.user
-        });
-       // res.send(userdetails, req.user);
-       // res.end();
+		res.render('pages/about', {
+			userdetails : userdetails,
+			user: req.user
+		});
+
     });
-
+	
     function allpost(callback) {
-        // save the bear and check for errors
-
-        post_model.post.find({posted_by: userid}).sort({created_at: -1}).exec(function(err, allpost) {
+	
+        post_model.post
+		.find({posted_by: user_id})
+		.sort({created_at: -1})
+		.exec(function(err, allpost) {
 
             if (err)
                 res.send(err);
-            // console.info(allpost);
             
             userdetails.allpost = allpost
-            console.log('allpost', userdetails);
-            // console.log(userdetails);
-       
+			callback(null, userdetails);
+			
         }); 
-    
-        callback(null, userdetails);
+
     }
 
     function tweetcount(callback) {
-
-        console.log('tweetcount ',userid);
-            console.log( 'string user id  '+userid.toString());
-
-        post_model.post
-        .aggregate([
-
-            {$match: {'posted_by': userid.toString()}}, 
-
-
-            {$group: { _id: '$posted_by', count: {$sum: 1}}}
-        ])
-        
-        .exec(function(err, tweetcount){
+		console.log(user_id);
+		post_model.post
+		.count({'posted_by': user_id.toString()})
+		.exec(function(err, tweetcount){
 
             if (err)
                 res.send(err);
-
-            // console.info(tweetcount);
-             if (tweetcount.length == 0) {
-
-                tweetcount = new Array();
-                tweetcount[0] = {count:0};
-
-            }
-
+				
+			console.log('Count ',tweetcount);	
             userdetails.tweetcount = tweetcount            
-
-        });
-
-        callback(null, userdetails);
+			callback(null, userdetails);
+        })
+		
     }
 
     function trends(callback) {
 
         post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
 
-            // console.log(results);
-
             if (err) {
                 res.send(err);
             };
 
             userdetails.trends = results
-            // res.json({
-            //     message: results
-            // });
-
             callback(null, userdetails);
 
         });
     }
+	
+	function following(callback) {
+	
+        user_final_followers_schema
+		.count({following_id : user_id})
+		.exec(function(err, followingcount){
+               
+			if (err)
+				res.send(err);
+               
+			userdetails.followingcount = followingcount
+			callback(null, userdetails);        
 
-    async.parallel([
-        allpost,
-        tweetcount,
-        trends
-    ], function (err, results){
-        //after 5 seconds, results will be [1, 2]
-        console.log(userdetails);
-        
-        res.redirect('about');
+		});
 
-        // res.render('pages/about', {
-        //     userdetails : userdetails,
-        //     user: req.user
-        // });
-       // res.send(userdetails, req.user);
-       // res.end();
-    });
+    }
+	
+	function followers(callback) {
+	
+        user_final_followers_schema
+		.count({user_id : user_id})
+		.exec(function(err, followercount){
+               
+			if (err)
+				res.send(err);
+               
+			userdetails.followerCount = followercount
+			callback(null, userdetails);        
+
+		});
+
+    }
 
 };
 
 var Trendsdk = function(req, res) {
-        console.log('dktrend api hitted')
-        post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
 
-            // console.log(results);
+	post_model.trends
+	.find()
+	.sort({count: -1})
+	.limit(5)
+	.exec(function(err, results){
 
-            if (err) {
-                res.send(err);
-            };
-            var TD = results
-            res.json({
-                trends_data: results
-            });
-         console.log('data' + TD);   
+		if (err) {
+			res.send(err);
+		};
+		var TD = results
+		res.json({
+			trends_data: results
+		});
+	
     });
 };
 
 //Get all post 
-var getpost = function(req, res) { // get a post 
-    console.log('Show all post');
+var getpost = function(req, res) {
 
-    // save the bear and check for errors
-    post_model.post.find(function(err, allpost) {
+    post_model.post
+	.find()
+	.exec(function(err, allpost) {
         if (err)
             res.send(err);
 
@@ -233,11 +229,7 @@ var getuserposts = function(req, res) { // get a post
                         // console.info('Retweet count', result[0].tweet_count);
 
                         post_model.post_retweet
-                            .find({
-                                ret_user_id: userid
-                            }, {
-                                _id: 0
-                            })
+                            .find({ret_user_id: userid},{_id: 0})
                             .select('post_id')
                             .populate('post_id')
                             .sort({

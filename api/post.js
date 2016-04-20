@@ -569,6 +569,11 @@ var getuserpostcount = function(req, res) { // get a post
 
 // }
 
+// var removepost = function(req, res){
+//     var post_id = req.body.post_id;
+
+// }
+
 module.exports = ({
     getuserdetails : getuserdetails,
     getpost : getpost,

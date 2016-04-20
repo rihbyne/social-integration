@@ -1,19 +1,6 @@
 var mongoose        = require('mongoose');           // For Mongoose
 var User = require('../app/models/user.js');
 
-var reply_schema = new mongoose.Schema;
-
-reply_schema.add({
-    posted_by :                      {type: mongoose.Schema.ObjectId},
-    username :                       {type: String, ref:'User'},
-    post_description:                {type: String},
-    post_reply:                      [reply_schema],
-    tweet_count :                    {type: Number, default: 0, min: 0},
-    like_count :                     {type: Number, default: 0, min: 0},
-    like_by_users :                  [{type: String, ref: 'post_like'}],
-    created_at :                     {type: Date, default: Date.now}
-});
-
 // Post Schema
 var post = mongoose.Schema({
     
@@ -21,7 +8,7 @@ var post = mongoose.Schema({
     username:                        {type: String, ref:'User'},
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
-    post_reply:                      [reply_schema],
+    // post_reply:                      [reply_schema],
     tweet_count:                     {type: Number, default: 0, min: 0},
     like_count:                      {type: Number, default: 0, min: 0},
     like_by_users:                   [{type: String, ref: 'post_like'}],
@@ -91,6 +78,14 @@ var trends = mongoose.Schema({
 
 }, { versionKey: false });
 
+//Reply Schema
+var post_reply_schema = mongoose.Schema({
+    post_id :                        {type: String, ref:'post'},
+    user_id :                        {type: String},
+    reply_user_id :                  {type: String},
+    reply_msg :                      {type: String},
+    created_at :                     {type: Date, default: Date.now},          // created date
+});
 
 // Model
 module.exports.post = mongoose.model('post', post);
@@ -101,4 +96,4 @@ module.exports.post_hashtag_links = mongoose.model('post_hashtag_links', post_ha
 module.exports.post_like = mongoose.model('post_like', post_like_schema);
 module.exports.post_retweet = mongoose.model('post_retweet', post_retweet_schema);
 module.exports.trends = mongoose.model('trends', trends);
-// module.exports.reply = mongoose.model('reply', reply_schema);
+module.exports.reply = mongoose.model('reply', post_reply_schema);

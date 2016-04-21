@@ -1,13 +1,14 @@
-var user_final_followers_schema = require('../app/models/model.final_followers.js'),
+var follower = require('../app/models/model_followers.js'),
     users = require('../app/models/user.js');
-
 
 var util = require('util');
 
+//Set following
 var setfollowing = function(req, res) {
 
     var user_id = req.body.user_id;
     var following_id = req.body.following_id;
+    var follow_back;
 
     //validation for blank variables
     req.checkBody('user_id', 'User id is mandatory').notEmpty();
@@ -34,15 +35,17 @@ var setfollowing = function(req, res) {
     };
 
     // validation for the profile if already followed 
-    user_final_followers_schema.
-    find({
+    follower
+    .find({
         $and: [{
             user_id: user_id
         }, {
             following_id: following_id
+        }, {
+            follow_status: true
         }]
-    }).
-    exec(function(err, result) {
+    })
+    .exec(function(err, result) {
 
         if (result.length !== 0) {
 
@@ -54,23 +57,11 @@ var setfollowing = function(req, res) {
             })
             return;
 
-        } else {
-
-            var following_idModel = new user_final_followers_schema({
-
-                user_id: user_id,
-                following_id: following_id,
-
-            });
-
-            following_idModel.save(function(err) {
-                if (err)
-                    res.send(err);
-            });
-
+        } else {//add new follower
+            
                 console.info('update follower status');
                 /*update user follower status true*/
-                user_final_followers_schema
+                follower
                 .find({
                     $and: [{
                         user_id: following_id
@@ -78,6 +69,7 @@ var setfollowing = function(req, res) {
                         following_id: user_id
                     }]
                 })
+                .select('follow_back')
                 .exec(function(err, result){
                    
                    if (err) {
@@ -89,11 +81,42 @@ var setfollowing = function(req, res) {
 
                         console.info(result);
 
+                        follower
+                        .update({_id: result[0]._id}, {follow_back: 'true'})
+                        .exec(function(err, statusResult){
+                            if (err) {
+                                res.send(err);
+                            };
+                            console.info(statusResult);
+
+                        })
+
+                        follow_back = 'true';
+                   }
+                   else{
+
+                        follow_back = 'false';
+
                    };
 
-                });
+                   var followingModel = new follower({
 
-            console.info('following/followers set saved');
+                        user_id: user_id,
+                        following_id: following_id,
+                        follow_back: follow_back
+
+                    });
+
+                    followingModel.save(function(err) {
+                       
+                        if (err)
+                            res.send(err);
+
+                        console.info('following/followers set saved');
+
+                    });
+
+                });
 
             res.json({
 
@@ -106,6 +129,7 @@ var setfollowing = function(req, res) {
 
 }
 
+//Get following
 var getfollowing = function(req, res) {
 
     var user_name = req.params.user_name;
@@ -122,34 +146,32 @@ var getfollowing = function(req, res) {
     }
 
     users
-        .find({
-            username: user_name
-        })
-        .select('_id')
-        .exec(function(err, result) {
+    .find({
+        username: user_name
+    })
+    .select('_id')
+    .exec(function(err, result) {
 
-            // console.info(result[0]._id);
+        // console.info(result[0]._id);
+        if (result[0]._id) {
 
-            if (result[0]._id) {
+            follower
+            .find({$and:[{user_id: result[0]._id},{follow_status: true}]})
+            .exec(function(err, result) {
+                console.info(result);
+                res.json({
+                    FollowingList: result
+                })
 
-                user_final_followers_schema
-                    .find({
-                        user_id: result[0]._id
-                    })
-                    .exec(function(err, result) {
-                        console.info(result);
-                        res.json({
-                            FollowingList: result
-                        })
+            })
 
-                    })
+        };
 
-            };
-
-        })
+    })
 
 }
 
+//get follower
 var getfollowers = function(req, res) {
 
     var user_name = req.params.user_name;
@@ -166,43 +188,40 @@ var getfollowers = function(req, res) {
     }
 
     users
+    .find({
+        username: user_name
+    })
+    .select('_id')
+    .exec(function(err, result) {
 
-        .find({
-            username: user_name
-        })
-        .select('_id')
-        .exec(function(err, result) {
+        // console.info(result[0]._id);
+        if (result[0]._id) {
 
-            // console.info(result[0]._id);
+            follower
+            .find({$and:[{following_id: result[0]._id},{follow_status: true}]})
+            .exec(function(err, result) {
+                console.info(result);
+                res.json({
+                    FollowersList: result
+                })
 
-            if (result[0]._id) {
+            })
 
-                user_final_followers_schema
-                    .find({
-                        following_id: result[0]._id
-                    })
-                    .exec(function(err, result) {
-                        console.info(result);
-                        res.json({
-                            FollowersList: result
-                        })
+        };
 
-                    })
-
-            };
-
-        })
+    })
 
 }
 
+//Unlink following
 var unlink_following = function(req, res) {
  
     console.info('unlink_followings api called');
-    var user_name = req.body.user_name;
+    var user_id = req.body.user_id;
     var unlink_followings = req.body.unlink_followings;
 
         //validation for blank variables
-    req.checkBody('user_name', 'User id is mandatory').notEmpty();
+    req.checkBody('user_id', 'User id is mandatory').notEmpty();
     req.checkBody('unlink_followings', 'unlink_followings is mandatory').notEmpty();
 
     var errors = req.validationErrors();
@@ -213,11 +232,15 @@ var unlink_following = function(req, res) {
         return;
     }
 
-
-    user_final_followers_schema
-        .findOneAndRemove({
-            user_id: user_name,
-            following_id: unlink_followings
+    follower
+        .update({
+            $and: [{
+                user_id: user_id
+            }, {
+                following_id: unlink_followings
+            }]
+        }, {
+            follow_status: false
         })
         .exec(function(err, result) {
             if (err) {
@@ -228,6 +251,7 @@ var unlink_following = function(req, res) {
                 })
             }
         })
+
 }
 
 //Get Count of Follwer
@@ -251,7 +275,7 @@ var getCountFollower = function(req, res){
 
         if(usercount>0){
 
-            user_final_followers_schema
+            follower
             .count({user_id : user_id}, function(err, followercount) {
                
                 if (err)
@@ -298,7 +322,7 @@ var getCountFollowing = function(req, res){
 
         if(usercount>0){
 
-            user_final_followers_schema
+            follower
             .count({following_id : following_id}, function(err, followingcount) {
                
                 if (err)
@@ -333,43 +357,4 @@ module.exports = ({
     getCountFollowing : getCountFollowing
 
 })
-
-// old dk code
-// var unlink_follower = function(req, res) {
-
-
-//     var user_name = req.body.user_name;
-//     var unlink_follower = req.body.unlink_follower;
-
-//          //validation for blank variables
-//     req.checkBody('user_name', 'User id is mandatory').notEmpty();
-//     req.checkBody('unlink_follower', 'following_id is mandatory').notEmpty();
-
-//     var errors = req.validationErrors();
-
-//     if (errors) {
-//         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-//         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-//         return;
-//     }
-
-//     console.info('unlink_follower api called');
-//     user_final_followers_schema
-//         .findOneAndRemove({
-//             following_id: unlink_follower,
-//             user_id: user_name
-//         })
-//         .exec(function(err, result) {
-//             if (err) {
-//                   res.json({
-//                     errors: err
-//                 })
-//             } else {
-//                 res.json({
-//                     message: 'Removed follower'
-//                 })
-//             }
-//         })
-// }
-
 

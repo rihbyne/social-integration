@@ -1,4 +1,4 @@
-var user_final_followers_schema = require('../app/models/model.final_followers.js');
+var follow = require('../app/models/model_followers.js');
 
 var setmuteuser = function(req, res) {
 
@@ -7,7 +7,7 @@ var setmuteuser = function(req, res) {
 
     //Validation remaining
 
-    user_final_followers_schema
+    follow
         .find({
             $and: [{
                 user_id: userId
@@ -24,7 +24,7 @@ var setmuteuser = function(req, res) {
 
             	var blockStatus = (muteresult[0].block == false) ? true : false;
 
-            	user_final_followers_schema
+            	follow
             	.update({_id : muteresult[0]._id}, {block: blockStatus})
             	.exec(function(err, result){
 
@@ -47,7 +47,7 @@ var getmuteuser = function(req, res){
 
     //validation Remaining
 
-    user_final_followers_schema
+    follow
     .find({$and: [{user_id: userId}, {block: 'true'}]})
     .select('following_id')
     .exec(function(err, result){

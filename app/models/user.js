@@ -13,7 +13,7 @@ var userSchema = mongoose.Schema({
     password     :  {type:  String},
     username    :   {type: String},
     posts 		: [{ type: Schema.ObjectId, ref: 'post' }]
-});
+}, { versionKey: false });
 
 // methods ======================
 // generating a hash

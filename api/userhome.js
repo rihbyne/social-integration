@@ -1,7 +1,7 @@
 var user = require('../app/models/user.js');
 var async = require('async');
-var post_model = require('../model/post_model.js');
-var user_followers = require('../app/models/model.final_followers.js');
+var post_model = require('../app/models/post_model.js');
+var user_followers = require('../app/models/model_followers.js');
 
 //Get all post
 var getuserhomeposts = function(req, res) { // get a post 

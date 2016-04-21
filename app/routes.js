@@ -1,20 +1,20 @@
 // Packages
-var express 		= require('express');
-var router 			= express.Router();
-var path        	= require('path');  
+var express = require('express');
+var router = express.Router();
+var path = require('path');
 
 // Pages
-var notification 	= require('../api/notification.js');
-var mailer 			= require('../api/mail.js'); 
-var post 			= require('../api/post.js');
-var mention 		= require('../api/mention.js');
-var follow 		    = require('../api/following.js');
-var hashtag         = require('../api/hashtag.js');  
-var like            = require('../api/like.js');  
-var retweet         = require('../api/retweet.js');  
-var userhome        = require('../api/userhome.js');  
-var reply 			= require('../api/reply.js');
-var blockuser 		= require('../api/blockuser.js');
+var notification = require('../api/notification.js');
+var mailer = require('../api/mail.js');
+var post = require('../api/post.js');
+var mention = require('../api/mention.js');
+var follow = require('../api/following.js');
+var hashtag = require('../api/hashtag.js');
+var like = require('../api/like.js');
+var retweet = require('../api/retweet.js');
+var userhome = require('../api/userhome.js');
+var reply = require('../api/reply.js');
+var blockuser = require('../api/blockuser.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -26,7 +26,7 @@ module.exports = function(app, passport) {
     app.post('/secure/sendMail', mailer.sendPHPmail);
     app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
-  
+
 
     // // user preferance page 
     // app.get('/following', function(req, res) {
@@ -72,7 +72,7 @@ module.exports = function(app, passport) {
     // });
 
 
-    
+
     // =====================================
     // LOGIN ===============================
     // =====================================
@@ -130,25 +130,31 @@ module.exports = function(app, passport) {
         res.render('pages/following.ejs', {
             user: req.user // get the user out of session and pass to template
         });
-    }); 
-     app.get('/followers', isLoggedIn, function(req, res) {
+    });
+    app.get('/followers', isLoggedIn, function(req, res) {
         res.render('pages/follower.ejs', {
             user: req.user // get the user out of session and pass to template
         });
-    });  
-      app.get('/userhome', isLoggedIn, function(req, res) {
+    });
+    app.get('/userhome', isLoggedIn, function(req, res) {
         res.render('pages/own_tweet.ejs', {
             user: req.user // get the user out of session and pass to template
         });
-    }); 
-
-      // user preferance page 
-    app.get('/user_preferance', function(req, res) {
-        res.render('pages/user_preferance' , {
+    });
+    app.get('/like', isLoggedIn, function(req, res) {
+        res.render('pages/user_like.ejs', {
             user: req.user // get the user out of session and pass to template
         });
     });
- 
+
+
+    // user preferance page 
+    app.get('/user_preferance', function(req, res) {
+        res.render('pages/user_preferance', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
+
 
     // =====================================
     // LOGOUT ==============================
@@ -159,50 +165,50 @@ module.exports = function(app, passport) {
     });
 
 
-	/*=================================================================================================*/
-	
-    app.use('/about', isLoggedIn, post.getuserdetails);						// about page
-    app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
-    app.get('/gethomepost/:username', userhome.getuserhomeposts);  			// user home timeline post API
+    /*=================================================================================================*/
 
-    app.get('/getpost', post.getpost); 										// Get all post
-    app.get('/getpost/:user', post.getuserposts); 							// Get post by username
-    app.get('/getpost/:user/:post_id', post.getuserpost); 					// Get single post of user
-    app.get('/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
-    app.get('/getpost/post/:post_title', post.getsinglepost); 				// Get post by post title
+    app.use('/about', isLoggedIn, post.getuserdetails); // about page
+    app.get('/mention/:mention_user', mention.getmentionuser); // Get Mention User Details
+    app.get('/gethomepost/:username', userhome.getuserhomeposts); // user home timeline post API
+
+    app.get('/getpost', post.getpost); // Get all post
+    app.get('/getpost/:user', post.getuserposts); // Get post by username
+    app.get('/getpost/:user/:post_id', post.getuserpost); // Get single post of user
+    app.get('/getpost/count/:user', post.getuserpostcount); // Get post count by username
+    app.get('/getpost/post/:post_title', post.getsinglepost); // Get post by post title
     app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
-    app.post('/hashtags', hashtag.gethashtag);                              // Get all hashtag keyword
-    app.get('/hashtags/:hashtag', hashtag.gethashposts);                    // Get post from hashtag
-    app.get('/hashtag/count', hashtag.allhashtagcount); 					// Get the count of all hashtag
+    app.post('/hashtags', hashtag.gethashtag); // Get all hashtag keyword
+    app.get('/hashtags/:hashtag', hashtag.gethashposts); // Get post from hashtag
+    app.get('/hashtag/count', hashtag.allhashtagcount); // Get the count of all hashtag
 
-    app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);               // Get the count of specifiedhashtag
-    app.post('/gethashtaglistcount', hashtag.gethashtaglist);               // Get all hashtag keyword
+    app.get('/hashtag/count/:hashtag', hashtag.hashtagcount); // Get the count of specifiedhashtag
+    app.post('/gethashtaglistcount', hashtag.gethashtaglist); // Get all hashtag keyword
 
-    app.post('/setuser', post.setuser);                                     // Set new user
+    app.post('/setuser', post.setuser); // Set new user
 
-    app.post('/setnewpost', post.setnewpost);                           	// Set new post
-    app.post('/setretweet', retweet.setretweet);                            // Set new user
-    app.post('/setlike', like.setlike);                                  	// Set like
-    app.get('/like/post/:post_id', like.getLikeByPost);                     // Get like by post
-    app.get('/like/user/:user_id', like.getLikeByUser);                     // Get like by User
-    app.get('/getretweet/:post_id', retweet.getretweet);                    // Get Retweet by post
+    app.post('/setnewpost', post.setnewpost); // Set new post
+    app.post('/setretweet', retweet.setretweet); // Set new user
+    app.post('/setlike', like.setlike); // Set like
+    app.get('/like/post/:post_id', like.getLikeByPost); // Get like by post
+    app.get('/like/user/:user_id', like.getLikeByUser); // Get like by User
+    app.get('/getretweet/:post_id', retweet.getretweet); // Get Retweet by post
 
-    app.post('/setfollowing', follow.setfollowing); 					    // Set follower// dk
-    app.get('/following/:user_name', follow.getfollowing); 				// Set followings
-    app.get('/followers/:user_name', follow.getfollowers); 				// Set follower
-    app.post('/unlink_followings_f', follow.unlink_following); 			// Set follower
-    app.get('/follower/count/:user_id', follow.getCountFollower);         // count follower
-    app.get('/following/count/:following_id', follow.getCountFollowing);  // count follower
+    app.post('/setfollowing', follow.setfollowing); // Set follower// dk
+    app.get('/following/:user_name', follow.getfollowing); // Set followings
+    app.get('/followers/:user_name', follow.getfollowers); // Set follower
+    app.post('/unlink_followings_f', follow.unlink_following); // Set follower
+    app.get('/follower/count/:user_id', follow.getCountFollower); // count follower
+    app.get('/following/count/:following_id', follow.getCountFollowing); // count follower
 
-    app.get('/api/Trendsdk', post.Trendsdk);								//trend keyword
-    app.get('/getreply/:reply_user_id', reply.getreply);							//Get reply
-    app.post('/setreply', reply.setreply); 									//Set reply
+    app.get('/api/Trendsdk', post.Trendsdk); //trend keyword
+    app.get('/getreply/:reply_user_id', reply.getreply); //Get reply
+    app.post('/setreply', reply.setreply); //Set reply
 
-    app.post('/setblockuser', blockuser.setblockuser);						//Set block user
-    app.get('/getblockuser/:userId', blockuser.getblockuser);				//get block user
+    app.post('/setblockuser', blockuser.setblockuser); //Set block user
+    app.get('/getblockuser/:userId', blockuser.getblockuser); //get block user
 
-    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);		//tweet,retweet & reply post
+    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); //tweet,retweet & reply post
 
 };
 // route middleware to make sure a user is logged in
@@ -215,4 +221,3 @@ function isLoggedIn(req, res, next) {
     // if they aren't redirect them to the home page
     res.redirect('/login');
 }
-

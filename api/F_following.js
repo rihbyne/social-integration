@@ -8,6 +8,7 @@ var setfollowing = function(req, res) {
 
     var user_id = req.body.user_id;
     var following_id = req.body.following_id;
+    var following_status;
 
     //validation for blank variables
     req.checkBody('user_id', 'User id is mandatory').notEmpty();
@@ -55,19 +56,8 @@ var setfollowing = function(req, res) {
             return;
 
         } else {
-
-            var following_idModel = new user_final_followers_schema({
-
-                user_id: user_id,
-                following_id: following_id,
-
-            });
-
-            following_idModel.save(function(err) {
-                if (err)
-                    res.send(err);
-            });
-
+            //add new follower
+            
                 console.info('update follower status');
                 /*update user follower status true*/
                 user_final_followers_schema
@@ -78,6 +68,7 @@ var setfollowing = function(req, res) {
                         following_id: user_id
                     }]
                 })
+                .select('following_status')
                 .exec(function(err, result){
                    
                    if (err) {
@@ -89,11 +80,44 @@ var setfollowing = function(req, res) {
 
                         console.info(result);
 
+                        user_final_followers_schema
+                        .update({_id: result[0]._id}, {following_status: 'true'})
+                        .exec(function(err, statusResult){
+                            if (err) {
+                                res.send(err);
+                            };
+                            console.info(statusResult);
+
+                        })
+
+                        following_status = 'true';
+                   }
+                   else{
+
+                        following_status = 'false';
+
                    };
+
+                   var following_idModel = new user_final_followers_schema({
+
+                        user_id: user_id,
+                        following_id: following_id,
+                        following_status: following_status
+
+                    });
+
+                    following_idModel.save(function(err) {
+                       
+                        if (err)
+                            res.send(err);
+
+                        console.info('following/followers set saved');
+
+                    });
+
 
                 });
 
-            console.info('following/followers set saved');
 
             res.json({
 

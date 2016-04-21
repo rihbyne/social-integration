@@ -8,7 +8,7 @@ var notification 	= require('../api/notification.js');
 var mailer 			= require('../api/mail.js'); 
 var post 			= require('../api/post.js');
 var mention 		= require('../api/mention.js');
-var f_follow 		= require('../api/F_following.js');
+var follow 		    = require('../api/following.js');
 var hashtag         = require('../api/hashtag.js');  
 var like            = require('../api/like.js');  
 var retweet         = require('../api/retweet.js');  
@@ -177,12 +177,12 @@ module.exports = function(app, passport) {
     app.get('/like/user/:user_id', like.getLikeByUser);                     // Get like by User
     app.get('/getretweet/:post_id', retweet.getretweet);                    // Get Retweet by post
 
-    app.post('/setfollowing_f', f_follow.setfollowing); 					// Set follower// dk
-    app.get('/following_f/:user_name', f_follow.getfollowing); 				// Set followings
-    app.get('/followers_f/:user_name', f_follow.getfollowers); 				// Set follower
-    app.post('/unlink_followings_f', f_follow.unlink_following); 			// Set follower
-    app.get('/follower/count/:user_id', f_follow.getCountFollower);         // count follower
-    app.get('/following/count/:following_id', f_follow.getCountFollowing);  // count follower
+    app.post('/setfollowing', follow.setfollowing); 					    // Set follower// dk
+    app.get('/following/:user_name', follow.getfollowing); 				// Set followings
+    app.get('/followers/:user_name', follow.getfollowers); 				// Set follower
+    app.post('/unlink_followings_f', follow.unlink_following); 			// Set follower
+    app.get('/follower/count/:user_id', follow.getCountFollower);         // count follower
+    app.get('/following/count/:following_id', follow.getCountFollowing);  // count follower
 
     app.get('/api/Trendsdk', post.Trendsdk);								//trend keyword
     app.get('/getreply/:reply_user_id', reply.getreply);							//Get reply

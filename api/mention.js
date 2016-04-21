@@ -1,4 +1,4 @@
-var post_model = require('../model/post_model.js');
+var post_model = require('../app/models/post_model.js');
 
 //Get mentionuser's post
 module.exports.getmentionuser = function(req, res) { // get a post 

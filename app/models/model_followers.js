@@ -14,7 +14,7 @@ var user_final_followers_schema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    block: { //for user post block
+    block: { //for block user post
         type: Boolean,
         date: {
             type: Date,

@@ -1,4 +1,4 @@
-var post_model = require('../model/post_model.js');
+var post_model = require('../app/models/post_model.js');
 
 //Set postlike
 var setlike = function(req, res) { //Create new like

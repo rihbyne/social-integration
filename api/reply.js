@@ -1,5 +1,4 @@
-var post_model = require('../model/post_model.js');
-var post_model = require('../model/post_model.js');
+var post_model = require('../app/models/post_model.js');
 //case-1
 /* User can reply on post
 required param post id, userid, reply_user_id

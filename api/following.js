@@ -1,4 +1,4 @@
-var follower = require('../app/models/model.final_followers.js'),
+var follower = require('../app/models/model_followers.js'),
     users = require('../app/models/user.js');
 
 var util = require('util');

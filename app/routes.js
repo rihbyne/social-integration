@@ -26,16 +26,12 @@ module.exports = function(app, passport) {
     app.post('/secure/sendMail', mailer.sendPHPmail);
     app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
-    // user preferance page 
-    app.get('/user_preferance', function(req, res) {
-        res.render('pages/user_preferance');
-    });
+  
 
-
-    // user preferance page 
-    app.get('/following', function(req, res) {
-        res.render('pages/following');
-    });
+    // // user preferance page 
+    // app.get('/following', function(req, res) {
+    //     res.render('pages/following');
+    // });
 
     app.get('/', isLoggedIn, function(req, res) {
         // save the bear and check for errors
@@ -134,7 +130,14 @@ module.exports = function(app, passport) {
         res.render('pages/following.ejs', {
             user: req.user // get the user out of session and pass to template
         });
+    });    
+      // user preferance page 
+    app.get('/user_preferance', function(req, res) {
+        res.render('pages/user_preferance' , {
+            user: req.user // get the user out of session and pass to template
+        });
     });
+ 
 
     // =====================================
     // LOGOUT ==============================

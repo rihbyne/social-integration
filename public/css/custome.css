@@ -432,3 +432,16 @@ nav .brand-logo {
 .btn-like .rt-count{
     padding-left: 10px;
 }
+
+.link-pro-tabs li {
+    float: left;
+    padding:0 10px;
+    font-size: 23px;
+}
+ul.link-pro-tabs {
+    display: flex;
+}
+.link-pro-tabs li a {
+    display: block;
+    color: #000;
+}

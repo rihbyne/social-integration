@@ -104,6 +104,7 @@ textarea.materialize-textarea {
 ul.collection.social_post {
     overflow: initial;
     z-index: 50;
+        margin-top: 0;
 }
 
 .social_post a:hover {
@@ -433,15 +434,43 @@ nav .brand-logo {
     padding-left: 10px;
 }
 
+/*tabs and links */
+
 .link-pro-tabs li {
     float: left;
     padding:0 10px;
-    font-size: 23px;
+    font-size: 18px;
 }
 ul.link-pro-tabs {
     display: flex;
+    margin: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-bottom: 0;
+    padding: 10px 0;
 }
 .link-pro-tabs li a {
     display: block;
     color: #000;
+
+}
+ul.link-pro-tabs.main-tab li a {
+    font-size: 13px;
+    text-align: center;
+    padding: 10px 0;
+
+}
+.link-pro-tabs li a.active {
+    border-bottom: 3px solid;
+}
+ul.link-pro-tabs.main-tab {
+    margin: 0;
+    background: #fff;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    padding: 0;
+}
+ul.link-pro-tabs.main-tab li a span {
+    font-weight: bold;
+    font-size: 17px;
 }

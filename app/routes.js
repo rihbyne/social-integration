@@ -130,7 +130,18 @@ module.exports = function(app, passport) {
         res.render('pages/following.ejs', {
             user: req.user // get the user out of session and pass to template
         });
-    });    
+    }); 
+     app.get('/followers', isLoggedIn, function(req, res) {
+        res.render('pages/follower.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });  
+      app.get('/userhome', isLoggedIn, function(req, res) {
+        res.render('pages/own_tweet.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    }); 
+
       // user preferance page 
     app.get('/user_preferance', function(req, res) {
         res.render('pages/user_preferance' , {

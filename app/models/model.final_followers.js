@@ -21,12 +21,16 @@ var user_final_followers_schema = mongoose.Schema({
             default: Date.now
         }
     },
-    mute:{
+    mute: {
         type: Boolean,
         date: {
             type: Date,
             default: Date.now
         }
+    },
+    following_status: {
+        type: Boolean,
+        default: false
     }
 }, {
     versionKey: false

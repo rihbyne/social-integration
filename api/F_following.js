@@ -59,7 +59,8 @@ var setfollowing = function(req, res) {
             var following_idModel = new user_final_followers_schema({
 
                 user_id: user_id,
-                following_id: following_id
+                following_id: following_id,
+
             });
 
             following_idModel.save(function(err) {
@@ -67,12 +68,36 @@ var setfollowing = function(req, res) {
                     res.send(err);
             });
 
+                console.info('update follower status');
+                /*update user follower status true*/
+                user_final_followers_schema
+                .find({
+                    $and: [{
+                        user_id: following_id
+                    }, {
+                        following_id: user_id
+                    }]
+                })
+                .exec(function(err, result){
+                   
+                   if (err) {
+
+                        res.send(err)
+                   };
+
+                   if (result.length == 1) {
+
+                        console.info(result);
+
+                   };
+
+                });
 
             console.info('following/followers set saved');
 
             res.json({
-                message: 'following/followers set'
 
+                message: 'following/followers set'
 
             })
         }

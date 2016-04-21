@@ -83,6 +83,7 @@ var post_reply_schema = mongoose.Schema({
     post_id :                        {type: String, ref:'post'},
     user_id :                        {type: String},
     reply_user_id :                  {type: String},
+    reply_to :                       {type: String, ref:'reply'}, //reply id of user if reply on reply....first reply it will blank 
     reply_msg :                      {type: String},
     created_at :                     {type: Date, default: Date.now},          // created date
 });
@@ -97,3 +98,7 @@ module.exports.post_like = mongoose.model('post_like', post_like_schema);
 module.exports.post_retweet = mongoose.model('post_retweet', post_retweet_schema);
 module.exports.trends = mongoose.model('trends', trends);
 module.exports.reply = mongoose.model('reply', post_reply_schema);
+
+
+var deepPopulate = require('mongoose-deep-populate')(mongoose);
+post_reply_schema.plugin(deepPopulate /* more on options below */);

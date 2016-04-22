@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var user_final_followers_schema = mongoose.Schema({
+var userfollowersSchema = mongoose.Schema({
     user_id: {  //logged in user id
         type: String,
         ref: "User",
@@ -40,4 +40,4 @@ var user_final_followers_schema = mongoose.Schema({
     versionKey: false
 });
 
-module.exports = mongoose.model('user_final_followers_schema', user_final_followers_schema);
+module.exports = mongoose.model('user_followers', userfollowersSchema);

@@ -34,20 +34,17 @@ module.exports.getmentionuser = function(req, res) { // get a post
         if (err)
             res.send(err);
         
-        // if (mentionspost) {
-        //     console.log(mentionspost);
-        //     res.json({
-        //         posts: mentionspost
-        //     });
-        // } else {
-        //     res.json('No Post Found')
-        // }
-
-        console.log(mentionspost);
-        
-        res.render('pages/mention', {
-            posts: mentionspost
-        });
+        if (mentionspost.length !== 0) {
+            console.log(mentionspost);
+            // res.json({
+            //     posts: mentionspost
+            // });
+            res.render('pages/mention', {
+                posts: mentionspost
+            });
+        } else {
+            res.json('No Post Found')
+        }
 
     });
 

@@ -108,17 +108,11 @@ module.exports.setretweet = function(req, res , done) { //Create new user
                                         res.send(err);
                                     };
 
-                                  res.redirect('about');
-
-
                                 })
 
-                            // res.json({
-                            //     message: 'User retweeted'
-                            // });
-                            // res.render('pages/profile');
-                        res.redirect('about');
-
+                            res.json({
+                                message: 'User retweeted'
+                            });
 
                         });
 

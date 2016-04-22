@@ -6,7 +6,7 @@ var setlike = function(req, res) { //Create new like
     var post_id = req.body.post_id;
     var like_user_id = req.body.like_user_id;
     // var likestatus = req.body.likestatus;  
-    var like_user_name= req.body.like_user_name;
+    // var like_user_name= req.body.like_user_name;
 
     console.log('Like Api hitted');
     // console.log('Like Status: ', req.body.likestatus);
@@ -92,8 +92,7 @@ var setlike = function(req, res) { //Create new like
 
                     var likeModel = new post_model.post_like({
                         post_id: post_id,
-                        like_user_id: like_user_id,
-                        like_user_name: like_user_name
+                        like_user_id: like_user_id
                     });
 
                     likeModel.save(function(err) {
@@ -103,11 +102,8 @@ var setlike = function(req, res) { //Create new like
                         console.log('_id of like', likeModel._id);
                         post_model.post
                             .findByIdAndUpdate(post_id, {
-                                $inc: {
-                                    like_count: 1
-                                }, 
+
                                 $push: {"like_by_users": likeModel._id}
-                                
                                 
                             })
                             .exec(function(err, result) {

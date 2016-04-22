@@ -40,12 +40,13 @@ var setreply =  function(req, res){
 
 var getreply = function(req, res){
 
+    var post_id = req.params.post_id;
     var reply_user_id = req.params.reply_user_id;
 
     post_model.reply
-    .find({reply_user_id : reply_user_id})
+    .find({$and:[{reply_user_id : reply_user_id}, {post_id: post_id}]})
     // .populate('reply_to')
-    .deepPopulate('post_id reply_to')
+    // .deepPopulate('post_id reply_to')
     .sort({created_at : -1})
     .exec(function(err, result){
         if (err) {

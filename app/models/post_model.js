@@ -10,7 +10,7 @@ var post = mongoose.Schema({
     post_description:                {type: String},        // post description 
     // post_reply:                      [reply_schema],
     tweet_count:                     {type: Number, default: 0, min: 0},
-    like_count:                      {type: Number, default: 0, min: 0},
+    // like_count:                      {type: Number, default: 0, min: 0},
     like_by_users:                   [{type: String, ref: 'post_like'}],
     created_at:                      {type: Date, default: Date.now},          // created date
     last_update: 				     {type: Date}           // last update date

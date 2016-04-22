@@ -11,7 +11,7 @@ var post = mongoose.Schema({
     // post_reply:                      [reply_schema],
     tweet_count:                     {type: Number, default: 0, min: 0},
     // like_count:                      {type: Number, default: 0, min: 0},
-    like_by_users:                   [{type: String, ref: 'post_like'}],
+    // like_by_users:                   [{type: String, ref: 'post_like'}],
     created_at:                      {type: Date, default: Date.now},          // created date
     last_update: 				     {type: Date}           // last update date
     
@@ -78,15 +78,15 @@ var trends = mongoose.Schema({
 
 }, { versionKey: false });
 
-//Reply Schema
 var post_reply_schema = mongoose.Schema({
-    post_id :                        {type: String, ref:'post'},
-    user_id :                        {type: String},
-    reply_user_id :                  {type: String},
-    reply_to :                       {type: String, ref:'reply'}, //reply id of user if reply on reply....first reply it will blank 
-    reply_msg :                      {type: String},
+    post_id :                        {type: String, ref:'post'},  // post ID
+    user_id :                        {type: String , ref:'User'}, // logged in user
+    reply_user_id :                  {type: String},   // _id of user reply on particular reply
+    reply_msg :                      {type: String},  // string of reply message
+    ref_reply_id:                    {type: String }, // if reply on reply so we will save _id of reply document @this filed
     created_at :                     {type: Date, default: Date.now},          // created date
-});
+}, { versionKey: false });
+
 
 // Model
 module.exports.post = mongoose.model('post', post);

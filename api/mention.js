@@ -36,12 +36,11 @@ module.exports.getmentionuser = function(req, res) { // get a post
         
         if (mentionspost.length !== 0) {
             console.log(mentionspost);
-            // res.json({
-            //     posts: mentionspost
-            // });
-            res.render('pages/mention', {
+            
+            res.json({
                 posts: mentionspost
             });
+
         } else {
             res.json('No Post Found')
         }

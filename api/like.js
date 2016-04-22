@@ -38,46 +38,46 @@ var setlike = function(req, res) { //Create new like
                     return;
                 };
 
-                if (result !== '') {
+                // if (result !== '') {
 
-                    post_model.post
-                    .findByIdAndUpdate(post_id, {
-                        $inc: {
-                            like_count: -1
-                        }
-                    })
-                    .exec(function(err, result) {
+                    // post_model.post
+                    // .findByIdAndUpdate(post_id, {
+                    //     $inc: {
+                    //         like_count: -1
+                    //     }
+                    // })
+                    // .exec(function(err, result) {
 
-                        console.log('Like count decrease by 1\n', result);
+                    //     console.log('Like count decrease by 1\n', result);
                        
-                        if (err) {
-                            res.send(err);
-                            return;
-                        };
+                    //     if (err) {
+                    //         res.send(err);
+                    //         return;
+                    //     };
 
-                        // res.json({
-                        //      message: 'Remove Like'
-                        // });
-                        // res.render('pages/about');
+                    //     // res.json({
+                    //     //      message: 'Remove Like'
+                    //     // });
+                    //     // res.render('pages/about');
 
-                        res.redirect('about');
+                    //     res.redirect('about');
                         
-                    })
+                    // })
                     
-                };
+                // };
 
             })
   
         } 
         else{
         /*This case will run for the first time -- To set like*/
-            post_model.post.find({
-                _id: post_id
-            }).exec(function(err, postdata) {
+            // post_model.post.find({
+            //     _id: post_id
+            // }).exec(function(err, postdata) {
 
-                console.log('postdata\n', postdata);
-                console.log(postdata.length);
-                if (postdata.length !== 0) {
+            //     console.log('postdata\n', postdata);
+            //     console.log(postdata.length);
+            //     if (postdata.length !== 0) {
 
                         // if (postdata[0].posted_by == like_user_id) {
 
@@ -125,12 +125,12 @@ var setlike = function(req, res) { //Create new like
 
                     });
 
-                }
-                else{
-                    console.info('No Post Found');
-                }
+                // }
+                // else{
+                //     console.info('No Post Found');
+                // }
 
-            });
+            // });
             
 
         }

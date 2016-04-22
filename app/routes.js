@@ -202,7 +202,7 @@ module.exports = function(app, passport) {
     app.get('/following/count/:following_id', follow.getCountFollowing); // count follower
 
     app.get('/api/Trendsdk', post.Trendsdk); //trend keyword
-    app.get('/getreply/:reply_user_id', reply.getreply); //Get reply
+    app.get('/getreply/:post_id/:reply_user_id', reply.getreply); //Get reply
     app.post('/setreply', reply.setreply); //Set reply
 
     app.post('/setblockuser', blockuser.setblockuser); //Set block user

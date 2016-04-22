@@ -3,7 +3,7 @@ var async = require('async');
 var post_model = require('../app/models/post_model.js');
 var user_followers = require('../app/models/model_followers.js');
 
-//Get all post
+//Get all post and retweet of user
 var getuserhomeposts = function(req, res) { // get a post 
 
     console.log('Show all posts for single user on home page');
@@ -72,7 +72,7 @@ var getuserhomeposts = function(req, res) { // get a post
 
 var getpostsrtreply = function(req, res) { // get a post 
 
-    console.log('Show all posts for single user on process._stopProfilerIdleNotifier(); page');
+    console.log('Show all posts, retweet & reply for single user');
 
     var username = req.params.username; // find posts of user and check for errors
 
@@ -227,60 +227,78 @@ function getRetweetPostsByUserId(callback) {
 
 function getReplyByUserId(callback){
 
-    var replyResultArray = new Array;
+    post_model.reply 
+    .find({user_id : userid})
+    .populate('user_id post_owner_id')
+    .sort({created_at: -1})
+    .limit()
+    .lean()
+    .exec(function(err, postReplyResult){
+        if (err) {
+            res.send(err)
+        };
+        console.info(postReplyResult);
 
-    //use userid to find all post of users
-    post_model.post
-    .find({
-        'post_reply.posted_by': userid
-    }, {
-        _id: 0
+        callback(null, postReplyResult);
     })
-    .select('post_reply')
-    // .populate('posted_by like_by_users')
-    .sort({
-        reply_at: -1
-    })
-    .limit(10)
-    .lean().exec(function(err, postReplyResult) {
 
-        if (err)
-            res.send(err);
+};
+// function getReplyByUserId(callback){
 
-        else if (postReplyResult.length == 0) {
+//     var replyResultArray = new Array;
 
-            callback(null, []);//No post found
+//     //use userid to find all post of users
+//     post_model.post
+//     .find({
+//         'post_reply.posted_by': userid
+//     }, {
+//         _id: 0
+//     })
+//     .select('post_reply')
+//     // .populate('posted_by like_by_users')
+//     .sort({
+//         reply_at: -1
+//     })
+//     .limit(10)
+//     .lean().exec(function(err, postReplyResult) {
 
-        } else {
-            // console.info(postReplyResult);
+//         if (err)
+//             res.send(err);
 
-                async.each(postReplyResult,
+//         else if (postReplyResult.length == 0) {
+
+//             callback(null, []);//No post found
+
+//         } else {
+//             // console.info(postReplyResult);
+
+//                 async.each(postReplyResult,
                                
-                    function(postReplyOne, callback) {
-                       console.info(postReplyOne);
-                        // postReplyOne['post_reply'][0]['created_at'] = postReplyOne['post_reply'][0]['reply_at'];
-                        // postReplyOne['post_reply'][0]['posted_by'] = postReplyOne['posted_by']  
-                        // console.info(postReplyOne['post_reply'][0]);
-                        replyResultArray.push(postReplyOne['post_reply'][0]);
+//                     function(postReplyOne, callback) {
+//                        console.info(postReplyOne);
+//                         // postReplyOne['post_reply'][0]['created_at'] = postReplyOne['post_reply'][0]['reply_at'];
+//                         // postReplyOne['post_reply'][0]['posted_by'] = postReplyOne['posted_by']  
+//                         // console.info(postReplyOne['post_reply'][0]);
+//                         replyResultArray.push(postReplyOne['post_reply'][0]);
 
-                        // console.info(replyResultArray);
-                        return callback(replyResultArray);
+//                         // console.info(replyResultArray);
+//                         return callback(replyResultArray);
 
-                    },
-                    // 3rd param is the function to call when everything's done
-                    function(err) {
+//                     },
+//                     // 3rd param is the function to call when everything's done
+//                     function(err) {
 
-                        // All tasks are done now
-                    }
+//                         // All tasks are done now
+//                     }
 
-                );
+//                 );
 
-            callback(null, replyResultArray);
-        }
+//             callback(null, replyResultArray);
+//         }
 
-    });
+//     });
 
-}
+// }
 
 //find id of user from user collection
 var getUserId =function(username, res){

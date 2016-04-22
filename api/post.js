@@ -52,17 +52,34 @@ var getuserdetails = function(req, res) {
     }
 
     function tweetcount(callback) {
-		console.log(user_id);
-		post_model.post
+
+        var totalCount;
+		
+    	post_model.post
 		.count({'posted_by': user_id.toString()})
+        .lean()
 		.exec(function(err, tweetcount){
 
             if (err)
                 res.send(err);
-				
-			console.log('Count ',tweetcount);	
-            userdetails.tweetcount = tweetcount            
-			callback(null, userdetails);
+			
+            post_model.post_retweet
+            .count({ret_user_id : user_id})
+            .lean()
+            .exec(function(err, retweetcount){
+                if (err)
+                res.send(err);
+
+            console.info(tweetcount+''+retweetcount);
+            var totalCount = tweetcount+retweetcount;
+
+            console.log('Total count ',totalCount); 
+            userdetails.tweetcount = totalCount            
+            callback(null, userdetails);
+
+            });
+
+
         })
 		
     }

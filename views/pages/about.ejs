@@ -84,7 +84,7 @@
                                         <input type="hidden" name="post_id" value="<%= userdetail._id %>">
                                         <input type="hidden" name="like_user_name" value="<%= userdetail.username %>">
                                         <button href="#" class="btn-like  tooltipped" data-position="top" data-delay="50" data-tooltip="like"  ><i class="fa fa-heart"></i>
-                                         <span class="rt-count"> <%= userdetail.like_count %></span>
+                                         <span class="rt-count"> <%= userdetail.postLikeCount %></span>
                                         </button>
                                     </form>
                                     <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'>

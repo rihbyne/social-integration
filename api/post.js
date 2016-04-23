@@ -27,6 +27,7 @@ var getuserdetails = function(req, res) {
 		followers
     ], function (err, results){
 
+        console.info(userdetails);
 		res.render('pages/about', {
 			userdetails : userdetails,
 			user: req.user
@@ -39,14 +40,50 @@ var getuserdetails = function(req, res) {
         post_model.post
 		.find({posted_by: user_id})
 		.sort({created_at: -1})
+        .lean()
 		.exec(function(err, allpost) {
 
             if (err)
                 res.send(err);
             
-            userdetails.allpost = allpost
-			callback(null, userdetails);
-			
+            // console.info(allpost);
+
+            async.each(allpost,
+                                   
+                function(singlepost, callback) {
+
+                    post_model.post_like
+                    .count({post_id: singlepost._id})
+                    .lean()
+                    .exec(function(err, countPostLikes){
+                        if (err) {
+                            res.send(err)
+                        };
+                        // console.info(countPostLikes);
+                        if (countPostLikes !== 0) {
+                            singlepost.postLikeCount = countPostLikes;
+                            // console.info(singlepost);
+                        }   
+                        else{
+                            singlepost.postLikeCount = 0;
+                        }   
+                        // console.info(singlepost);
+                        callback();
+                    })
+                    
+                },
+                // 3rd param is the function to call when everything's done
+                function(err) {
+                    // All tasks are done now
+                    console.info(allpost);
+                    userdetails.allpost = allpost
+                    callback(null, userdetails);
+                  
+                }
+
+            );
+            
+            			
         }); 
 
     }

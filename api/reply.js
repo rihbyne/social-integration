@@ -11,6 +11,7 @@ var setreply =  function(req, res){
 
     var post_id = req.body.post_id;
     var user_id = req.body.user_id;   
+    var post_owner_id = req.body.post_owner_id;
     var ref_reply_id = req.body.ref_reply_id;
     var reply_msg = req.body.reply_msg; 
 
@@ -20,6 +21,7 @@ var setreply =  function(req, res){
         post_id : post_id,
         user_id : user_id,
         ref_reply_id : ref_reply_id,
+        post_owner_id : post_owner_id,
         reply_msg : reply_msg,
     });
 

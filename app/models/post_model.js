@@ -80,7 +80,8 @@ var trends = mongoose.Schema({
 
 var post_reply_schema = mongoose.Schema({
     post_id :                        {type: String, ref:'post'},  // post ID
-    user_id :                        {type: String , ref:'User'}, // logged in user
+    user_id :                        {type: String, ref:'User'}, // logged in user
+    post_owner_id:                   {type: String,  ref:'User'}, //id of post owner
     reply_user_id :                  {type: String},   // _id of user reply on particular reply
     reply_msg :                      {type: String},  // string of reply message
     ref_reply_id:                    {type: String }, // if reply on reply so we will save _id of reply document @this filed

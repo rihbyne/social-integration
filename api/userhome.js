@@ -149,7 +149,7 @@ function getPostByUserId(callback){
     }, {
         _id: 0
     })
-    // .populate('posted_by like_by_users')
+    .populate('posted_by like_by_users')
     .sort({
         created_at: -1
     })

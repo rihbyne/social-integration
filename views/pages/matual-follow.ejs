@@ -33,9 +33,12 @@
                             </ul>
                         </div>
                     </div>
-                      <!-- Followers you know -->
+                    <div class=" s12 m12 ">
+                        <a class="waves-effect waves-light blue btn  ">tweet to</a>
+                        <a class="waves-effect waves-light blue btn right">messege</a>
+                    </div>
                     <div class=" s12 m12 match-list-wrap">
-                        <a href="/followers_you_follow"><i class="fa fa-user" aria-hidden="true"></i>  10 Followers you know</a>
+                        <a href="#1"><i class="fa fa-user" aria-hidden="true"></i>  10 Followers you know</a>
                         <ul class="match-list">
                             <li class="">
                                 <img src="images/pro_01.jpg" alt="" class="circle">
@@ -114,13 +117,17 @@
                 </div>
                 <!-- END left div -->
                 <div class="col s12 m12 l9">
-                    <div class="row">
+                    <div class="row ">
                         
                         <!-- <a href="/logout" class="btn btn-default btn-sm">Logout</a> -->
                         <form class="col s12">
                             <div class="row">
                                 <% include ../partials/tweet_type_tab.ejs %>
-                               
+                                <div class="col s12">
+                                <ul class="link-pro-tabs no-bg-bor">
+                                    <li><a href="/following">All followers</a></li>
+                                    <li><a href="/followers_you_follow">followers you know</a></li>
+                                </ul></div>
                                 <div id="test1" class="col s12">
                                     
                                 </div>
@@ -175,7 +182,7 @@
                                                     <p>animatingly Verline Cassidy animatingly Verline Cassidyanimatingly Verline Cassidyanimatingly Verline Cassidyanimatingly Verline Cassidyanimatingly Verline Cassidy</p><br>
                                                 </div>
                                                 <div class="card-action">
-                                                    <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
+                                                    <button class="btn waves-effect waves-light red light-red lighten-1 " type="submit" name="action">following
                                                     <i class="material-icons right">user</i>
                                                     </button>
                                                 </div>
@@ -189,6 +196,7 @@
                     </div>
                 </div>
                 <!-- center div post  -->
+                <!-- END center div post  -->
                 
                 <!-- right div suggesion , footer -->
             </div>
@@ -200,8 +208,8 @@
         <div id="modal1" class="modal">
             <div class="modal-content">
                 <div class="row">
-                    <form method="post" action="/secure/setnewpost" name="compose_post">
-                        <input type="hidden" name="username" value="">
+                    <form method="post" action="/setnewpost" name="compose_post">
+                        <input type="hidden" name="username" value="<%= user.username %>">
                         <h5 class="center-align">Compose a new Post</h5>
                         <div class="input-field col s12 mb-10">
                             <!-- <input type="text" name="post_title" value=""> -->

@@ -27,8 +27,6 @@ module.exports = function(app, passport) {
     app.post('/secure/sendMail', mailer.sendPHPmail);
     app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
-
-
     // // user preferance page 
     // app.get('/following', function(req, res) {
     //     res.render('pages/following');
@@ -104,6 +102,12 @@ module.exports = function(app, passport) {
         // render the page and pass in any flash data if it exists
         res.render('pages/signup.ejs', {
             message: req.flash('signupMessage')
+        });
+    });
+
+    app.get('/followers_you_follow', isLoggedIn, function(req, res) {
+        res.render('pages/matual-follow.ejs', {
+            user: req.user // get the user out of session and pass to template
         });
     });
 
@@ -213,7 +217,10 @@ module.exports = function(app, passport) {
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); 		// tweet,retweet & reply post
 	
 	app.get('/suggestion/:user_id', suggest.getSuggestion);				// Get Suggestions
-	app.get('/randomSuggestion', suggest.randomSuggestion);		// Get Random Suggestions
+	app.get('/randomSuggestion', suggest.randomSuggestion);				// Get Random Suggestions
+	
+	app.post('/deletepost', post.deletepost); // delete post
+    app.post('/deletereply', reply.deletereply); // delete post
 
 };
 // route middleware to make sure a user is logged in

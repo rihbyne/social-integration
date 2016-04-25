@@ -604,6 +604,40 @@ var getuserpostcount = function(req, res) { // get a post
 
 };
 
+var deletepost = function(req, res){
+
+    var post_id = req.body.post_id;  
+
+    post_model.post
+    .findOneAndRemove({
+        _id: post_id
+    })
+    .exec(function(err, result) {
+        if (err) {
+            res.send(err);
+        };
+
+        if (result !== null) {
+
+            console.info('Post Deleted');
+
+            res.json({
+                message: 'Post Deleted'
+            });
+        }
+        else{
+
+            console.info('No Post Found');
+
+            res.json({
+                message: 'No Post Found'
+            });
+        }
+        
+    });
+
+};
+
 // var sortOut = function(finalObj1, res){
 
 //     finalObj1.sort(function comp(a, b) {
@@ -627,5 +661,6 @@ module.exports = ({
     setnewpost : setnewpost,
     setuser : setuser,
     getuserpostcount : getuserpostcount,
-    Trendsdk : Trendsdk
+    Trendsdk : Trendsdk,
+    deletepost : deletepost
 })

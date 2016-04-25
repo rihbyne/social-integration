@@ -474,3 +474,32 @@ ul.link-pro-tabs.main-tab li a span {
     font-weight: bold;
     font-size: 17px;
 }
+
+
+/*matual list*/
+.match-list-wrap {
+    margin-top: 15px;
+}
+ul.match-list {
+    float: left;
+}
+ul.match-list li img {
+    max-width: 46px;
+    margin-right: 12px;
+}
+ul.match-list li {
+    float: left;
+    /* max-width: 45px; */
+}
+.s12.m12.match-list-wrap a:hover {
+    text-decoration: underline;
+}
+
+/*tabs withour bg-border*/
+ul.link-pro-tabs.no-bg-bor {
+    background:transparent; 
+    border: none; 
+}
+.wtf-wrap {
+    background-color: #fff
+}

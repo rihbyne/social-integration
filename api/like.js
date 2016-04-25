@@ -1,142 +1,77 @@
 var post_model = require('../app/models/post_model.js');
 
-//Set postlike
-var setlike = function(req, res) { //Create new like
+//Set post like
+var setlike = function(req, res) {
 
     var post_id = req.body.post_id;
     var like_user_id = req.body.like_user_id;
-    // var likestatus = req.body.likestatus;  
-    // var like_user_name= req.body.like_user_name;
+    var post_type = req.body.post_type;
 
     console.log('Like Api hitted');
-    // console.log('Like Status: ', req.body.likestatus);
     console.log('Post Id: ', req.body.post_id);
     console.log('Like User Id: ', req.body.like_user_id);
 
-    /*This case will run for the second time -- To remove like*/
-    post_model.post_like.find({
+    /*This case will run for the second case -- To remove like*/
+    post_model.post_like
+    .find({
         post_id: post_id,
         like_user_id: like_user_id
-    }).exec(function(err, likedata) {
+    }).lean()
+    .exec(function(err, likedata) {
 
         if (likedata.length !== 0) {
 
-            console.log('You can not like twice for same post');
-            console.log('Make it unlike. changed like status');
-            // res.json({
-            //     message: 'You can not like twice for same post'
-            // });
-            post_model.post_like
-            .find({$and: [{post_id : post_id}, {like_user_id : like_user_id}]})
-            .remove()
-            .exec(err, function(err, result) {
+            console.log('Make it unlike.');
 
-                console.log('Unlike document removed', result);
-               
+            post_model.post_like
+            .findOneAndRemove({$and: [{post_id : post_id}, {like_user_id : like_user_id}]})
+            .lean()
+            .exec(function(err, result) {
+
                 if (err) {
                     res.send(err);
                     return;
                 };
 
-                // if (result !== '') {
-
-                    // post_model.post
-                    // .findByIdAndUpdate(post_id, {
-                    //     $inc: {
-                    //         like_count: -1
-                    //     }
-                    // })
-                    // .exec(function(err, result) {
-
-                    //     console.log('Like count decrease by 1\n', result);
-                       
-                    //     if (err) {
-                    //         res.send(err);
-                    //         return;
-                    //     };
-
-                    //     // res.json({
-                    //     //      message: 'Remove Like'
-                    //     // });
-                    //     // res.render('pages/about');
-
-                    //     res.redirect('about');
-                        
-                    // })
-                    
-                // };
+                console.log('Like document removed / Undo like', result);
+               
+                // res.json({
+                //     message: 'Like document removed / Undo like'
+                // });
 
             })
   
         } 
-        else{
-        /*This case will run for the first time -- To set like*/
-            // post_model.post.find({
-            //     _id: post_id
-            // }).exec(function(err, postdata) {
+        else {
+            /*This case will run for the first time -- To set like*/
 
-            //     console.log('postdata\n', postdata);
-            //     console.log(postdata.length);
-            //     if (postdata.length !== 0) {
+            var likeModel = new post_model.post_like({
+                post_id: post_id,
+                like_user_id: like_user_id,
+                post_type : post_type
+            });
 
-                        // if (postdata[0].posted_by == like_user_id) {
+            likeModel.save(function(err) {
 
-                        //     console.log('You can not like on your own post');
-                        //     return;
-                        //     // res.json({
-                        //     //     message: 'You can not retweet on your own post'
-                        //     // });
+                if (err)
+                    res.send(err);
 
-                        // } else {
+                console.log('Post like');
 
+                // res.json({
+                //     message: 'User like'
+                // });                
 
-                    var likeModel = new post_model.post_like({
-                        post_id: post_id,
-                        like_user_id: like_user_id
-                    });
-
-                    likeModel.save(function(err) {
-
-                        if (err)
-                            res.send(err);
-                        console.log('_id of like', likeModel._id);
-                        post_model.post
-                            .findByIdAndUpdate(post_id, {
-
-                                $push: {"like_by_users": likeModel._id}
-                                
-                            })
-                            .exec(function(err, result) {
-
-                                console.log('New like added and modified like count \n', result);
-
-                                if (err) {
-                                    res.send(err);
-                                };
-
-                            })
-
-                        // res.json({
-                        //     message: 'User retweeted'
-                        // });
-                        // res.render('pages/about');
-                        // req.route('pages/about');
-                        res.redirect('about');
-
-                    });
-
-                // }
-                // else{
-                //     console.info('No Post Found');
-                // }
-
-            // });
-            
+            });
 
         }
-    
-    });
 
+        setlikecount(post_id, post_type, function(){
+            res.redirect('about');
+        })
+
+    });
+    
 }
 
 var getLikeByPost = function(req, res) { //get new like
@@ -183,8 +118,66 @@ var getLikeByUser = function(req, res) { //get new like
 
 }
 
+//update count of like in post
+var setlikecount = function(post_id, post_type, res){
+
+    post_model.post_like
+    .count({post_id: post_id})
+    .lean()
+    .exec(function(err, postLikeCount){
+        
+        if (post_type == 1) {
+            post_model.post
+            .findOneAndUpdate({_id: post_id}, {like_count: postLikeCount})
+            .exec(function(err, postUpdateResult) {
+
+                if (err)
+                    res.send(err);
+
+                // console.log(postUpdateResult); 
+
+                res(null, postUpdateResult)
+
+            });
+        }
+        // else if(post_type == 2){
+        //     post_model.retweet
+        //     .findOneAndUpdate({_id: post_id}, {like_count: postLikeCount})
+        //     .exec(function(err, postUpdateResult) {
+
+        //         if (err)
+        //             res.send(err);
+
+        //         // console.log(postUpdateResult); 
+
+        //         res(null, postUpdateResult)
+
+        //     });
+        // }
+        else{
+            post_model.reply
+            .findOneAndUpdate({_id: post_id}, {like_count: postLikeCount})
+            .exec(function(err, postUpdateResult) {
+
+                if (err)
+                    res.send(err);
+
+                // console.log(postUpdateResult); 
+
+                res(null, postUpdateResult)
+
+            });
+
+        }
+        
+
+    });
+
+}
+
 module.exports = ({
     getLikeByUser : getLikeByUser,
     getLikeByPost : getLikeByPost,
-    setlike       : setlike
+    setlike       : setlike,
+    setlikecount : setlikecount
 })

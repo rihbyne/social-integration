@@ -34,8 +34,8 @@
                         </div>
                     </div>
                     <div class=" s12 m12 ">
-                        <a class="waves-effect waves-light blue btn  ">tweet to</a>
-                        <a class="waves-effect waves-light blue btn right">messege</a>
+                        <a href="#modal2" class="waves-effect waves-light blue btn modal-trigger ">tweet to</a>
+                        <a href="#modal_messege" class="waves-effect waves-light  blue btn right modal-trigger">messege</a>
                     </div>
                     <!-- Followers you know -->
                     <div class=" s12 m12 match-list-wrap">
@@ -255,27 +255,138 @@
                                         </a>
                                         <ul>
                                             <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
-                                            <!-- <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li> -->
                                             <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
                                             <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
                                             <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
                                             </button></li>
-                                            <!--   <li><a ><i class="material-icons btn-ico">library_add
-                                            </i> <input class="btn-floating yellow darken-1"  type="submit" value=''></a>
-                                        </li> -->
-                                    </ul>
-                                </div>
-                                
-                            </form>
+                                        </ul>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <!--                                     <div class="modal-footer">
-                        <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+                    <!-- tweet to user modal -->
+                    <div id="modal2" class="modal">
+                        <div class="modal-content">
+                            <div class="row">
+                                <form method="post" action="/setnewpost" name="compose_post">
+                                    <input type="hidden" name="username" value="<%= user.username %>">
+                                    <h5 class="center-align">tweet to username</h5>
+                                    <div class="input-field col s12 mb-10">
+                                        <!-- <input type="text" name="post_title" value=""> -->
+                                        <textarea id="textarea1" name="post_description" placeholder="@username" class="materialize-textarea" length="350"></textarea>
+                                        <label for="textarea1"></label>
+                                    </div>
+                                    <div class="fixed-action-btn horizontal click-to-toggle">
+                                        <a class="btn-floating btn-large red">
+                                            <i class="large mdi-navigation-menu"></i>
+                                        </a>
+                                        <ul>
+                                            <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+                                            <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+                                            <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+                                            <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
+                                            </button></li>
+                                        </ul>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                -->                                </div>
-                <footer>
-                    <% include ../partials/footer %>
-                </footer>
-                
-            </body>
-        </html>
+                    <!-- messege modal -->
+                    <div id="modal_messege" class="modal msg-box-modal">
+                        <div class="modal-content">
+                            <div class="row">
+                                <div class="messege-header">
+                                    <p class="center">sudeep_dk
+                                        <a class='dropdown-button right' href='#' data-activates='dropdown_msg'><i class="fa fa-ellipsis-h"></i></a>
+                                    </p>
+                                    <!-- Dropdown Structure -->
+                                    <ul id='dropdown_msg' class='dropdown-content'>
+                                        <li><a href="#!">Turn off notifications</a></li>
+                                        <li><a href="#!">Delete conversation</a></li>
+                                        <li><a href="#!">Flag</a></li>
+                                    </ul>
+                                </div>
+                                <div class="messege-body-wrap col m12 s12">
+                                    <!--  <ul>
+                                        <li>
+                                            <a href="">test</a>
+                                        </li>
+                                        <li>
+                                            <a href="">test</a>
+                                        </li> <li>
+                                        <a href="">test</a>
+                                    </li> <li>
+                                    <a href="">test</a>
+                                </li> <li>
+                                <a href="">test</a>
+                            </li> <li>
+                            <a href="">test</a>
+                        </li> <li>
+                        <a href="">test</a>
+                    </li> <li>
+                    <a href="">test</a>
+                </li>
+            </ul> -->
+            <div class="arrow"></div>
+            <ul class="ChatLog">
+                <li class="ChatLog__entry">
+                    <img class="ChatLog__avatar" src="//placekitten.com/g/50/50" />
+                    <p class="ChatLog__message">
+                        Hello!
+                        <time class="ChatLog__timestamp">6 minutes ago</time>
+                    </p>
+                </li>
+                <li class="ChatLog__entry">
+                    <img class="ChatLog__avatar" src="//placekitten.com/g/50/50" />
+                    <p class="ChatLog__message">
+                        What is going on here?
+                        <time class="ChatLog__timestamp">5 minutes ago</time>
+                    </p>
+                </li>
+                <li class="ChatLog__entry ChatLog__entry_mine">
+                    <img class="ChatLog__avatar" src="//placekitten.com/56/56" />
+                    <p class="ChatLog__message">
+                        I have no idea.
+                        <time class="ChatLog__timestamp">4 minutes ago</time>
+                    </p>
+                </li>
+                <li class="ChatLog__entry">
+                    <img class="ChatLog__avatar" src="//placekitten.com/g/50/50" />
+                    <p class="ChatLog__message">
+                        I have a neat idea. Maybe I should explain it to you in detail?
+                        <time class="ChatLog__timestamp">3 minutes ago</time>
+                    </p>
+                </li>
+                <li class="ChatLog__entry ChatLog__entry_mine">
+                    <img class="ChatLog__avatar" src="//placekitten.com/50/50" />
+                    <p class="ChatLog__message">
+                        Sure thing. The more detail the better. In fact, if you could provide definitions for every single term you use, that would be terrific!
+                        <time class="ChatLog__timestamp">2 minutes ago</time>
+                    </p>
+                </li>
+            </ul>
+        </div>
+        <div class="msg-footer">
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="msg" type="text" class="col s11">
+                    <a class="btn-floating right blue waves-effect"><i class="material-icons">send</i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- messege modal -->
+<!--                                     <div class="modal-footer">
+<a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+</div>
+-->
+<footer>
+<% include ../partials/footer %>
+</footer>
+
+</body>
+</html>

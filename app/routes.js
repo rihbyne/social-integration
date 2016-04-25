@@ -105,7 +105,7 @@ module.exports = function(app, passport) {
     });
 
     app.get('/followers_you_follow', isLoggedIn, function(req, res) {
-        res.render('pages/matual-follow.ejs', {
+        res.render('pages/mutual-follow.ejs', {
             user: req.user // get the user out of session and pass to template
         });
     });

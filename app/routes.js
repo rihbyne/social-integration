@@ -167,13 +167,15 @@ module.exports = function(app, passport) {
 
     app.use('/about', isLoggedIn, post.getuserdetails); // about page
     app.get('/mention/:mention_user', mention.getmentionuser); // Get Mention User Details
+    
     app.get('/gethomepost/:username', userhome.getuserhomeposts); // user home timeline post API
+    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); //tweet,retweet & reply post -- profile timeline
 
     app.get('/getpost', post.getpost); // Get all post
     app.get('/getpost/:user', post.getuserposts); // Get post by username
     app.get('/getpost/:user/:post_id', post.getuserpost); // Get single post of user
     app.get('/getpost/count/:user', post.getuserpostcount); // Get post count by username
-    app.get('/getpost/post/:post_title', post.getsinglepost); // Get post by post title
+    // app.get('/getpost/post/:post_title', post.getsinglepost); // Get post by post title
     app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
     app.post('/hashtags', hashtag.gethashtag); // Get all hashtag keyword
@@ -195,7 +197,7 @@ module.exports = function(app, passport) {
     app.post('/setfollowing', follow.setfollowing); // Set follower// dk
     app.get('/following/:user_name', follow.getfollowing); // Set followings
     app.get('/followers/:user_name', follow.getfollowers); // Set follower
-    app.post('/unlink_followings_f', follow.unlink_following); // Set follower
+    app.post('/unlink_following', follow.unlink_following); // Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower); // count follower
     app.get('/following/count/:following_id', follow.getCountFollowing); // count follower
 
@@ -205,8 +207,6 @@ module.exports = function(app, passport) {
 
     app.post('/setblockuser', blockuser.setblockuser); //Set block user
     app.get('/getblockuser/:userId', blockuser.getblockuser); //get block user
-
-    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); //tweet,retweet & reply post
 
     app.post('/deletepost', post.deletepost); // delete post
     app.post('/deletereply', reply.deletereply); // delete post

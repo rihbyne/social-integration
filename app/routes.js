@@ -104,6 +104,12 @@ module.exports = function(app, passport) {
         });
     });
 
+    app.get('/followers_you_follow', isLoggedIn, function(req, res) {
+        res.render('pages/matual-follow.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
+
 
     // process the signup form
     app.post('/signup', passport.authenticate('local-signup', {

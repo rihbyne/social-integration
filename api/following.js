@@ -348,13 +348,83 @@ var getCountFollowing = function(req, res){
 
 }
 
+var getMutualFollowerYouKnow = function(req, res){
+
+	var user_id = req.params.user_id;
+	var following_id = req.params.following_id;
+	var count = 0;
+	
+	//validation for blank variables
+    req.checkParams('user_id', 'User Id is mandatory').notEmpty();
+    req.checkParams('following_id', 'Following Id is mandatory').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+	
+	follower
+	.find({$and:[{user_id:user_id},{follow_status:true}]},{_id:0})
+	.select('following_id')
+	.lean()
+	.exec(function(err, followingIds){
+		
+		if (err)
+			res.send(err);
+			
+		follower
+		.find({$and:[{following_id:following_id},{follow_status:true}]},{_id:0})
+		.populate('user_id')
+		.select('user_id')
+		.lean()
+		.exec(function(err, followerIds){
+			
+			// console.log(typeof(followerIds));
+			// console.log(followerIds);
+			
+			var item, items;
+			var i = 0;
+			var users = [];
+			var id = []
+			for(item in followingIds)
+			{				
+				for (items in followerIds)
+				{					
+					if(followingIds[item].following_id == followerIds[items].user_id._id)
+					{
+						count++;
+						users[i] = followerIds[items].user_id.username;
+						id[i] = followerIds[items].user_id._id;
+						i++
+					}	
+				}
+			  
+			}
+			
+			res.json({
+				// FollowingIds: followingIds,
+				// FollowerIds: followerIds,
+				users : users,
+				id : id,
+				count: count
+			});
+		
+		})
+		
+	})
+
+}
+
 module.exports = ({
     setfollowing : setfollowing,
     getfollowing : getfollowing,
     getfollowers : getfollowers,
     unlink_following : unlink_following,
     getCountFollower : getCountFollower,
-    getCountFollowing : getCountFollowing
-
+    getCountFollowing : getCountFollowing,
+	getMutualFollowerYouKnow : getMutualFollowerYouKnow
 })
 

@@ -70,6 +70,7 @@ var getuserhomeposts = function(req, res) { // get a post
 
 }
 
+//Get all post, retweet and reply of user
 var getpostsrtreply = function(req, res) { // get a post 
 
     console.log('Show all posts, retweet & reply for single user');
@@ -228,80 +229,43 @@ function getRetweetPostsByUserId(callback) {
 function getReplyByUserId(callback){
 
     post_model.reply 
-    .find({user_id : userid})
-    .populate('user_id post_owner_id')
+    .find({reply_user_id : userid})
+    .populate('post_id post_owner_id')
     .sort({created_at: -1})
-    .limit()
+    .limit(5)
     .lean()
     .exec(function(err, postReplyResult){
         if (err) {
             res.send(err)
         };
-        console.info(postReplyResult);
+        // console.info('Reply By user: \n',postReplyResult);
 
-        callback(null, postReplyResult);
+        async.each(postReplyResult, 
+
+            function(singlepostReplyResult, callback){
+                console.info('single ',singlepostReplyResult);
+
+                if (singlepostReplyResult.post_id == null) {
+
+                    console.info('this post is not available');
+                    singlepostReplyResult.post_id = 'This post is not available';
+
+                };
+
+                callback();
+
+        }, function(err){
+            
+            callback(null, postReplyResult);
+
+        });
+
     })
 
 };
-// function getReplyByUserId(callback){
-
-//     var replyResultArray = new Array;
-
-//     //use userid to find all post of users
-//     post_model.post
-//     .find({
-//         'post_reply.posted_by': userid
-//     }, {
-//         _id: 0
-//     })
-//     .select('post_reply')
-//     // .populate('posted_by like_by_users')
-//     .sort({
-//         reply_at: -1
-//     })
-//     .limit(10)
-//     .lean().exec(function(err, postReplyResult) {
-
-//         if (err)
-//             res.send(err);
-
-//         else if (postReplyResult.length == 0) {
-
-//             callback(null, []);//No post found
-
-//         } else {
-//             // console.info(postReplyResult);
-
-//                 async.each(postReplyResult,
-                               
-//                     function(postReplyOne, callback) {
-//                        console.info(postReplyOne);
-//                         // postReplyOne['post_reply'][0]['created_at'] = postReplyOne['post_reply'][0]['reply_at'];
-//                         // postReplyOne['post_reply'][0]['posted_by'] = postReplyOne['posted_by']  
-//                         // console.info(postReplyOne['post_reply'][0]);
-//                         replyResultArray.push(postReplyOne['post_reply'][0]);
-
-//                         // console.info(replyResultArray);
-//                         return callback(replyResultArray);
-
-//                     },
-//                     // 3rd param is the function to call when everything's done
-//                     function(err) {
-
-//                         // All tasks are done now
-//                     }
-
-//                 );
-
-//             callback(null, replyResultArray);
-//         }
-
-//     });
-
-// }
 
 //find id of user from user collection
-var getUserId =function(username, res){
+var getUserId = function(username, res){
 
     user
     .find({

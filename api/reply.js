@@ -10,7 +10,7 @@ required param post id, userid, reply_user_id
 var setreply =  function(req, res){
 
     var post_id = req.body.post_id;
-    var user_id = req.body.user_id;   
+    var reply_user_id = req.body.reply_user_id;   
     var post_owner_id = req.body.post_owner_id;
     var ref_reply_id = req.body.ref_reply_id;
     var reply_msg = req.body.reply_msg; 
@@ -19,7 +19,7 @@ var setreply =  function(req, res){
 
     var post_reply = new post_model.reply({
         post_id : post_id,
-        user_id : user_id,
+        reply_user_id : reply_user_id,
         ref_reply_id : ref_reply_id,
         post_owner_id : post_owner_id,
         reply_msg : reply_msg,
@@ -43,26 +43,9 @@ var getreply = function(req, res){
     var post_id = req.params.post_id;
     var reply_user_id = req.params.reply_user_id;
 
-    // post_model.reply
-    // .find({$and:[{reply_user_id : reply_user_id}, {post_id: post_id}]})
-    // // .populate('reply_to')
-    // // .deepPopulate('post_id reply_to')
-    // .sort({created_at : -1})
-    // .exec(function(err, result){
-    //     if (err) {
-    //         res.send(err)
-    //     };
-    //     console.info(result);
-
-    //     res.json({
-    //         reply: result
-    //     })
-
-    // })
-
     post_model.reply 
     .find({post_id : post_id})
-    .populate('user_id')
+    .populate('user_id post_id')
     .sort({created_at : -1})
     .exec(function(err, result){
         if (err) {
@@ -78,7 +61,42 @@ var getreply = function(req, res){
 
 }
 
+var deletereply = function(req, res){
+
+    var reply_id = req.body.reply_id;  
+
+    post_model.reply
+    .findOneAndRemove({
+        _id: reply_id
+    })
+    .exec(function(err, result) {
+        if (err) {
+            res.send(err);
+        };
+
+        if (result !== null) {
+
+            console.info('Reply Deleted');
+
+            res.json({
+                message: 'Reply Deleted'
+            });
+        }
+        else{
+
+            console.info('No Reply Found');
+
+            res.json({
+                message: 'No Reply Found'
+            });
+        }
+        
+    });
+
+};
+
 module.exports = ({
     setreply : setreply,
-    getreply : getreply
+    getreply : getreply,
+    deletereply : deletereply
 });

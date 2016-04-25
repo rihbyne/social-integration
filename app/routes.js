@@ -26,8 +26,6 @@ module.exports = function(app, passport) {
     app.post('/secure/sendMail', mailer.sendPHPmail);
     app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
-
-
     // // user preferance page 
     // app.get('/following', function(req, res) {
     //     res.render('pages/following');
@@ -209,6 +207,9 @@ module.exports = function(app, passport) {
     app.get('/getblockuser/:userId', blockuser.getblockuser); //get block user
 
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); //tweet,retweet & reply post
+
+    app.post('/deletepost', post.deletepost); // delete post
+    app.post('/deletereply', reply.deletereply); // delete post
 
 };
 // route middleware to make sure a user is logged in

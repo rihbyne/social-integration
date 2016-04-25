@@ -78,7 +78,42 @@ var getreply = function(req, res){
 
 }
 
+var deletereply = function(req, res){
+
+    var reply_id = req.body.reply_id;  
+
+    post_model.reply
+    .findOneAndRemove({
+        _id: reply_id
+    })
+    .exec(function(err, result) {
+        if (err) {
+            res.send(err);
+        };
+
+        if (result !== null) {
+
+            console.info('Reply Deleted');
+
+            res.json({
+                message: 'Reply Deleted'
+            });
+        }
+        else{
+
+            console.info('No Reply Found');
+
+            res.json({
+                message: 'No Reply Found'
+            });
+        }
+        
+    });
+
+};
+
 module.exports = ({
     setreply : setreply,
-    getreply : getreply
+    getreply : getreply,
+    deletereply : deletereply
 });

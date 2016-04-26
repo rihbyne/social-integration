@@ -24,6 +24,7 @@ var server              = require('http').Server(app);
 var notificationschema  = require('./model/notification_model.js');
 var notification        = require('./api/notification.js');  
 var mailer              = require('./api/mail.js');                     // Mail Functionality
+var routeDirectMsgApi = require('./app/routes/api_direct_msg')
 
 // Middleware
 app.use(morgan('dev')); // log every request to the console
@@ -50,6 +51,8 @@ require('./config/passport.js')(passport); // pass passport for configuration
 // routes ======================================================================
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
+//============ direct messaging router====================
+app.use('/api/direct_messages', routeDirectMsgApi)
 
 // launch ======================================================================
 app.listen(port);

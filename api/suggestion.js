@@ -1,7 +1,8 @@
 var follower 	= require('../app/models/model_followers.js'),
     users 		= require('../app/models/user.js')
 	util 		= require('util'),
-	async		= require('async');
+	async		= require('async')
+	request     = require('request');                               // Request Module
 	
 // var getSuggestion1 = function(req,res){
 
@@ -146,6 +147,7 @@ var randomSuggestion = function(req, res){
 
 	follower
 	.aggregate([
+		{ $match :{follow_status:true}},
 		{ $group : { "_id" : "$following_id", "follower_id" : { "$push" : "$user_id" }, "count" : { "$sum" : 1 } } },
 		{ $sort: { count: -1 } }
 	])
@@ -161,15 +163,149 @@ var randomSuggestion = function(req, res){
 				res.send(err);
 			
 			res.send({Results:results})
-		
+			
 		})
 		
 	})	
 	
 }
+
+var allSuggestion = function(req, res){
+	
+	var user_id = req.params.user_id;
+	var list_data = new Array;
+	
+	req.checkParams('user_id', 'User Id is mandatory').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+	
+	users
+	.find({_id:{$ne:user_id}})
+	.lean()
+	.exec(function(err, results){
+		
+		if(err)
+			res.send(err);
+		
+		var arrayLength = results.length;
+		var loop=i=0;
+		async.forEach(results, function (item, cb) {
+		
+			var following_id = item._id;
+			var username = item.username;
+			var firstName = item.first_name;
+			var lastName = item.last_name;
+			
+			if(err)
+				res.send(err);
+			
+			if(user_id==following_id)
+			{
+				loop++;
+				cb()
+			}
+			
+			else
+			{
+				follower
+				.count({$and:[{user_id:user_id},{following_id:following_id},{follow_status:true}]})
+				.lean()
+				.exec(function(err, total){
+					
+					if(err)
+						res.send(err);
+						
+					loop++;
+					
+					if(!total)
+					{
+						list_data[i] = {
+											id : following_id,
+											username : username,
+											firstname : firstName,
+											lastname : lastName
+										}
+						i++;
+					}
+					
+					if(loop == arrayLength)
+					{
+						res.send(list_data);
+						return
+					}
+					
+					cb()
+				})
+			}
+
+		})
+		
+	})
+
+}
+
+var wrapperSuggest = function(req, res){
+
+	var user_id = req.params.user_id;
+	
+	req.checkParams('user_id', 'User Id is mandatory').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+	
+	follower
+	.count({$and:[{user_id : user_id},{follow_status:true}]})
+	.exec(function(err, followingCount){
+               
+		if (err)
+			res.send(err);
+               
+		if(followingCount==0)
+		{
+			request.get({
+                                
+				url: 'http://192.168.2.16:4000/randomSuggestion',
+				headers: {"content-type": "application/json"}
+				
+			},function optionalCallback(err, body){
+				
+				var result = JSON.parse(body.body);
+				res.send(result);
+			
+			})
+		}
+		
+		else
+		{
+			request.get({
+                                
+				url: 'http://192.168.2.16:4000/suggestion/'+user_id,
+				headers: {"content-type": "application/json"}
+				
+			},function optionalCallback(err, body){
+				
+				var result = JSON.parse(body.body);
+				res.send(result);
+			
+			})
+		}
+	
+	});
+}
 	
 	
 module.exports = ({
     getSuggestion : getSuggestion,
-	randomSuggestion : randomSuggestion
+	randomSuggestion : randomSuggestion,
+	allSuggestion : allSuggestion,
+	wrapperSuggest : wrapperSuggest
 })

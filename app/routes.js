@@ -209,7 +209,7 @@ module.exports = function(app, passport) {
     app.post('/unlink_followings_f', follow.unlink_following); 				// Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower); 			// count follower
     app.get('/following/count/:following_id', follow.getCountFollowing); 	// count follower
-	//app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
+	app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
 
     app.get('/api/Trendsdk', post.Trendsdk); 								// trend keyword
     app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply
@@ -220,11 +220,11 @@ module.exports = function(app, passport) {
 
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); 		// tweet,retweet & reply post
 	
-	app.get('/suggestion/:user_id', suggest.getSuggestion);				// Get Suggestions
-	app.get('/randomSuggestion', suggest.randomSuggestion);				// Get Random Suggestions
+	app.get('/suggestion/:user_id', suggest.getSuggestion);					// Get Suggestions
+	app.get('/randomSuggestion', suggest.randomSuggestion);					// Get Random Suggestions
 	
-	app.post('/deletepost', post.deletepost); // delete post
-    app.post('/deletereply', reply.deletereply); // delete post
+	app.post('/deletepost', post.deletepost); 								// delete post
+    app.post('/deletereply', reply.deletereply); 							// delete Reply
 
 };
 // route middleware to make sure a user is logged in

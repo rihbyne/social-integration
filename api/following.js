@@ -157,6 +157,7 @@ var getfollowing = function(req, res) {
 
             follower
             .find({$and:[{user_id: result[0]._id},{follow_status: true}]})
+            .populate('user_id following_id')
             .exec(function(err, result) {
                 console.info(result);
                 res.json({

@@ -189,20 +189,20 @@ var Trendsdk = function(req, res) {
 };
 
 //Get all post 
-var getpost = function(req, res) {
+// var getpost = function(req, res) {
 
-    post_model.post
-	.find()
-	.exec(function(err, allpost) {
-        if (err)
-            res.send(err);
+//     post_model.post
+// 	.find()
+// 	.exec(function(err, allpost) {
+//         if (err)
+//             res.send(err);
 
-        res.json({
-            posts: allpost
-        });
-    });
+//         res.json({
+//             posts: allpost
+//         });
+//     });
 
-};
+// };
 
 //Get single post of user
 var getsinglepost = function(req, res) { // get a post 
@@ -364,7 +364,7 @@ var getuserpost = function(req, res) { // get a post
 };
 
 //Set new post
-var setnewpost = function(req, res) { // create a post 
+var setpost = function(req, res) { // create a post 
 
     console.log('Add post');
 
@@ -654,11 +654,11 @@ var deletepost = function(req, res){
 
 module.exports = ({
     getuserdetails : getuserdetails,
-    getpost : getpost,
+    // getpost : getpost,
     getsinglepost : getsinglepost,
     getuserposts : getuserposts,
     getuserpost : getuserpost,
-    setnewpost : setnewpost,
+    setpost : setpost,
     setuser : setuser,
     getuserpostcount : getuserpostcount,
     Trendsdk : Trendsdk,

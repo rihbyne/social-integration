@@ -4,7 +4,7 @@ var User = require('../models/user.js');
 // Post Schema
 var post = mongoose.Schema({
     
-    posted_by:                       {type: mongoose.Schema.ObjectId},       // posted by 
+    posted_by:                       {type: String, ref:'User'},       // posted by 
     username:                        {type: String, ref:'User'},
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 

@@ -4,13 +4,13 @@ var User = require('../models/user.js');
 // Post Schema
 var post = mongoose.Schema({
     
-    posted_by:                       {type: mongoose.Schema.ObjectId},       // posted by 
+    posted_by:                       {type: String, ref:'User'},       // posted by 
     username:                        {type: String, ref:'User'},
     post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     // post_reply:                      [reply_schema],
-    // tweet_count:                     {type: Number, default: 0, min: 0},
-    // like_count:                      {type: Number, default: 0, min: 0},
+    retweet_count:                   {type: Number, default: 0, min: 0},
+    like_count:                      {type: Number, default: 0, min: 0},
     // like_by_users:                   [{type: String, ref: 'post_like'}],
     created_at:                      {type: Date, default: Date.now},          // created date
     last_update: 				     {type: Date}           // last update date
@@ -64,7 +64,8 @@ var post_like_schema = mongoose.Schema({
     
     post_id:                         {type: String},        // post Id
     like_user_id:                    {type: String},        // posted by  
-    like_user_name  :                {type: String}
+    like_user_name  :                {type: String},
+    post_type :                      {type: String, enum : [1,2,3], default : 1} // 1 - post, 2 - retweet, 3 - reply
 
 }, { versionKey: false });
 
@@ -83,6 +84,8 @@ var post_reply_schema = mongoose.Schema({
     post_owner_id:                   {type: String, ref:'User'}, //id of post owner
     reply_user_id :                  {type: String},   // _id of user reply on particular reply
     reply_msg :                      {type: String},  // string of reply message
+    retweet_count:                   {type: Number, default: 0, min: 0},
+    like_count:                      {type: Number, default: 0, min: 0},
     ref_reply_id:                    {type: String }, // if reply on reply so we will save _id of reply document @this filed
     created_at :                     {type: Date, default: Date.now},          // created date
 }, { versionKey: false });

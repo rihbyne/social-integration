@@ -503,3 +503,128 @@ ul.link-pro-tabs.no-bg-bor {
 .wtf-wrap {
     background-color: #fff
 }
+
+/*messege*/
+.modal.msg-box-modal {
+    max-height: 85% !important;
+    min-height: 80%;
+}
+
+.msg-footer {
+    position: fixed;
+    bottom: 0;
+    width: 93%;
+}
+
+/*.messege-body-wrap.col.m12.s12 {
+    overflow-x: hidden;
+    position: relative;
+    max-height: 370px;
+    overflow-y: scroll;
+}
+*/
+.messege-body-wrap.col.m12.s12 {
+    overflow-x: hidden;
+    position: relative;
+    min-height: 370px !Important;
+    /*overflow-y: scroll;*/
+}
+.messege-body-wrap.col.m12.s12 ul {
+    position: absolute;
+    bottom: 0;
+    overflow-y: scroll;
+    max-height: 450px;
+}
+/** {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #bbb;
+}
+
+ul.ChatLog {
+  list-style: none;
+}*/
+
+.ChatLog {
+  /*max-width: 20em;*/
+  margin: 0 auto;
+}
+.ChatLog .ChatLog__entry {
+  margin: .5em;
+}
+
+.ChatLog__entry {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  max-width: 100%;
+}
+
+.ChatLog__entry.ChatLog__entry_mine {
+  flex-direction: row-reverse;  
+  align-items: flex-end;
+}
+li.ChatLog__entry .ChatLog__avatar {
+    margin-top: 17px;
+}
+li.ChatLog__entry.ChatLog__entry_mine .ChatLog__avatar {
+    margin-bottom: 17px;
+}
+
+
+
+.ChatLog__avatar {
+  flex-shrink: 0;
+  flex-grow: 0;
+  z-index: 1;
+      /*margin-bottom: 17px;*/
+}
+
+.ChatLog__entry.ChatLog__entry_mine .ChatLog__avatar {
+  box-shadow: 2px 2px 0px #aaa;   
+}
+
+.ChatLog__entry .ChatLog__message {
+  position: relative;
+}
+
+.ChatLog__entry .ChatLog__message::before {
+  position: absolute;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  left: -12px;
+  height: 0;
+  content: '';
+  border: 6px solid transparent;
+  border-top-color: #fff;
+  border-right-color: #fff;
+  z-index: 2;
+}
+
+.ChatLog__entry.ChatLog__entry_mine .ChatLog__message::before {
+  top: auto;
+  right: -12px;
+  bottom: 0;
+  left: auto;
+  border: 6px solid transparent;
+  border-bottom-color: #fff;
+  border-left-color: #fff;
+}
+
+.ChatLog__message {
+  background-color: #fff;
+  padding: .5em;
+  box-shadow: 2px 2px 0px #aaa; 
+}
+
+.ChatLog__message .ChatLog__timestamp {
+  display: block;
+  margin: .2em;
+  font-size: 80%;
+  color: #444;
+}

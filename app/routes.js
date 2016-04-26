@@ -106,7 +106,7 @@ module.exports = function(app, passport) {
     });
 
     app.get('/followers_you_follow', isLoggedIn, function(req, res) {
-        res.render('pages/matual-follow.ejs', {
+        res.render('pages/mutual-follow.ejs', {
             user: req.user // get the user out of session and pass to template
         });
     });
@@ -176,7 +176,7 @@ module.exports = function(app, passport) {
     app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
     app.get('/gethomepost/:username', userhome.getuserhomeposts); 			// user home timeline post API
 
-    app.get('/getpost', post.getpost); 										// Get all post
+    // app.get('/getpost', post.getpost); 										// Get all post
     app.get('/getpost/:user', post.getuserposts); 							// Get post by username
     app.get('/getpost/:user/:post_id', post.getuserpost); 					// Get single post of user
     app.get('/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
@@ -192,7 +192,7 @@ module.exports = function(app, passport) {
 
     app.post('/setuser', post.setuser); 									// Set new user
 
-    app.post('/setnewpost', post.setnewpost); 								// Set new post
+    app.post('/setpost', post.setpost); 								// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
     app.post('/setlike', like.setlike); 									// Set like
     app.get('/like/post/:post_id', like.getLikeByPost); 					// Get like by post

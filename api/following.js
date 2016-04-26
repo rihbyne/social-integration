@@ -157,13 +157,17 @@ var getfollowing = function(req, res) {
 
             follower
             .find({$and:[{user_id: result[0]._id},{follow_status: true}]})
+            .populate('user_id following_id')
             .exec(function(err, result) {
                 console.info(result);
+                var f_list = result;
+
                 // res.json({
-                //     FollowingList: result
+                //     FollowingList: f_list
                 // })
                     res.render('pages/following', {
-                        result : result,
+                        // FollowingList : ['result'],
+                        FollowingList : f_list,
                         user: req.user
                     });
 
@@ -204,11 +208,20 @@ var getfollowers = function(req, res) {
 
             follower
             .find({$and:[{following_id: result[0]._id},{follow_status: true}]})
+            .populate('following_id user_id')
+
             .exec(function(err, result) {
                 console.info(result);
-                res.json({
-                    FollowersList: result
-                })
+                var f_list = result;
+
+                // res.json({
+                //     FollowersList: result
+                // })
+                  res.render('pages/follower', {
+                        // FollowingList : ['result'],
+                        Followers_List : f_list,
+                        user: req.user
+                    });
 
             })
 

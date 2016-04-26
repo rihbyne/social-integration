@@ -171,7 +171,7 @@ module.exports = function(app, passport) {
     app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
     app.get('/gethomepost/:username', userhome.getuserhomeposts); 			// user home timeline post API
 
-    app.get('/getpost', post.getpost); 										// Get all post
+    // app.get('/getpost', post.getpost); 										// Get all post
     app.get('/getpost/:user', post.getuserposts); 							// Get post by username
     app.get('/getpost/:user/:post_id', post.getuserpost); 					// Get single post of user
     app.get('/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
@@ -187,7 +187,7 @@ module.exports = function(app, passport) {
 
     app.post('/setuser', post.setuser); 									// Set new user
 
-    app.post('/setnewpost', post.setnewpost); 								// Set new post
+    app.post('/setpost', post.setpost); 								// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
     app.post('/setlike', like.setlike); 									// Set like
     app.get('/like/post/:post_id', like.getLikeByPost); 					// Get like by post
@@ -196,7 +196,7 @@ module.exports = function(app, passport) {
 
     app.post('/setfollowing', follow.setfollowing); 						// Set follower// dk
 
-    app.get('/following/:user_name', isLoggedIn ,follow.getfollowing); 					// Set followings
+    app.get('/:user_name/following', isLoggedIn ,follow.getfollowing); 					// Set followings
     
     // app.get('/following/:user_name', isLoggedIn, follow.getfollowing , function(req, res) {
     //     // res.render('pages/following.ejs', {
@@ -205,7 +205,7 @@ module.exports = function(app, passport) {
     // });
 
 
-    app.get('/followers/:user_name', follow.getfollowers); 					// Set follower
+    app.get('/:user_name/followers', isLoggedIn , follow.getfollowers); 					// Set follower
     app.post('/unlink_followings_f', follow.unlink_following); 				// Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower); 			// count follower
     app.get('/following/count/:following_id', follow.getCountFollowing); 	// count follower

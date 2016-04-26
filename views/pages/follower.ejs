@@ -13,10 +13,10 @@
                 <div class="col s12 m12 l3">
                     <div class="card">
                         <div class="card-image waves-effect waves-block waves-light">
-                            <img class="activator" src="images/CeoXGIuWQAAtrZN.jpg">
+                            <img class="activator" src="/images/CeoXGIuWQAAtrZN.jpg">
                         </div>
                         <div class="card-content">
-                            <img src="images/pro_01.jpg" alt="" class="circle user_pro_p">
+                            <img src="/images/pro_01.jpg" alt="" class="circle user_pro_p">
                             <span class="card-title activator grey-text text-darken-4">Sudeep B Makwana<i class="material-icons right">more_vert</i></span>
                             <p></p>
                             <p><a href="#">@sudeep_dk</a></p>
@@ -33,48 +33,48 @@
                             </ul>
                         </div>
                     </div>
-                      <!-- Followers you know -->
+                    <!-- Followers you know -->
                     <div class=" s12 m12 match-list-wrap">
                         <a href="/followers_you_follow"><i class="fa fa-user" aria-hidden="true"></i>  10 Followers you know</a>
                         <ul class="match-list">
                             <li class="">
-                                <img src="images/pro_01.jpg" alt="" class="circle">
+                                <img src="/images/pro_01.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_02.jpg" alt="" class="circle">
+                                <img src="/images/pro_02.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_03.jpg" alt="" class="circle">
+                                <img src="/images/pro_03.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_01.jpg" alt="" class="circle">
+                                <img src="/images/pro_01.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_02.jpg" alt="" class="circle">
+                                <img src="/images/pro_02.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_03.jpg" alt="" class="circle">
+                                <img src="/images/pro_03.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_01.jpg" alt="" class="circle">
+                                <img src="/images/pro_01.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_02.jpg" alt="" class="circle">
+                                <img src="/images/pro_02.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_03.jpg" alt="" class="circle">
+                                <img src="/images/pro_03.jpg" alt="" class="circle">
                             </li>
                             <li class="">
-                                <img src="images/pro_03.jpg" alt="" class="circle">
+                                <img src="/images/pro_03.jpg" alt="" class="circle">
                             </li>
                         </ul>
                     </div>
-                    <div class="s12 m12">   
+                    <div class="s12 m12">
                         <a href="#">Who to follow</a>
                         <a href="#1" class="right">view all</a>
                         <ul class="collection">
                             <li class="collection-item avatar">
-                                <img src="images/pro_01.jpg" alt="" class="circle">
+                                <img src="/images/pro_01.jpg" alt="" class="circle">
                                 <a href=""><b class="fullname">Damon Jernstad</b></a><br>
                                 <small>
                                 Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
@@ -83,7 +83,7 @@
                                 <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
                             </li>
                             <li class="collection-item avatar">
-                                <img src="images/pro_02.jpg" alt="" class="circle">
+                                <img src="/images/pro_02.jpg" alt="" class="circle">
                                 <a href=""><b class="fullname">Harrison Bonardi</b></a><br>
                                 <small>
                                 Followed by <a href="#12"><b>Aiko</b></a> and <a href="#" class=""><b>others</b></a>
@@ -92,7 +92,7 @@
                                 <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
                             </li>
                             <li class="collection-item avatar">
-                                <img src="images/pro_03.jpg" alt="" class="circle">
+                                <img src="/images/pro_03.jpg" alt="" class="circle">
                                 <a href=""><b class="fullname">Linnie Escalona</b></a><br>
                                 <small>
                                 Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
@@ -120,67 +120,45 @@
                         <form class="col s12">
                             <div class="row">
                                 <% include ../partials/tweet_type_tab.ejs %>
-                               
+                                
                                 <div id="test1" class="col s12">
                                     
                                 </div>
                                 <div id="test2" class="col s12">
                                     <!-- following tabs -->
                                     <div class="row">
+                                        <% Followers_List.forEach(function(Followers_List, i){ %>
                                         <div class="col s12 m4">
                                             <div class="card small">
                                                 <div class="card-image">
-                                                    <img src="images/CeoXGIuWQAAtrZN.jpg">
-                                                    <span class="card-title">Sudeep Makwana</span>
-                                                    <span class="card-title handle">@sudeep_dk</span>
-                                                    <span class="right card-title f-status">follows you</span>
+                                                    <img src="/images/CeoXGIuWQAAtrZN.jpg">
+                                                    <span class="card-title"><%= Followers_List.user_id.first_name %><%= Followers_List.user_id.last_name %></span>
+                                                    <span class="card-title handle"><%= Followers_List.user_id.username %></span>
+                                                    <span class="right card-title f-status">
+                                                        <% if (Followers_List.follow_back == true) { %>
+                                                        <!-- you are following -->
+                                                        <% } else { %>
+                                                        
+                                                        <% } %>
+                                                    </span>
                                                 </div>
                                                 <div class="card-content">
                                                     <p>apheretic Rutha Padiong apheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiong</p><br>
                                                 </div>
                                                 <div class="card-action">
-                                                    <button class="btn waves-effect waves-light red light-red lighten-1 " type="submit" name="action">following
-                                                    <i class="material-icons right">user</i>
+                                                    <% if (Followers_List.follow_back == true) { %>
+                                                    <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
                                                     </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col s12 m4">
-                                            <div class="card small">
-                                                <div class="card-image">
-                                                    <img src="images/CeoXGIuWQAAtrZN.jpg">
-                                                    <span class="card-title">Constance Robusto</span>
-                                                    <span class="card-title handle">@Constance</span>
-                                                    <span class="right card-title f-status">follows you</span>
-                                                </div>
-                                                <div class="card-content">
-                                                    <p>tindered Corrie Lukacs tindered Corrie Lukacstindered Corrie Lukacstindered Corrie Lukacstindered Corrie Lukacstindered Corrie Lukacs</p><br>
-                                                </div>
-                                                <div class="card-action">
-                                                    <button class="btn waves-effect waves-light red light-red lighten-1 " type="submit" name="action">following
-                                                    <i class="material-icons right">user</i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col s12 m4">
-                                            <div class="card small">
-                                                <div class="card-image">
-                                                    <img src="images/CeoXGIuWQAAtrZN.jpg">
-                                                    <span class="card-title">Pei Salzman</span>
-                                                    <span class="card-title handle">@Pei</span>
-                                                    <span class="right card-title f-status">follows you</span>
-                                                </div>
-                                                <div class="card-content">
-                                                    <p>animatingly Verline Cassidy animatingly Verline Cassidyanimatingly Verline Cassidyanimatingly Verline Cassidyanimatingly Verline Cassidyanimatingly Verline Cassidy</p><br>
-                                                </div>
-                                                <div class="card-action">
+                                                    <% } else { %>
                                                     <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
-                                                    <i class="material-icons right">user</i>
                                                     </button>
+                                                    
+                                                    <% } %>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
+                                        <% }) %>
                                     </div>
                                     <!-- end following tab -->
                                 </div>

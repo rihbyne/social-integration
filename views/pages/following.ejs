@@ -126,32 +126,37 @@
                                 <div id="test2" class="col s12">
                                     <!-- following tabs -->
                                     <div class="row">
-                                        <h5>list of <%= result[0].following_id %> /followings</h5>
-                                        <p> following user  name :<%= result[0].user_id %></p>
-                                        <p> follow by  user name  :<%= result[0].following_id %></p>
-                                        <p> following status :<%= result[0].follow_status %></p>
-                                        <p> follow back status :<%= result[0].follow_status %></p>
-                                        <p> First name :<%= result[0].following_id %></p>
-                                        
-                                        
+                                        <% FollowingList.forEach(function(FollowingList, i){ %>
                                         <div class="col s12 m4">
                                             <div class="card small">
                                                 <div class="card-image">
                                                     <img src="/images/CeoXGIuWQAAtrZN.jpg">
-                                                    <span class="card-title">Sudeep Makwana</span>
-                                                    <span class="card-title handle">@sudeep_dk</span>
-                                                    <span class="right card-title f-status">follows you</span>
+                                                    <span class="card-title"><%= FollowingList.following_id.first_name %><%= FollowingList.following_id.last_name %></span>
+                                                    <span class="card-title handle"><%= FollowingList.following_id.username %></span>
+                                                    <span class="right card-title f-status">
+                                                        <% if (FollowingList.follow_back == true) { %>
+                                                        follows you
+                                                        <% } else { %>
+                                                        
+                                                        <% } %>
+                                                    </span>
                                                 </div>
                                                 <div class="card-content">
                                                     <p>apheretic Rutha Padiong apheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiong</p><br>
                                                 </div>
                                                 <div class="card-action">
-                                                    <button class="btn waves-effect waves-light red light-red lighten-1 " type="submit" name="action">following
-                                                    <i class="material-icons right">user</i>
+                                                  <% if (FollowingList.follow_status == true) { %>
+                                                    <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
                                                     </button>
+                                                    <% } else { %>
+                                                    <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
+                                                    </button>
+                                                    
+                                                    <% } %>
                                                 </div>
                                             </div>
                                         </div>
+                                        <% }) %>
                                     </div>
                                     <!-- end following tab -->
                                 </div>

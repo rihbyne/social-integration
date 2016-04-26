@@ -131,11 +131,6 @@ module.exports = function(app, passport) {
     });
 
 
-    app.get('/following', isLoggedIn, function(req, res) {
-        res.render('pages/following.ejs', {
-            user: req.user // get the user out of session and pass to template
-        });
-    });
     app.get('/followers', isLoggedIn, function(req, res) {
         res.render('pages/follower.ejs', {
             user: req.user // get the user out of session and pass to template
@@ -200,7 +195,16 @@ module.exports = function(app, passport) {
     app.get('/getretweet/:post_id', retweet.getretweet); 					// Get Retweet by post
 
     app.post('/setfollowing', follow.setfollowing); 						// Set follower// dk
-    app.get('/following/:user_name', follow.getfollowing); 					// Set followings
+
+    app.get('/following/:user_name', isLoggedIn ,follow.getfollowing); 					// Set followings
+    
+    // app.get('/following/:user_name', isLoggedIn, follow.getfollowing , function(req, res) {
+    //     // res.render('pages/following.ejs', {
+    //     //     user: req.user // get the user out of session and pass to template
+    //     // });
+    // });
+
+
     app.get('/followers/:user_name', follow.getfollowers); 					// Set follower
     app.post('/unlink_followings_f', follow.unlink_following); 				// Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower); 			// count follower

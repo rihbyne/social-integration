@@ -159,9 +159,14 @@ var getfollowing = function(req, res) {
             .find({$and:[{user_id: result[0]._id},{follow_status: true}]})
             .exec(function(err, result) {
                 console.info(result);
-                res.json({
-                    FollowingList: result
-                })
+                // res.json({
+                //     FollowingList: result
+                // })
+                    res.render('pages/following', {
+                        result : result,
+                        user: req.user
+                    });
+
 
             })
 

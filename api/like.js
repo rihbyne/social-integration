@@ -101,6 +101,7 @@ var getLikeByUser = function(req, res) { //get new like
     post_model
     .post_like
     .find({like_user_id: user_id})
+    .populate('post_id')
     .exec(function(err, userlikeResult){
 
         console.info(userlikeResult.length+ '\n' +userlikeResult);

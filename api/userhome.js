@@ -171,68 +171,140 @@ function getPostByUserId(callback){
     });
 
 }
-   
-function getRetweetPostsByUserId(callback) {
 
-    var finalObj = new Array;
+function getRetweetPostsByUserId(callback){
+    post_model.post_retweet
+    .find({ret_user_id: userid})
+    .sort({retweet_at: -1})
+    .limit(10)
+    .lean()
+    .exec(function(err, retweets){
 
-        post_model.post_retweet
-        .find({ret_user_id: userid}, {_id: 0})
-        .select('post_id post_type retweet_at')
-        .populate('post_id')
-        .sort({retweet_at: -1})
-        .limit(10)
-        .exec(function(err, retweetpostids1) {
-            console.info(retweetpostids1);
-            var options = {
-                path: 'post_id.posted_by',
-                model: 'User'
-            };
+        if (err)
+            res.send(err);
 
-            post_model.post_retweet
-            .populate(retweetpostids1, options, function (err, retweetpostids) {
+        else if (retweets.length == 0) {
+
+             callback(null, []);//No post found
+
+        } 
+        else{
+
+            async.each(retweets, 
+
+                function(singleretweet, callback){
+
+                    if (singleretweet.retweet_type == '1') {
+
+                        var options = {
+                            path: 'post_id',
+                            model: 'post'
+                        };
+
+                    }
+                    else if(singleretweet.retweet_type == '2'){
+
+                        var options = {
+                            path: 'post_id',
+                            model: 'post_retweet'
+                        };
+
+                    }
+
+                    singleretweet['created_at'] = singleretweet.retweet_at;
+
+                    post_model.post_retweet
+                    .populate(singleretweet, options, function (err, retweet) {
+
+                        // finalObj.push(singleretweet)
+                        callback();
+
+                    });
+                        
+
+                }, function(err){
                 
-                console.info('Retweet Post: ',retweetpostids);
-
-                if (err)
-                    res.send(err);
-
-                else if (retweetpostids.length == 0) {
-
-                     callback(null, []);//No post found
-
-                } else {
-
-                    async.each(retweetpostids,
-                                   
-                        function(retweetpostid, callback) {
-                            // console.info(retweetpostid['post_id']);
-                             
-                            if (retweetpostid['post_id'] !== null) {
-
-                                retweetpostid['post_id'].created_at = retweetpostid['retweet_at'];
-                                finalObj.push(retweetpostid['post_id'])
-                            }
-                            
-                            // console.info(finalObj);
-                            return callback(finalObj);
-                        },
-                        // 3rd param is the function to call when everything's done
-                        function(err) {
-
-                            // All tasks are done now
-                        }
-
-                    );
-
-                    callback(null, finalObj);
-                }
+                console.info(retweets);
+                // callback(null, retweets);
+                return callback(null, retweets);
 
             });
 
-        });
+            // return callback(null, retweets);
+        }
 
+    });
 }
+// function getRetweetPostsByUserId(callback) {
+
+//     var finalObj = new Array;
+
+//         post_model.post_retweet
+//         .find({ret_user_id: userid}, {_id: 0})
+//         .select('post_id post_type retweet_at')
+//         // .populate('post_id')
+//         .sort({retweet_at: -1})
+//         .limit(10)
+//         .exec(function(err, retweetpostids1) {
+
+//             // var options1 = {
+//             //     path: 'post_retweet.post_id',
+//             //     model: 'post_retweet'
+//             // };
+
+//             // post_model.post_retweet
+//             // .populate(retweetpostids1, options1, function (err, retweetpostids) {
+
+//             // console.info(retweetpostids1);
+//             // var options = {
+//             //     path: 'post_id.posted_by',
+//             //     model: 'User'
+//             // };
+
+//             post_model.post_retweet
+//             .populate(retweetpostids1, options, function (err, retweetpostids) {
+                
+//                 console.info('Retweet Post: ',retweetpostids);
+
+//                 if (err)
+//                     res.send(err);
+
+//                 else if (retweetpostids.length == 0) {
+
+//                      callback(null, []);//No post found
+
+//                 } else {
+
+//                     async.each(retweetpostids,
+                                   
+//                         function(retweetpostid, callback) {
+//                             // console.info(retweetpostid['post_id']);
+                             
+//                             if (retweetpostid['post_id'] !== null) {
+
+//                                 retweetpostid['post_id'].created_at = retweetpostid['retweet_at'];
+//                                 finalObj.push(retweetpostid['post_id'])
+//                             }
+                            
+//                             // console.info(finalObj);
+//                             return callback(finalObj);
+//                         },
+//                         // 3rd param is the function to call when everything's done
+//                         function(err) {
+
+//                             // All tasks are done now
+//                         }
+
+//                     );
+
+//                     callback(null, finalObj);
+//                 }
+
+//             });
+
+//         });
+
+// }
 
 function getReplyByUserId(callback){
 
@@ -296,7 +368,75 @@ var getUserId = function(username, res){
 
 }
 
+
+// var getRetweetByUserId = function(req, res){
+// var userid = req.params.userid;
+
+//     post_model.post_retweet
+//     .find({ret_user_id: userid})
+//     .sort({retweet_at: -1})
+//     .limit(10)
+//     .lean()
+//     .exec(function(err, retweets){
+
+//         if (err)
+//             res.send(err);
+
+//         else if (retweets.length == 0) {
+
+//              callback(null, []);//No post found
+
+//         } 
+//         else{
+
+//             async.each(retweets, 
+
+//                 function(singleretweet, callback){
+
+//                     if (singleretweet.retweet_type == '1') {
+
+//                         var options = {
+//                             path: 'post_id',
+//                             model: 'post'
+//                         };
+
+//                     }
+//                     else if(singleretweet.retweet_type == '2'){
+
+//                         var options = {
+//                             path: 'post_id',
+//                             model: 'post_retweet'
+//                         };
+
+//                     }
+
+//                     singleretweet['created_at'] = singleretweet.retweet_at;
+
+//                     post_model.post_retweet
+//                     .populate(singleretweet, options, function (err, retweet) {
+
+//                         // finalObj.push(singleretweet)
+//                         callback();
+
+//                     });
+                        
+
+//                 }, function(err){
+                
+//                 console.info(retweets);
+//                 // callback(null, retweets);
+//                 return callback(retweets);
+
+//             });
+
+//         }
+
+//     });
+
+// }
+
 module.exports = ({
     getuserhomeposts : getuserhomeposts,
     getpostsrtreply : getpostsrtreply
+    // getRetweetByUserId:getRetweetByUserId
 })

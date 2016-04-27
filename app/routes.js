@@ -222,6 +222,8 @@ module.exports = function(app, passport) {
 	app.post('/deletepost', post.deletepost); // delete post
     app.post('/deletereply', reply.deletereply); // delete post
 
+    // app.get('/getRetweetByUserId/:userid', userhome.getRetweetByUserId); // delete post
+
 };
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

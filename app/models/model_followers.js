@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var User = require('../models/user.js');
+var User = require('./user.js');
 
 var userfollowersSchema = mongoose.Schema({
     user_id: {  //logged in user id
@@ -10,7 +10,7 @@ var userfollowersSchema = mongoose.Schema({
     following_id: { //following/follower id
         type: String,
         required: [true, 'Why no following_id?'],
-        ref: "User",
+        ref: "User"
     },
     follower_since: { //following from
         type: Date,

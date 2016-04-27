@@ -200,6 +200,7 @@ var getfollowers = function(req, res) {
 
             follower
             .find({$and:[{following_id: result[0]._id},{follow_status: true}]})
+    
             .exec(function(err, result) {
                 console.info(result);
                 res.json({

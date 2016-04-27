@@ -1,135 +1,154 @@
 var post_model = require('../app/models/post_model.js');
 
 //Set retweet
-module.exports.setretweet = function(req, res , done) { //Create new user
+var setretweet = function(req, res , done) { 
 
     var post_id = req.body.post_id;
     var retweet_user_id = req.body.retweet_user_id;
-    // var tweetstatus = req.body.tweetstatus;
+    var post_type = req.body.post_type;
+    var retweet_type = req.body.retweet_type;
+    var retweet_quote = req.body.retweet_quote;
 
     console.log('Retweet Api hitted');
-    // console.log(req.body.tweetstatus);
-    console.log(req.body.post_id);
-    console.log(req.body.retweet_user_id);
 
-    post_model.post_retweet.find({
+    console.log('Post Id', req.body.post_id);
+    console.log('Retweet User Id', req.body.retweet_user_id);
+    console.log('Post Type', req.body.post_type);
+
+    if(post_type == 1){ //if post
+        
+        var collectionName = post_model.post;
+        var userIdFrom = 'posted_by';              
+        var message = 'User retweeted on Post';
+
+    }
+    else if(post_type == 2){ //if retweet
+
+        var collectionName = post_model.post_retweet;
+        var userIdFrom = 'ret_user_id';
+        var message = 'User retweeted On Retweet';        
+
+    }
+    else if(post_type == 3){ //if reply
+
+        var collectionName = post_model.reply;
+        var userIdFrom = 'reply_user_id';
+        var message = 'User retweeted On Reply';
+    }
+
+    post_model.post_retweet
+    .find({
         post_id: post_id,
-        ret_user_id: retweet_user_id
-    }).exec(function(err, retweetdata) {
+        ret_user_id: retweet_user_id,
+        retweet_type : retweet_type
+    })
+    .exec(function(err, retweetdata) {
 
-        if (retweetdata.length !== 0) {
+        if(((retweetdata.length == 0) && (retweet_type == 1)) || (retweet_type == 2)){
+            
+                collectionName
+                .find({
+                    _id: post_id
+                })
+                .lean()
+                .exec(function(err, postdata) {
+                    // console.log('postdata \n', postdata);
 
-        //     return (null, false, req.flash('RTMessagetwise', 'You can not retweet twice for same post.'));
-        // res.render('pages/about', {
-        //     message: req.flash('RTMessagetwise')
-        // });
+                    if (postdata.length !== 0) {
+
+                        if (postdata[0].userIdFrom !== retweet_user_id) {
+
+                            if (retweet_type == 1) { //simple retweet
+
+                                var retweet = new post_model.post_retweet({
+                                    post_id: post_id,
+                                    ret_user_id: retweet_user_id,
+                                    post_type : post_type,
+                                    retweet_type : retweet_type
+
+                                });
+
+                            }
+                            else if(retweet_type == 2) { // Quote retweet
+
+                                var retweet = new post_model.post_retweet({
+                                    post_id: post_id,
+                                    ret_user_id: retweet_user_id,
+                                    post_type : post_type,
+                                    retweet_type : retweet_type,
+                                    retweet_quote : retweet_quote
+                                });
+                                
+                            };
+                            
+                            retweet.save(function(err) {
+
+                                if (err)
+                                    res.send(err);
+                                
+                                setretweetcount(post_id, collectionName, function(){
+
+                                    console.info(message);
+                                    
+                                    res.json({
+                                        message: message
+                                    });
+
+                                });
+                                
+                            });
+
+                        }
+                        else{
+
+                            console.log('You can not RE-tweet on your own post');
+                            res.redirect('about');
+
+                        } 
+
+                    }
+                    else{
+                        console.log('No Post Found');
+                        res.redirect('about');
+                    }
+
+                });
+
+        }
+        else{
+
             console.log('You can not retweet twice for same post');
 
             post_model.post_retweet
-            .find({$and: [{post_id : post_id}, {retweet_user_id : retweet_user_id}]})
+            .find({$and: [{post_id : post_id}, {ret_user_id : retweet_user_id}, {retweet_type: retweet_type}]})
             .remove()
             .exec(err, function(err, result) {
-
-                console.log('Retweet document removed');
                
                 if (err) {
                     res.send(err);
                     return;
                 };
 
-                if (result !== '') {
+                setretweetcount(post_id, collectionName, function(){
 
-                    post_model.post
-                    .findByIdAndUpdate(post_id, {
-                        $inc: {
-                            tweet_count: -1
-                        }
-                    })
-                    .exec(function(err, result) {
+                    console.log('Retweet document removed');
 
-                        console.log('Retweet count decrease by 1', result);
+                    res.json({
+                        message: 'Remove tweet'
+                    });
 
-                        if (err) {
-                            res.send(err);
-                        };
-
-                    })
-                
-                }
-
+                });
+               
             })
 
-            return;
-            // res.json({
-            //     message: 'Remove tweet'
-            // });
-
-        } else {
-
-            post_model.post.find({
-                _id: post_id
-            }).exec(function(err, postdata) {
-
-                console.log('postdata', postdata);
-
-                if (postdata.length !== 0) {
-
-                    if (postdata[0].posted_by == retweet_user_id) {
-
-                        console.log('You can not RE-tweet on your own post');
-                        // return;                        
-                          // return done(null, false, req.flash('RTMessageownpost', 'You can not tweet on your own post'));
-                        res.redirect('about');
-
-                    } 
-                    else{
-
-                        var retweet = new post_model.post_retweet({
-                            post_id: post_id,
-                            ret_user_id: retweet_user_id
-                        });
-
-                        retweet.save(function(err) {
-
-                            if (err)
-                                res.send(err);
-
-                            post_model.post
-                                .findByIdAndUpdate(post_id, {
-                                    $inc: {
-                                        tweet_count: 1
-                                    }
-                                })
-                                .exec(function(err, result) {
-
-                                    console.log('User retweeted\n', result);
-
-                                    if (err) {
-                                        res.send(err);
-                                    };
-
-                                })
-
-                            res.json({
-                                message: 'User retweeted'
-                            });
-
-                        });
-
-                    }
-
-                }
-
-            });
-        
-        }
+        } 
 
     })
 
 }
 
 //Get Retweet
-module.exports.getretweet = function(req, res) { //get new like
+var getretweet = function(req, res) { //get new like
 
     var post_id = req.params.post_id;
 
@@ -144,6 +163,39 @@ module.exports.getretweet = function(req, res) { //get new like
             count: getRetweetResult.length,
             retweetinfo :getRetweetResult
         })
+
     });
 
+}
+
+//update count of retweet in post
+var setretweetcount = function(post_id, collectionName, res){
+
+    if (collectionName) {
+
+        post_model.post_retweet
+        .count({post_id: post_id})
+        .lean()
+        .exec(function(err, postRetweetCount){
+
+            collectionName
+            .findOneAndUpdate({_id: post_id}, {retweet_count: postRetweetCount})
+            .exec(function(err, postUpdateResult) {
+
+                if (err)
+                    res.send(err);
+
+                // console.log(postUpdateResult); 
+
+                res(null, postUpdateResult)
+
+            });     
+
+        });
+    }
+    
+}
+module.exports = {
+    getretweet : getretweet,
+    setretweet : setretweet
 }

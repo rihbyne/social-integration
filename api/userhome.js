@@ -175,52 +175,60 @@ function getPostByUserId(callback){
 function getRetweetPostsByUserId(callback) {
 
     var finalObj = new Array;
+
         post_model.post_retweet
-        .find({
-            ret_user_id: userid
-        }, {
-            _id: 0
-        })
-        .select('post_id retweet_at')
+        .find({ret_user_id: userid}, {_id: 0})
+        .select('post_id post_type retweet_at')
         .populate('post_id')
-        .sort({
-            retweet_at: -1
-        })
+        .sort({retweet_at: -1})
         .limit(10)
-        .exec(function(err, retweetpostids) {
+        .exec(function(err, retweetpostids1) {
+            console.info(retweetpostids1);
+            var options = {
+                path: 'post_id.posted_by',
+                model: 'User'
+            };
 
-            //console.info('Retweet Post: ',retweetpostids);
+            post_model.post_retweet
+            .populate(retweetpostids1, options, function (err, retweetpostids) {
+                
+                console.info('Retweet Post: ',retweetpostids);
 
-            if (err)
-                res.send(err);
+                if (err)
+                    res.send(err);
 
-            else if (retweetpostids.length == 0) {
+                else if (retweetpostids.length == 0) {
 
-                 callback(null, []);//No post found
+                     callback(null, []);//No post found
 
-            } else {
+                } else {
 
-                async.each(retweetpostids,
-                               
-                    function(retweetpostid, callback) {
+                    async.each(retweetpostids,
+                                   
+                        function(retweetpostid, callback) {
+                            // console.info(retweetpostid['post_id']);
+                             
+                            if (retweetpostid['post_id'] !== null) {
 
-                        retweetpostid['post_id'].created_at = retweetpostid['retweet_at'];
+                                retweetpostid['post_id'].created_at = retweetpostid['retweet_at'];
+                                finalObj.push(retweetpostid['post_id'])
+                            }
+                            
+                            // console.info(finalObj);
+                            return callback(finalObj);
+                        },
+                        // 3rd param is the function to call when everything's done
+                        function(err) {
 
-                        finalObj.push(retweetpostid['post_id'])
-                        // console.info(finalObj);
-                        return callback(finalObj);
-                    },
-                    // 3rd param is the function to call when everything's done
-                    function(err) {
+                            // All tasks are done now
+                        }
 
-                        // All tasks are done now
-                    }
+                    );
 
-                );
+                    callback(null, finalObj);
+                }
 
-                callback(null, finalObj);
-            }
-
+            });
 
         });
 
@@ -243,7 +251,7 @@ function getReplyByUserId(callback){
         async.each(postReplyResult, 
 
             function(singlepostReplyResult, callback){
-                console.info('single ',singlepostReplyResult);
+                // console.info('single ',singlepostReplyResult);
 
                 if (singlepostReplyResult.post_id == null) {
 

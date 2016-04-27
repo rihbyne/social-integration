@@ -36,96 +36,99 @@ var setfollowing = function(req, res) {
 
     // validation for the profile if already followed 
     follower
-    .find({
-        $and: [{
-            user_id: user_id
-        }, {
-            following_id: following_id
-        }, {
-            follow_status: true
-        }]
-    })
-    .exec(function(err, result) {
+        .find({
+            $and: [{
+                user_id: user_id
+            }, {
+                following_id: following_id
+            }, {
+                follow_status: true
+            }]
+        })
+        .exec(function(err, result) {
 
-        if (result.length !== 0) {
+            if (result.length !== 0) {
 
 
-            console.info('User already following');
+                console.info('User already following');
 
-            res.json({
-                message: 'User already following'
-            })
-            return;
+                res.json({
+                    message: 'User already following'
+                })
+                return;
 
-        } else {//add new follower
-            
+            } else { //add new follower
+
                 console.info('update follower status');
                 /*update user follower status true*/
                 follower
-                .find({
-                    $and: [{
-                        user_id: following_id
-                    }, {
-                        following_id: user_id
-                    }]
-                })
-                .select('follow_back')
-                .exec(function(err, result){
-                   
-                   if (err) {
+                    .find({
+                        $and: [{
+                            user_id: following_id
+                        }, {
+                            following_id: user_id
+                        }]
+                    })
+                    .select('follow_back')
+                    .exec(function(err, result) {
 
-                        res.send(err)
-                   };
+                        if (err) {
 
-                   if (result.length == 1) {
+                            res.send(err)
+                        };
 
-                        console.info(result);
+                        if (result.length == 1) {
 
-                        follower
-                        .update({_id: result[0]._id}, {follow_back: 'true'})
-                        .exec(function(err, statusResult){
-                            if (err) {
+                            console.info(result);
+
+                            follower
+                                .update({
+                                    _id: result[0]._id
+                                }, {
+                                    follow_back: 'true'
+                                })
+                                .exec(function(err, statusResult) {
+                                    if (err) {
+                                        res.send(err);
+                                    };
+                                    console.info(statusResult);
+
+                                })
+
+                            follow_back = 'true';
+                        } else {
+
+                            follow_back = 'false';
+
+                        };
+
+                        var followingModel = new follower({
+
+                            user_id: user_id,
+                            following_id: following_id,
+                            follow_back: follow_back
+
+                        });
+
+                        followingModel.save(function(err) {
+
+                            if (err)
                                 res.send(err);
-                            };
-                            console.info(statusResult);
 
-                        })
+                            console.info('following/followers set saved');
 
-                        follow_back = 'true';
-                   }
-                   else{
-
-                        follow_back = 'false';
-
-                   };
-
-                   var followingModel = new follower({
-
-                        user_id: user_id,
-                        following_id: following_id,
-                        follow_back: follow_back
+                        });
 
                     });
 
-                    followingModel.save(function(err) {
-                       
-                        if (err)
-                            res.send(err);
+                res.json({
 
-                        console.info('following/followers set saved');
+                    message: 'following/followers set'
 
-                    });
+                })
+            }
 
-                });
-
-            res.json({
-
-                message: 'following/followers set'
-
-            })
-        }
-
-    })
+        })
 
 }
 
@@ -146,37 +149,86 @@ var getfollowing = function(req, res) {
     }
 
     users
-    .find({
-        username: user_name
-    })
-    .select('_id')
-    .exec(function(err, result) {
+        .find({
+            username: user_name
+        })
+        .select('_id')
+        // .exec(function(err, result) {
 
-        // console.info(result[0]._id);
-        if (result[0]._id) {
+        //     // console.info(result[0]._id);
+        //     if (result[0]._id) {
 
-            follower
-            .find({$and:[{user_id: result[0]._id},{follow_status: true}]})
-            .populate('user_id following_id')
-            .exec(function(err, result) {
-                console.info(result);
-                var f_list = result;
+        //         follower
+        //             .find({
+        //                 $and: [{
+        //                     user_id: result[0]._id
+        //                 }, {
+        //                     follow_status: true
+        //                 }]
+        //             })
+        //             .populate('user_id following_id')
+        //             .exec(function(err, result) {
+        //                 console.info(result);
+        //                 var f_list = result;
 
-                // res.json({
-                //     FollowingList: f_list
-                // })
-                    res.render('pages/following', {
-                        // FollowingList : ['result'],
-                        FollowingList : f_list,
-                        user: req.user
-                    });
+        //                 // res.json({
+        //                 //     FollowingList: f_list
+        //                 // })
+        //                 res.render('pages/following', {
+        //                     // FollowingList : ['result'],
+        //                     FollowingList: f_list,
+        //                     user: req.user
+        //                 });
 
 
-            })
+        //             })
 
-        };
+        //     };
 
-    })
+        // })
+                .exec(function(err, result) {
+
+            // console.info(result[0]._id);
+            if (result[0]._id) {
+
+                follower
+                    .find({
+                        $and: [{
+                            user_id: result[0]._id
+                        }, {
+                            follow_status: true
+                        }]
+                    })
+                    .populate('user_id following_id')
+                    .exec(function(err, result) {
+                        console.info(result);
+                        request.get({
+
+                            url: 'http://localhost:4000/Trendsdk',
+                            headers: {
+                                "content-type": "application/json"
+                            }
+
+                        }, function optionalCallback(err, body) {
+
+                            var dk_f_list = {
+                                trend: JSON.parse(body.body),
+                                following_list: { data:  result}
+                            }
+                            res.render('pages/following', {
+                                Following_result: { data001: result , data002: JSON.parse(body.body) } ,
+                                user: req.user
+                            });
+                            // res.json({
+                            //     Following_result: { data001: result , data002: JSON.parse(body.body) } 
+                            //     // Following_result: [dk_f_list]
+                            // })
+                        })
+                    })
+
+            };
+
+        })
 
 }
 
@@ -197,48 +249,76 @@ var getfollowers = function(req, res) {
     }
 
     users
-    .find({
-        username: user_name
-    })
-    .select('_id')
-    .exec(function(err, result) {
+        .find({
+            username: user_name
+        })
+        .select('_id')
+        .exec(function(err, result) {
 
-        // console.info(result[0]._id);
-        if (result[0]._id) {
+            // console.info(result[0]._id);
+            if (result[0]._id) {
 
-            follower
-            .find({$and:[{following_id: result[0]._id},{follow_status: true}]})
-            .populate('following_id user_id')
+                follower
+                    .find({
+                        $and: [{
+                            following_id: result[0]._id
+                        }, {
+                            follow_status: true
+                        }]
+                    })
+                    .populate('following_id user_id')
 
-            .exec(function(err, result) {
-                console.info(result);
-                var f_list = result;
+                .exec(function(err, result) {
+                    // console.info(result);
+                    // var f_list = result;
 
-                // res.json({
-                //     FollowersList: result
-                // })
-                  res.render('pages/follower', {
-                        // FollowingList : ['result'],
-                        Followers_List : f_list,
-                        user: req.user
-                    });
+                    // // res.json({
+                    // //     FollowersList: result
+                    // // })
+                    // res.render('pages/follower', {
+                    //     // FollowingList : ['result'],
+                    //     Followers_List: f_list,
+                    //     user: req.user
+                    // });
+                        request.get({
 
-            })
+                            url: 'http://localhost:4000/Trendsdk',
+                            headers: {
+                                "content-type": "application/json"
+                            }
 
-        };
+                        }, function optionalCallback(err, body) {
 
-    })
+                            var dk_f_list = {
+                                trend: JSON.parse(body.body),
+                                following_list: { data:  result}
+                            }
+                            res.render('pages/follower', {
+                                Following_result: { data001: result , data002: JSON.parse(body.body) } ,
+                                user: req.user
+                            });
+                            // res.json({
+                            //     Following_result: { data001: result , data002: JSON.parse(body.body) } 
+                            //     // Following_result: [dk_f_list]
+                            // })
+                        })
+
+                })
+
+            };
+
+        })
 
 }
 
 //Unlink following
 var unlink_following = function(req, res) {
- 
+
     console.info('unlink_followings api called');
     var user_id = req.body.user_id;
     var unlink_followings = req.body.unlink_followings;
 
-        //validation for blank variables
+    //validation for blank variables
     req.checkBody('user_id', 'User id is mandatory').notEmpty();
     req.checkBody('unlink_followings', 'unlink_followings is mandatory').notEmpty();
 
@@ -273,7 +353,7 @@ var unlink_following = function(req, res) {
 }
 
 //Get Count of Follwer
-var getCountFollower = function(req, res){
+var getCountFollower = function(req, res) {
 
     var user_id = req.params.user_id;
 
@@ -289,38 +369,41 @@ var getCountFollower = function(req, res){
     }
 
     users
-    .count({_id: user_id}, function (err, usercount){ 
+        .count({
+            _id: user_id
+        }, function(err, usercount) {
 
-        if(usercount>0){
+            if (usercount > 0) {
 
-            follower
-            .count({user_id : user_id}, function(err, followercount) {
-               
-                if (err)
-                    res.send(err);
-               
-                console.log('Count is ' + followercount);
-                
+                follower
+                    .count({
+                        user_id: user_id
+                    }, function(err, followercount) {
+
+                        if (err)
+                            res.send(err);
+
+                        console.log('Count is ' + followercount);
+
+                        res.json({
+                            FollowerCount: followercount
+                        });
+
+                    });
+
+            } else {
+
                 res.json({
-                    FollowerCount: followercount
+                    Result: 'No user with this id'
                 });
+            }
 
-            });
-
-        }
-        else{
-
-            res.json({
-                Result: 'No user with this id'
-            });
-        }
-
-    }); 
+        });
 
 }
 
 //Get Count of Follwing
-var getCountFollowing = function(req, res){
+var getCountFollowing = function(req, res) {
 
     var following_id = req.params.following_id;
 
@@ -336,43 +419,46 @@ var getCountFollowing = function(req, res){
     }
 
     users
-    .count({_id: following_id}, function (err, usercount){ 
+        .count({
+            _id: following_id
+        }, function(err, usercount) {
 
-        if(usercount>0){
+            if (usercount > 0) {
 
-            follower
-            .count({following_id : following_id}, function(err, followingcount) {
-               
-                if (err)
-                    res.send(err);
-               
-                console.log('Count is ' + followingcount);
-                
+                follower
+                    .count({
+                        following_id: following_id
+                    }, function(err, followingcount) {
+
+                        if (err)
+                            res.send(err);
+
+                        console.log('Count is ' + followingcount);
+
+                        res.json({
+                            Followingcount: followingcount
+                        });
+
+                    });
+
+            } else {
+
                 res.json({
-                    Followingcount: followingcount
+                    Result: 'No user with this id'
                 });
+            }
 
-            });
-
-        }
-        else{
-
-            res.json({
-                Result: 'No user with this id'
-            });
-        }
-
-    }); 
+        });
 
 }
 
-var getMutualFollowerYouKnow = function(req, res){
+var getMutualFollowerYouKnow = function(req, res) {
 
-	var user_id = req.params.user_id;
-	var following_id = req.params.following_id;
-	var count = 0;
-	
-	//validation for blank variables
+    var user_id = req.params.user_id;
+    var following_id = req.params.following_id;
+    var count = 0;
+
+    //validation for blank variables
     req.checkParams('user_id', 'User Id is mandatory').notEmpty();
     req.checkParams('following_id', 'Following Id is mandatory').notEmpty();
 
@@ -383,66 +469,78 @@ var getMutualFollowerYouKnow = function(req, res){
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
-	
-	follower
-	.find({$and:[{user_id:user_id},{follow_status:true}]},{_id:0})
-	.select('following_id')
-	.lean()
-	.exec(function(err, followingIds){
-		
-		if (err)
-			res.send(err);
-			
-		follower
-		.find({$and:[{following_id:following_id},{follow_status:true}]},{_id:0})
-		.populate('user_id')
-		.select('user_id')
-		.lean()
-		.exec(function(err, followerIds){
-			
-			// console.log(typeof(followerIds));
-			// console.log(followerIds);
-			
-			var item, items;
-			var i = 0;
-			var users = [];
-			var id = []
-			for(item in followingIds)
-			{				
-				for (items in followerIds)
-				{					
-					if(followingIds[item].following_id == followerIds[items].user_id._id)
-					{
-						count++;
-						users[i] = followerIds[items].user_id.username;
-						id[i] = followerIds[items].user_id._id;
-						i++
-					}	
-				}
-			  
-			}
-			
-			res.json({
-				// FollowingIds: followingIds,
-				// FollowerIds: followerIds,
-				users : users,
-				id : id,
-				count: count
-			});
-		
-		})
-		
-	})
+
+    follower
+        .find({
+            $and: [{
+                user_id: user_id
+            }, {
+                follow_status: true
+            }]
+        }, {
+            _id: 0
+        })
+        .select('following_id')
+        .lean()
+        .exec(function(err, followingIds) {
+
+            if (err)
+                res.send(err);
+
+            follower
+                .find({
+                    $and: [{
+                        following_id: following_id
+                    }, {
+                        follow_status: true
+                    }]
+                }, {
+                    _id: 0
+                })
+                .populate('user_id')
+                .select('user_id')
+                .lean()
+                .exec(function(err, followerIds) {
+
+                    // console.log(typeof(followerIds));
+                    // console.log(followerIds);
+
+                    var item, items;
+                    var i = 0;
+                    var users = [];
+                    var id = []
+                    for (item in followingIds) {
+                        for (items in followerIds) {
+                            if (followingIds[item].following_id == followerIds[items].user_id._id) {
+                                count++;
+                                users[i] = followerIds[items].user_id.username;
+                                id[i] = followerIds[items].user_id._id;
+                                i++
+                            }
+                        }
+
+                    }
+
+                    res.json({
+                        // FollowingIds: followingIds,
+                        // FollowerIds: followerIds,
+                        users: users,
+                        id: id,
+                        count: count
+                    });
+
+                })
+
+        })
 
 }
 
 module.exports = ({
-    setfollowing : setfollowing,
-    getfollowing : getfollowing,
-    getfollowers : getfollowers,
-    unlink_following : unlink_following,
-    getCountFollower : getCountFollower,
-    getCountFollowing : getCountFollowing,
-	getMutualFollowerYouKnow : getMutualFollowerYouKnow
+    setfollowing: setfollowing,
+    getfollowing: getfollowing,
+    getfollowers: getfollowers,
+    unlink_following: unlink_following,
+    getCountFollower: getCountFollower,
+    getCountFollowing: getCountFollowing,
+    getMutualFollowerYouKnow: getMutualFollowerYouKnow
 })
-

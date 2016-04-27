@@ -187,7 +187,7 @@ module.exports = function(app, passport) {
 
     app.post('/setuser', post.setuser); 									// Set new user
 
-    app.post('/setnewpost', post.setpost); 								// Set new post
+    app.post('/secure/setnewpost', post.setpost); 								// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
     app.post('/setlike', like.setlike); 									// Set like
     app.get('/like/post/:post_id', like.getLikeByPost); 					// Get like by post
@@ -196,14 +196,15 @@ module.exports = function(app, passport) {
 
     app.post('/setfollowing', follow.setfollowing); 						// Set follower// dk
 
-    app.get('/:user_name/following', isLoggedIn ,follow.getfollowing); 					// Set followings
+    app.get('/:user_name/following',  follow.getfollowing); 					// Set followings
     
     // app.get('/following/:user_name', isLoggedIn, follow.getfollowing , function(req, res) {
     //     // res.render('pages/following.ejs', {
     //     //     user: req.user // get the user out of session and pass to template
     //     // });
     // });
-
+    app.get('/Trendsdk', post.Trendsdk);                                // trend keyword
+    
 
     app.get('/:user_name/followers', isLoggedIn , follow.getfollowers); 					// Set follower
     app.post('/unlink_followings_f', follow.unlink_following); 				// Set follower
@@ -211,7 +212,7 @@ module.exports = function(app, passport) {
     app.get('/following/count/:following_id', follow.getCountFollowing); 	// count follower
 	app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
 
-    app.get('/api/Trendsdk', post.Trendsdk); 								// trend keyword
+    app.get('/Trendsdk', post.Trendsdk); 								// trend keyword
     app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply
     app.post('/setreply', reply.setreply); 									// Set reply
 
@@ -220,8 +221,10 @@ module.exports = function(app, passport) {
 
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); 		// tweet,retweet & reply post
 	
+	app.get('/wrapper/:user_id', suggest.wrapperSuggest)
 	app.get('/suggestion/:user_id', suggest.getSuggestion);					// Get Suggestions
 	app.get('/randomSuggestion', suggest.randomSuggestion);					// Get Random Suggestions
+	app.get('/allSuggestion/:user_id', suggest.allSuggestion);					// Get All Suggestions
 	
 	app.post('/deletepost', post.deletepost); 								// delete post
     app.post('/deletereply', reply.deletereply); 							// delete Reply

@@ -126,40 +126,45 @@
                                 </div>
                                 <div id="test2" class="col s12">
                                     <!-- following tabs -->
-                                    <div class="row">
-                                        <% Followers_List.forEach(function(Followers_List, i){ %>
-                                        <div class="col s12 m4">
-                                            <div class="card small">
-                                                <div class="card-image">
-                                                    <img src="/images/CeoXGIuWQAAtrZN.jpg">
-                                                    <span class="card-title"><%= Followers_List.user_id.first_name %><%= Followers_List.user_id.last_name %></span>
-                                                    <span class="card-title handle"><%= Followers_List.user_id.username %></span>
-                                                    <span class="right card-title f-status">
-                                                        <% if (Followers_List.follow_back == true) { %>
-                                                        <!-- you are following -->
+                                     <div class="row">
+                                        <ul>
+                                            <% for(var i=0; i<Following_result.data001.length; i++) {%>
+                                            
+                                            <div class="col s12 m4">
+                                                <div class="card small">
+                                                    <div class="card-image">
+                                                        <img src="/images/CeoXGIuWQAAtrZN.jpg">
+                                                        <span class="card-title"><%= Following_result.data001[i].user_id.first_name %><%= Following_result.data001[i].user_id.last_name %></span>
+                                                        <span class="card-title handle"><%= Following_result.data001[i].user_id.username %></span>
+                                                        <span class="right card-title f-status">
+                                                            <% if (Following_result.data001[i].follow_back == true) { %>
+                                                            follows you
+                                                            <% } else { %>
+                                                            
+                                                            <% } %>
+                                                        </span>
+                                                    </div>
+                                                    <div class="card-content">
+                                                        <p>apheretic Rutha Padiong apheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiong</p><br>
+                                                    </div>
+                                                    
+                                                    <div class="card-action">
+                                                        <% if (Following_result.data001[i].follow_back == false) { %>
+                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
+                                                        </button>
                                                         <% } else { %>
+                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
+                                                        </button>
                                                         
                                                         <% } %>
-                                                    </span>
-                                                </div>
-                                                <div class="card-content">
-                                                    <p>apheretic Rutha Padiong apheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiongapheretic Rutha Padiong</p><br>
-                                                </div>
-                                                <div class="card-action">
-                                                    <% if (Followers_List.follow_back == true) { %>
-                                                    <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
-                                                    </button>
-                                                    <% } else { %>
-                                                    <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
-                                                    </button>
-                                                    
-                                                    <% } %>
-                                                    
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <% } %>
+                                            
                                         </div>
-                                        <% }) %>
-                                    </div>
+
+                                 
                                     <!-- end following tab -->
                                 </div>
                             </div>

@@ -55,5 +55,5 @@ require('./app/routes.js')(app, passport); // load our routes and pass in our ap
 app.use('/api/direct_messages', routeDirectMsgApi)
 
 // launch ======================================================================
-app.listen(port);
-console.log('Connected To server at port ' + port);
+server.listen(port);
+log.info('Connected To server at port ' + port);

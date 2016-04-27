@@ -28,8 +28,8 @@
                         <div class="card-action t-count">
                             <ul>
                                 <li><a href="/userhome">tweet<span><%= userdetails.tweetcount %></span></a></li>
-                                <li><a href="/following">Following<span><%= userdetails.followerCount %></span></a></li>
-                                <li><a href="/followers">Follower<span><%= userdetails.followingcount %></span></a></li>
+                                <li><a href="/<%= user.username%>/following">Following<span><%= userdetails.followerCount %></span></a></li>
+                                <li><a href="/<%= user.username%>/followers">Follower<span><%= userdetails.followingcount %></span></a></li>
                             </ul>
                         </div>
                     </div>

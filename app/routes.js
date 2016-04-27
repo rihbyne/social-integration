@@ -192,7 +192,7 @@ module.exports = function(app, passport) {
 
     app.post('/setuser', post.setuser); 									// Set new user
 
-    app.post('/setnewpost', post.setnewpost); 								// Set new post
+    app.post('/setpost', post.setpost); 									// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
     app.post('/setlike', like.setlike); 									// Set like
     app.get('/like/post/:post_id', like.getLikeByPost); 					// Get like by post
@@ -216,8 +216,10 @@ module.exports = function(app, passport) {
 
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); 		// tweet,retweet & reply post
 	
-	app.get('/suggestion/:user_id', suggest.getSuggestion);				// Get Suggestions
-	app.get('/randomSuggestion', suggest.randomSuggestion);				// Get Random Suggestions
+	app.get('/wrapper/:user_id', suggest.wrapperSuggest)
+	app.get('/suggestion/:user_id', suggest.getSuggestion);					// Get Suggestions
+	app.get('/randomSuggestion', suggest.randomSuggestion);					// Get Random Suggestions
+	app.get('/allSuggestion/:user_id', suggest.allSuggestion);					// Get All Suggestions
 	
 	app.post('/deletepost', post.deletepost); // delete post
     app.post('/deletereply', reply.deletereply); // delete post

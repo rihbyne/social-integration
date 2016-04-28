@@ -188,6 +188,7 @@ module.exports = function(app, passport) {
     app.post('/setuser', post.setuser); 									// Set new user
 
     app.post('/secure/setnewpost', post.setpost); 								// Set new post
+    // app.post('/setnewpost', post.setpost); 									// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
     app.post('/setlike', like.setlike); 									// Set like
     app.get('/like/post/:post_id', like.getLikeByPost); 					// Get like by post
@@ -211,6 +212,7 @@ module.exports = function(app, passport) {
     app.get('/follower/count/:user_id', follow.getCountFollower); 			// count follower
     app.get('/following/count/:following_id', follow.getCountFollowing); 	// count follower
 	app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
+	// app.get('/followLatestPost/:user_id', follow.followLatestPost);
 
     app.get('/Trendsdk', post.Trendsdk); 								// trend keyword
     app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply

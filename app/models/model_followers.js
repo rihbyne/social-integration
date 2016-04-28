@@ -16,6 +16,18 @@ var userfollowersSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
+	// recent_activity: {
+		// type : Date,
+		// defalult : Date.now
+	// },
+	// recent_reTweet_activity: {
+		// type : Date,
+		// defalult : Date.now
+	// },
+	// recent_reply_activity: {
+		// type : Date,
+		// defalult : Date.now
+	// },
     block: { //for block user post
         type: Boolean,
         date: {

@@ -39,133 +39,117 @@ user_final_followers_schema = require('../app/models/model_followers.js');
 //             // })
 
 //         })
-//     } // Get Details
-var getuserdetails = function(req, res) {
+//     } // Get Detailsvar getuserdetails = function(req, res) { 
+var getuserdetails = function(req, res) { 
 
     var userdetails = new Array();
-    var user_id = req.user._id;
-
+    var user_id         = req.user._id;
+    
     async.parallel([
         allpost,
         tweetcount,
         trends,
         following,
         followers
-    ], function(err, results) {
+    ], function (err, results){
 
         console.info(userdetails);
         res.render('pages/about', {
-            userdetails: userdetails,
+            userdetails : userdetails,
             user: req.user
         });
-        // res.json({
-        //     userdetails: userdetails,
-        //     user: req.user
-        // })
-
 
     });
-
+    
     function allpost(callback) {
-
+    
         post_model.post
-            .find({
-                posted_by: user_id
-            })
-            .sort({
-                created_at: -1
-            })
-            .lean()
-            .exec(function(err, allpost) {
+        .find({posted_by: user_id})
+        .sort({created_at: -1})
+        .lean()
+        .exec(function(err, allpost) {
 
-                if (err)
-                    res.send(err);
+            if (err)
+                res.send(err);
+            
+            // console.info(allpost);
 
-                // console.info(allpost);
+            async.each(allpost,
+                                   
+                function(singlepost, callback) {
 
-                async.each(allpost,
+                    post_model.post_like
+                    .count({post_id: singlepost._id})
+                    .lean()
+                    .exec(function(err, countPostLikes){
+                        if (err) {
+                            res.send(err)
+                        };
+                        // console.info(countPostLikes);
+                        if (countPostLikes !== 0) {
+                            singlepost.postLikeCount = countPostLikes;
+                            // console.info(singlepost);
+                        }   
+                        else{
+                            singlepost.postLikeCount = 0;
+                        }   
+                        // console.info(singlepost);
+                        callback();
+                    })
+                    
+                },
+                // 3rd param is the function to call when everything's done
+                function(err) {
+                    // All tasks are done now
+                    console.info(allpost);
+                    userdetails.allpost = allpost
+                    callback(null, userdetails);
+                  
+                }
 
-                    function(singlepost, callback) {
-
-                        post_model.post_like
-                            .count({
-                                post_id: singlepost._id
-                            })
-                            .lean()
-                            .exec(function(err, countPostLikes) {
-                                if (err) {
-                                    res.send(err)
-                                };
-                                // console.info(countPostLikes);
-                                if (countPostLikes !== 0) {
-                                    singlepost.postLikeCount = countPostLikes;
-                                    // console.info(singlepost);
-                                } else {
-                                    singlepost.postLikeCount = 0;
-                                }
-                                // console.info(singlepost);
-                                callback();
-                            })
-
-                    },
-                    // 3rd param is the function to call when everything's done
-                    function(err) {
-                        // All tasks are done now
-                        console.info(allpost);
-                        userdetails.allpost = allpost
-                        callback(null, userdetails);
-
-                    }
-
-                );
-
-
-            });
+            );
+            
+                        
+        }); 
 
     }
 
     function tweetcount(callback) {
 
         var totalCount;
-
+        
         post_model.post
-            .count({
-                'posted_by': user_id.toString()
-            })
+        .count({'posted_by': user_id.toString()})
+        .lean()
+        .exec(function(err, tweetcount){
+
+            if (err)
+                res.send(err);
+            
+            post_model.post_retweet
+            .count({ret_user_id : user_id})
             .lean()
-            .exec(function(err, tweetcount) {
-
+            .exec(function(err, retweetcount){
                 if (err)
-                    res.send(err);
+                res.send(err);
 
-                post_model.post_retweet
-                    .count({
-                        ret_user_id: user_id
-                    })
-                    .lean()
-                    .exec(function(err, retweetcount) {
-                        if (err)
-                            res.send(err);
+            console.info(tweetcount+''+retweetcount);
+            var totalCount = tweetcount+retweetcount;
 
-                        console.info(tweetcount + '' + retweetcount);
-                        var totalCount = tweetcount + retweetcount;
+            console.log('Total count ',totalCount); 
+            userdetails.tweetcount = totalCount            
+            callback(null, userdetails);
 
-                        console.log('Total count ', totalCount);
-                        userdetails.tweetcount = totalCount
-                        callback(null, userdetails);
-
-                    });
+            });
 
 
-            })
-
+        })
+        
     }
 
     function trends(callback) {
 
-        post_model.trends.find().sort({
-            count: -1
-        }).limit(5).exec(function(err, results) {
+        post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
 
             if (err) {
                 res.send(err);
@@ -176,44 +160,41 @@ var getuserdetails = function(req, res) {
 
         });
     }
-
+    
     function following(callback) {
-
+    
         user_final_followers_schema
-            .count({
-                following_id: user_id
-            })
-            .exec(function(err, followingcount) {
+        .count({following_id : user_id})
+        .exec(function(err, followingcount){
+               
+            if (err)
+                res.send(err);
+               
+            userdetails.followingcount = followingcount
+            callback(null, userdetails);        
 
-                if (err)
-                    res.send(err);
-
-                userdetails.followingcount = followingcount
-                callback(null, userdetails);
-
-            });
+        });
 
     }
-
+    
     function followers(callback) {
-
+    
         user_final_followers_schema
-            .count({
-                user_id: user_id
-            })
-            .exec(function(err, followercount) {
+        .count({user_id : user_id})
+        .exec(function(err, followercount){
+               
+            if (err)
+                res.send(err);
+               
+            userdetails.followerCount = followercount
+            callback(null, userdetails);        
 
-                if (err)
-                    res.send(err);
-
-                userdetails.followerCount = followercount
-                callback(null, userdetails);
-
-            });
+        });
 
     }
 
 };
+
 
 var Trendsdk = function(req, res) {
 
@@ -401,13 +382,10 @@ var getuserpost = function(req, res) { // get a post
 
     // find posts of user and check for errors
     post_model.post
-        .find({
-            _id: post_id
-        })
-        .exec(function(err, userposts) {
-            if (err)
-                res.send(err);
-
+    .find({_id: post_id})
+    .exec(function(err, userposts) {
+        if (err)
+            res.send(err);
             res.json({
                 posts: userposts
             });
@@ -508,10 +486,20 @@ var setpost = function(req, res) { // create a post
             if (err)
                 res.send(err);
 
-            // res.json({
-            //     message: 'Post created!'
-            // });
-
+			// user_final_followers_schema
+			// .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
+			// .lean()
+			// .exec(function(err, resValue){
+			
+				// if (err)
+					// res.send(err);
+					
+				res.json({
+					message: 'Post created!'
+				});
+			
+			// })
+			
         });
 
     });

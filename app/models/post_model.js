@@ -6,7 +6,7 @@ var post = mongoose.Schema({
     
     posted_by:                       {type: String, ref:'User'},       // posted by 
     username:                        {type: String, ref:'User'},
-    post_title:                      {type: String},        // post title 
+    // post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     // post_reply:                      [reply_schema],
     retweet_count:                   {type: Number, default: 0, min: 0},

@@ -164,7 +164,7 @@ var getuserdetails = function(req, res) {
     function following(callback) {
     
         user_final_followers_schema
-        .count({following_id : user_id})
+        .count({$and:[{following_id : user_id},{follow_status:true}]})
         .exec(function(err, followingcount){
                
             if (err)
@@ -180,7 +180,7 @@ var getuserdetails = function(req, res) {
     function followers(callback) {
     
         user_final_followers_schema
-        .count({user_id : user_id})
+        .count({$and:[{user_id : user_id},{follow_status:true}]})
         .exec(function(err, followercount){
                
             if (err)
@@ -494,9 +494,10 @@ var setpost = function(req, res) { // create a post
 				// if (err)
 					// res.send(err);
 					
-				res.json({
-					message: 'Post created!'
-				});
+				// res.json({
+				// 	message: 'Post created!'
+				// });
+                console.log('post created.');
 			
 			// })
 			

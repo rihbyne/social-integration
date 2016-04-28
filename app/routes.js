@@ -187,7 +187,7 @@ module.exports = function(app, passport) {
 
     app.post('/setuser', post.setuser); 									// Set new user
 
-    app.post('/secure/setnewpost', post.setpost); 								// Set new post
+    app.post('/setnewpost', post.setpost); 								// Set new post
     // app.post('/setnewpost', post.setpost); 									// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
     app.post('/setlike', like.setlike); 									// Set like
@@ -230,6 +230,8 @@ module.exports = function(app, passport) {
 	
 	app.post('/deletepost', post.deletepost); 								// delete post
     app.post('/deletereply', reply.deletereply); 							// delete Reply
+
+    // app.get('/getRetweetByUserId/:userid', userhome.getRetweetByUserId); // delete post
 
 };
 // route middleware to make sure a user is logged in

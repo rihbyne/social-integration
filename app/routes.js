@@ -176,7 +176,7 @@ module.exports = function(app, passport) {
     app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
     app.get('/gethomepost/:username', userhome.getuserhomeposts); 			// user home timeline post API
 
-    app.get('/getpost', post.getpost); 										// Get all post
+    // app.get('/getpost', post.getpost); 										// Get all post
     app.get('/getpost/:user', post.getuserposts); 							// Get post by username
     app.get('/getpost/:user/:post_id', post.getuserpost); 					// Get single post of user
     app.get('/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
@@ -192,7 +192,7 @@ module.exports = function(app, passport) {
 
     app.post('/setuser', post.setuser); 									// Set new user
 
-    app.post('/setpost', post.setpost); 									// Set new post
+    app.post('/setnewpost', post.setpost); 									// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
     app.post('/setlike', like.setlike); 									// Set like
     app.get('/like/post/:post_id', like.getLikeByPost); 					// Get like by post
@@ -205,7 +205,8 @@ module.exports = function(app, passport) {
     app.post('/unlink_followings_f', follow.unlink_following); 				// Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower); 			// count follower
     app.get('/following/count/:following_id', follow.getCountFollowing); 	// count follower
-	//app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
+	app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
+	// app.get('/followLatestPost/:user_id', follow.followLatestPost);
 
     app.get('/api/Trendsdk', post.Trendsdk); 								// trend keyword
     app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply
@@ -221,8 +222,8 @@ module.exports = function(app, passport) {
 	app.get('/randomSuggestion', suggest.randomSuggestion);					// Get Random Suggestions
 	app.get('/allSuggestion/:user_id', suggest.allSuggestion);					// Get All Suggestions
 	
-	app.post('/deletepost', post.deletepost); // delete post
-    app.post('/deletereply', reply.deletereply); // delete post
+	app.post('/deletepost', post.deletepost); 								// delete post
+    app.post('/deletereply', reply.deletereply); 							// delete Reply
 
 };
 // route middleware to make sure a user is logged in

@@ -1,7 +1,9 @@
 var follower = require('../app/models/model_followers.js'),
     users = require('../app/models/user.js');
+    postSchema = require('../app/models/post_model.js');
 
 var util = require('util');
+var async = require('async');
 
 //Set following
 var setfollowing = function(req, res) {
@@ -419,6 +421,81 @@ var getMutualFollowerYouKnow = function(req, res){
 
 }
 
+// var followLatestPost1 = function(req, res){
+
+	// var user_id = req.params.user_id;
+	// req.checkParams('user_id', 'User Id is mandatory').notEmpty();
+	
+	// var errors = req.validationErrors();
+
+    // if (errors) {
+        // res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        // return;
+    // }
+	
+	// follower
+	// .find({$and:[{user_id:user_id},{follow_status:true}]})
+	// .select('following_id recent_activity')
+	// .sort({recent_activity:-1})
+	// .limit(5)
+	// .exec(function(err, result){
+	
+		// if(err)
+			// res.send(err);
+			
+		// var arrayLength = result.length;
+		// console.log(arrayLength);
+		// var counter = 0;
+		// var recentPost = [];
+			
+		// async.forEach(result, function (item, cb){
+		
+			// var followingId = item.following_id;
+			// var recentActivity = item.recent_activity;
+			
+			// postSchema.post
+			// .find({$and:[{posted_by:followingId},{created_at:recentActivity}]})
+			// .lean()
+			// .exec(function(err, output){
+			
+				// if(err)
+					// res.send(err);
+				
+				// if(output!= null && output != undefined && output != "" )
+				// {
+					// console.log('Hello');
+					// recentPost[counter]=output[0]
+				// }
+				// counter++;		
+
+				// if(counter==arrayLength)
+				// {
+					// res.send(recentPost);
+					// return
+				// }
+				
+				// cb();			
+				
+			// })
+		
+		// })		
+		
+	// })	
+//}
+
+// var followLatestPost = function(req, res){
+
+	// var user_id = req.params.user_id;
+	// req.checkParams('user_id', 'User Id is mandatory').notEmpty();
+	
+	// var errors = req.validationErrors();
+
+    // if (errors) {
+        // res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        // return;
+    // }
+// }
+
 module.exports = ({
     setfollowing : setfollowing,
     getfollowing : getfollowing,
@@ -426,6 +503,7 @@ module.exports = ({
     unlink_following : unlink_following,
     getCountFollower : getCountFollower,
     getCountFollowing : getCountFollowing,
-	getMutualFollowerYouKnow : getMutualFollowerYouKnow
+	getMutualFollowerYouKnow : getMutualFollowerYouKnow,
+	//followLatestPost : followLatestPost
 })
 

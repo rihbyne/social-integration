@@ -138,7 +138,7 @@ var getuserdetails = function(req, res) {
 	function following(callback) {
 	
         user_final_followers_schema
-		.count({following_id : user_id})
+		.count({$and:[{following_id : user_id},{follow_status:true}]})
 		.exec(function(err, followingcount){
                
 			if (err)
@@ -154,7 +154,7 @@ var getuserdetails = function(req, res) {
 	function followers(callback) {
 	
         user_final_followers_schema
-		.count({user_id : user_id})
+		.count({$and:[{user_id : user_id},{follow_status:true}]})
 		.exec(function(err, followercount){
                
 			if (err)
@@ -349,9 +349,7 @@ var getuserpost = function(req, res) { // get a post
 
     // find posts of user and check for errors
     post_model.post
-    .find({
-        _id: post_id
-    })
+    .find({_id: post_id})
     .exec(function(err, userposts) {
         if (err)
             res.send(err);
@@ -454,10 +452,20 @@ var setpost = function(req, res) { // create a post
             if (err)
                 res.send(err);
 
-            // res.json({
-            //     message: 'Post created!'
-            // });
-
+			// user_final_followers_schema
+			// .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
+			// .lean()
+			// .exec(function(err, resValue){
+			
+				// if (err)
+					// res.send(err);
+					
+				res.json({
+					message: 'Post created!'
+				});
+			
+			// })
+			
         });
 
     });

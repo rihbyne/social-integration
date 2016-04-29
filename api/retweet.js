@@ -1,22 +1,22 @@
 var post_model = require('../app/models/postSchema.js');
 
 //Set retweet
-var setretweet = function(req, res , done) { 
+var setretweet = function(req, res){
 
     var post_id = req.body.post_id;
-    var retweet_user_id = req.body.retweet_user_id;
     var post_type = req.body.post_type;
+    var ret_user_id = req.body.ret_user_id;
     var retweet_type = req.body.retweet_type;
     var retweet_quote = req.body.retweet_quote;
 
     console.log('Retweet Api hitted');
 
     console.log('Post Id', req.body.post_id);
-    console.log('Retweet User Id', req.body.retweet_user_id);
-    console.log('Post Type', req.body.post_type);
+    console.log('Retweet User Id', req.body.ret_user_id);
+    console.log('Retweet Type', req.body.retweet_type);
 
     if(post_type == 1){ //if post
-        
+
         var collectionName = post_model.post;
         var userIdFrom = 'posted_by';              
         var message = 'User retweeted on Post';
@@ -24,63 +24,77 @@ var setretweet = function(req, res , done) {
     }
     else if(post_type == 2){ //if retweet
 
-        var collectionName = post_model.post_retweet;
-        var userIdFrom = 'ret_user_id';
-        var message = 'User retweeted On Retweet';        
+        if (retweet_type == 1){ //simple retweet
+            var collectionName = post_model.retweet;
+        }
+        else if(retweet_type == 2){
+            var collectionName = post_model.retweet_quote;
+            var message = 'User retweeted On Retweet'; 
+        }
 
+        var userIdFrom = 'ret_user_id'; 
     }
-    else if(post_type == 3){ //if reply
+    else if(post_type == 3){ //if reply        
 
         var collectionName = post_model.reply;
         var userIdFrom = 'reply_user_id';
         var message = 'User retweeted On Reply';
     }
 
-    post_model.post_retweet
+    collectionName
     .find({
-        post_id: post_id,
-        ret_user_id: retweet_user_id,
-        retweet_type : retweet_type
+        _id: post_id
     })
-    .exec(function(err, retweetdata) {
+    .lean()
+    .exec(function(err, retweetResult){
 
-        if(((retweetdata.length == 0) && (retweet_type == 1)) || (retweet_type == 2)){
-            
-                collectionName
-                .find({
-                    _id: post_id
-                })
-                .lean()
-                .exec(function(err, postdata) {
-                    // console.log('postdata \n', postdata);
+        if (err) {
+            res.send(err);
+            return;
+        };
 
-                    if (postdata.length !== 0) {
+        if (retweetResult.length !== 0) {
 
-                        if (postdata[0].userIdFrom !== retweet_user_id) {
 
-                            if (retweet_type == 1) { //simple retweet
+                if(post_type == 1){ //if post
 
-                                var retweet = new post_model.post_retweet({
-                                    post_id: post_id,
-                                    ret_user_id: retweet_user_id,
-                                    post_type : post_type,
-                                    retweet_type : retweet_type
+                    var retweetUser = retweetResult[0].posted_by
+                }
+                else if(post_type == 2){ //if retweet
 
-                                });
+                    if (retweet_type == 1){ //simple retweet
+                        var retweetUser = retweetResult[0].ret_user_id
+                    }
+                    else if(retweet_type == 2){
+                        var retweetUser = retweetResult[0].ret_user_id
+                    }
 
-                            }
-                            else if(retweet_type == 2) { // Quote retweet
+                }
+                else if(post_type == 3){ //if reply        
 
-                                var retweet = new post_model.post_retweet({
-                                    post_id: post_id,
-                                    ret_user_id: retweet_user_id,
-                                    post_type : post_type,
-                                    retweet_type : retweet_type,
-                                    retweet_quote : retweet_quote
-                                });
-                                
-                            };
-                            
+                    var retweetUser = retweetResult[0].reply_user_id
+                }
+
+
+            // console.info(userIdFrom);
+            // return;
+            if (retweetUser !== ret_user_id) {
+
+                if (retweet_type == 1){ //simple retweet
+
+                    post_model.retweet
+                    .find({post_id: post_id, ret_user_id: ret_user_id})
+                    .lean()
+                    .exec(function(err, simpleRetweet){
+
+                        if (simpleRetweet.length == 0) { //save new tweet
+
+                            var retweet = new post_model.retweet({
+
+                                post_id: post_id,
+                                ret_user_id: ret_user_id
+                            });
+
                             retweet.save(function(err) {
 
                                 if (err)
@@ -99,51 +113,78 @@ var setretweet = function(req, res , done) {
                             });
 
                         }
-                        else{
+                        else{//remove old simple retweet
 
-                            console.log('You can not RE-tweet on your own post');
-                            res.redirect('about');
+                            post_model.retweet
+                            .remove({post_id: post_id, ret_user_id: ret_user_id})
+                            .exec(function(err, result){
+                                if (err) {
+                                    res.send(err)
+                                    return;
+                                };
 
-                        } 
+                                console.log('Retweet document removed');
 
-                    }
-                    else{
-                        console.log('No Post Found');
-                        res.redirect('about');
-                    }
+                                res.json({
+                                    message: 'Remove tweet'
+                                });
 
+                            })
+
+                        }
+
+                    })
+
+                }
+                else if(retweet_type == 2){//quote retweet
+
+                    var retweet = new post_model.retweet_quote({
+
+                        post_id: post_id,
+                        ret_user_id: ret_user_id,
+                        retweet_quote: retweet_quote
+                    });
+
+                    retweet.save(function(err) {
+
+                        if (err)
+                            res.send(err);
+                        
+                            console.info(message);
+                            
+                            res.json({
+                                message: message
+                            });
+                        
+                    });
+
+                }                
+
+            }
+            else{
+
+                console.log('You can not RE-tweet on your own post');
+
+                res.json({
+                    message: 'You can not RE-tweet on your own post'
                 });
+
+                // res.redirect('about');
+
+            } 
 
         }
         else{
 
-            console.log('You can not retweet twice for same post');
+            console.log('No Post Found');
 
-            post_model.post_retweet
-            .find({$and: [{post_id : post_id}, {ret_user_id : retweet_user_id}, {retweet_type: retweet_type}]})
-            .remove()
-            .exec(err, function(err, result) {
-               
-                if (err) {
-                    res.send(err);
-                    return;
-                };
-
-                setretweetcount(post_id, collectionName, function(){
-
-                    console.log('Retweet document removed');
-
-                    res.json({
-                        message: 'Remove tweet'
-                    });
-
-                });
-               
+            res.json({
+                Result : 'No Post Found'
             })
+            // res.redirect('about');
+        }
 
-        } 
-
-    })
+    });
 
 }
 
@@ -171,27 +212,30 @@ var getretweet = function(req, res) { //get new like
 //update count of retweet in post
 var setretweetcount = function(post_id, collectionName, res){
 
-    if (collectionName) {
+    if (collectionName !== '') {
+      
+            post_model.retweet
+            .count({post_id: post_id})
+            .lean()
+            .exec(function(err, retweetCount){
 
-        post_model.post_retweet
-        .count({post_id: post_id})
-        .lean()
-        .exec(function(err, postRetweetCount){
+                collectionName
+                .findOneAndUpdate({_id: post_id}, {retweet_count: retweetCount})
+                .exec(function(err, postUpdateResult) {
 
-            collectionName
-            .findOneAndUpdate({_id: post_id}, {retweet_count: postRetweetCount})
-            .exec(function(err, postUpdateResult) {
+                    if (err)
+                        res.send(err);
 
-                if (err)
-                    res.send(err);
+                    console.log(postUpdateResult); 
 
-                // console.log(postUpdateResult); 
+                    res(null, postUpdateResult)
 
-                res(null, postUpdateResult)
+                });     
 
-            });     
-
-        });
+            });
+    }
+    else{
+        console.info('collectionName is blank')
     }
     
 }

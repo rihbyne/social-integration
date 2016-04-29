@@ -399,7 +399,6 @@ var setpost = function(req, res) { // create a post
     console.log('Add post');
 
     var username = req.body.username; // get the post name (comes from the request)
-    var post_title = req.body.post_title; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
     var post_links = req.body.post_links;
 
@@ -437,11 +436,8 @@ var setpost = function(req, res) { // create a post
     var post = new post_model.post({
 
         username: username,
-        post_title: post_title,
-        post_description: post_description,
-        created_at: Date.now(),
-        last_update: Date.now()
-
+        post_description: post_description
+        
     }); // create a new instance of the post model
 
     function getuserid(username, callback) {

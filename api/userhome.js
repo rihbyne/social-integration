@@ -51,8 +51,8 @@ var getuserhomeposts = function(req, res) { // get a post
 
                 var profilePosts = result[0].concat(result[1]);//Got two result , concent two results
                     function custom_sort(a, b) {
-                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-                }
+                        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                    }
 
                 profilePosts.sort(custom_sort);
                 

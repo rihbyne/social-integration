@@ -124,6 +124,3 @@ module.exports.retweet 				= mongoose.model('retweet', retweet_schema);
 module.exports.retweet_quote 		= mongoose.model('retweet_quote', retweet_quote_schema);
 module.exports.trends 				= mongoose.model('trends', trends);
 module.exports.reply 				= mongoose.model('reply', reply_schema);
-
-var deepPopulate = require('mongoose-deep-populate')(mongoose);
-post_reply_schema.plugin(deepPopulate /* more on options below */);

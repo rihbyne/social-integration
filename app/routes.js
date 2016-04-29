@@ -27,23 +27,19 @@ module.exports = function(app, passport) {
     app.post('/secure/sendMail', mailer.sendPHPmail);
     app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
-    // // user preferance page 
-    // app.get('/following', function(req, res) {
-    //     res.render('pages/following');
-    // });
-
     app.get('/', isLoggedIn, function(req, res) {
         // save the bear and check for errors
         var drinks = [{
-            name: 'Bloody Mary',
-            drunkness: 3
-        }, {
-            name: 'Martini',
-            drunkness: 5
-        }, {
-            name: 'Scotch',
-            drunkness: 10
-        }];
+						name: 'Bloody Mary',
+						drunkness: 3
+					},{
+						name: 'Martini',
+						drunkness: 5
+					},{
+						name: 'Scotch',
+						drunkness: 10
+					}];
+					
         var tagline = "Any code of your own that you haven't looked at for six or more months might as well have been written by someone else.";
 
         res.render('pages/index', {
@@ -53,24 +49,6 @@ module.exports = function(app, passport) {
         });
 
     });
-
-
-    // // profile
-    // app.get('/profile', function(req, res) {
-    //     res.render('pages/profile');
-    // });
-
-    // // login
-    // app.get('/login', function(req, res) {
-    //     res.render('pages/login');
-    // });
-
-    // register
-    // app.get('/signup', function(req, res) {
-    //     res.render('pages/signup');
-    // });
-
-
 
     // =====================================
     // LOGIN ===============================
@@ -147,14 +125,12 @@ module.exports = function(app, passport) {
         });
     });
 
-
     // user preferance page 
     app.get('/user_preferance', function(req, res) {
         res.render('pages/user_preferance', {
             user: req.user // get the user out of session and pass to template
         });
     });
-
 
     // =====================================
     // LOGOUT ==============================
@@ -223,10 +199,11 @@ module.exports = function(app, passport) {
 
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply); 		// tweet,retweet & reply post
 	
-	app.get('/wrapper/:user_id', suggest.wrapperSuggest)
+	// Suggestions
+	app.get('/wrapper/:user_id', suggest.wrapperSuggest)					// Decision Making Wrapper API
 	app.get('/suggestion/:user_id', suggest.getSuggestion);					// Get Suggestions
 	app.get('/randomSuggestion', suggest.randomSuggestion);					// Get Random Suggestions
-	app.get('/allSuggestion/:user_id', suggest.allSuggestion);					// Get All Suggestions
+	app.get('/allSuggestion/:user_id', suggest.allSuggestion);				// Get All Suggestions
 	
 	app.post('/deletepost', post.deletepost); 								// delete post
     app.post('/deletereply', reply.deletereply); 							// delete Reply

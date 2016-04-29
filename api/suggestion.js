@@ -1,5 +1,5 @@
-var follower 	= require('../app/models/model_followers.js'),
-    users 		= require('../app/models/user.js')
+var follower 	= require('../app/models/followersSchema.js'),
+    users 		= require('../app/models/userSchema.js')
 	util 		= require('util'),
 	async		= require('async')
 	request     = require('request');                               // Request Module

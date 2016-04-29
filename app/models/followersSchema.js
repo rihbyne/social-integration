@@ -1,5 +1,5 @@
-var mongoose 		= require('mongoose');				// For Mongoose
-var User 			= require('./user.js');				// For Referring User Collection
+var mongoose 		= require('mongoose');						// For Mongoose
+var User 			= require('./userSchema.js');				// For Referring User Collection
 
 var userfollowersSchema = mongoose.Schema({
     

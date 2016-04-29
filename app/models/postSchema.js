@@ -1,5 +1,5 @@
 var mongoose        = require('mongoose');           								// For Mongoose
-var User 			= require('../models/user.js');									// For Referring User Collection
+var User 			= require('../models/userSchema.js');							// For Referring User Collection
 
 // Post Schema
 var post = mongoose.Schema({
@@ -126,4 +126,3 @@ module.exports.trends 				= mongoose.model('trends', trends);
 module.exports.reply 				= mongoose.model('reply', reply_schema);
 
 var deepPopulate = require('mongoose-deep-populate')(mongoose);
-post_reply_schema.plugin(deepPopulate /* more on options below */);

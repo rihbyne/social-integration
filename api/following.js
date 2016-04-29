@@ -3,9 +3,9 @@ var util 		= require('util');
 var async 		= require('async');
 
 // Pages
-var follower 	= require('../app/models/model_followers.js');
-var users 		= require('../app/models/user.js');
-var postSchema 	= require('../app/models/post_model.js');
+var follower 	= require('../app/models/followersSchema.js');
+var users 		= require('../app/models/userSchema.js');
+var postSchema 	= require('../app/models/postSchema.js');
 
 //Set following
 var setfollowing = function(req, res) {

@@ -4,8 +4,6 @@ var router 			= express.Router();
 var path 			= require('path');
 
 // Pages
-var notification 	= require('../api/notification.js');
-var mailer 			= require('../api/mail.js');
 var post 			= require('../api/post.js');
 var mention 		= require('../api/mention.js');
 var follow 			= require('../api/following.js');
@@ -19,13 +17,6 @@ var suggest			= require('../api/suggestion.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
-
-    app.post('/secure/sendVerificationEmail', notification.sendVerificationEmail);
-    app.post('/secure/sendforgotpassword', notification.sendforgotpassword);
-    app.post('/secure/changePassEmail', notification.changePassEmail);
-    app.post('/secure/resettedConfirmation', notification.resettedConfirmation);
-    app.post('/secure/sendMail', mailer.sendPHPmail);
-    app.post('/secure/getNotificationStatus', mailer.getNotificationStatus);
 
     app.get('/', isLoggedIn, function(req, res) {
         // save the bear and check for errors
@@ -141,7 +132,7 @@ module.exports = function(app, passport) {
     });
 
 
-    /*=================================================================================================*/
+/*===========================================================================================================================*/
 
     app.use('/about', isLoggedIn, post.getuserdetails); 					// about page
     app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
@@ -209,6 +200,12 @@ module.exports = function(app, passport) {
     app.post('/deletereply', reply.deletereply); 							// delete Reply
 
     // app.get('/getRetweetByUserId/:userid', userhome.getRetweetByUserId); // delete post
+	
+	
+/*===========================================================================================================================*/	
+	
+	
+	
 
 };
 // route middleware to make sure a user is logged in

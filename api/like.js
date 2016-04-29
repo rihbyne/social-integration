@@ -1,30 +1,27 @@
-var post_model = require('../app/models/post_model.js');
+var postSchema 	= require('../app/models/postSchema.js');		// Including PostSchema File
 
-//Set post like
+//Set Post Like
 var setlike = function(req, res) {
 
-    var post_id = req.body.post_id;
-    var like_user_id = req.body.like_user_id;
-    var post_type = req.body.post_type;
+    var post_id 		= req.body.post_id;
+    var like_user_id 	= req.body.like_user_id;
 
     console.log('Like Api hitted');
-    console.log('Post Id: ', req.body.post_id);
-    console.log('Like User Id: ', req.body.like_user_id);
+    console.log('Post Id: ', post_id);
+    console.log('Like User Id: ', like_user_id);
 
     /*This case will run for the second case -- To remove like*/
-    post_model.post_like
-    .find({
-        post_id: post_id,
-        like_user_id: like_user_id
-    }).lean()
+    postSchema.post_like
+    .find({ post_id: post_id, like_user_id: like_user_id })
+	.lean()
     .exec(function(err, likedata) {
 
         if (likedata.length !== 0) {
 
             console.log('Make it unlike.');
 
-            post_model.post_like
-            .findOneAndRemove({$and: [{post_id : post_id}, {like_user_id : like_user_id}]})
+            postSchema.post_like
+            .findOneAndRemove({$and:[{post_id : post_id}, {like_user_id : like_user_id}]})
             .lean()
             .exec(function(err, result) {
 
@@ -34,11 +31,6 @@ var setlike = function(req, res) {
                 };
 
                 console.log('Like document removed / Undo like', result);
-               
-                // res.json({
-                //     message: 'Like document removed / Undo like'
-                // });
-
             })
   
         } 
@@ -47,8 +39,7 @@ var setlike = function(req, res) {
 
             var likeModel = new post_model.post_like({
                 post_id: post_id,
-                like_user_id: like_user_id,
-                post_type : post_type
+                like_user_id: like_user_id
             });
 
             likeModel.save(function(err) {

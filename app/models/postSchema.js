@@ -1,5 +1,5 @@
 var mongoose        = require('mongoose');           								// For Mongoose
-var User 			= require('../models/user.js');									// For Referring User Collection
+var User 			= require('../models/userSchema.js');							// For Referring User Collection
 
 // Post Schema
 var post = mongoose.Schema({

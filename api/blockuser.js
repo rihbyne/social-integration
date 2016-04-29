@@ -1,4 +1,4 @@
-var follow = require('../app/models/model_followers.js');
+var follow = require('../app/models/followersSchema.js');
 
 var setblockuser = function(req, res) {
 

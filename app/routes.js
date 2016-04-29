@@ -154,10 +154,12 @@ module.exports = function(app, passport) {
 
     app.post('/setuser', post.setuser); 									// Set new user
 
-    app.post('/setpost', post.setpost); 								// Set new post
+    app.post('/setpost', post.setpost); 									// Set new post
     app.post('/setretweet', retweet.setretweet); 							// Set new user
-    app.post('/setlike', like.setlike); 									// Set like
+    app.post('/setLike', like.setLike); 									// Set Like
     app.get('/like/post/:post_id', like.getLikeByPost); 					// Get like by post
+    app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet); 		// Get like by retweet
+    app.get('/like/reply/:reply_id', like.getLikeByReply); 					// Get like by reply
     app.get('/like/user/:user_id', like.getLikeByUser); 					// Get like by User
     app.get('/getretweet/:post_id', retweet.getretweet); 					// Get Retweet by post
 

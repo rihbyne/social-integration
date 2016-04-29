@@ -28,8 +28,8 @@
                         <div class="card-action t-count">
                             <ul>
                                 <li><a href="userhome">tweet<span>27</span></a></li>
-                                <li><a href="/following">Following<span>36</span></a></li>
-                                <li><a href="/followers">Follower<span>74</span></a></li>
+                                <li><a href="/<%= user.username%>/following ">Following<span>36</span></a></li>
+                                <li><a href="/<%= user.username %>/followers">Follower<span>74</span></a></li>
                             </ul>
                         </div>
                     </div>
@@ -370,8 +370,8 @@
         </div>
         <div class="msg-footer">
             <div class="row">
-                <div class="input-field col s12">
-                    <input id="msg" type="text" class="col s11">
+                <div class="input-field col s12 m12">
+                    <input id="msg" type="text" class="col m11 s11">
                     <a class="btn-floating right blue waves-effect"><i class="material-icons">send</i></a>
                 </div>
             </div>

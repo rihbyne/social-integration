@@ -6,7 +6,7 @@ var post = mongoose.Schema({
     
     posted_by:                       {type: String, ref:'User'},       // posted by 
     username:                        {type: String, ref:'User'},
-    post_title:                      {type: String},        // post title 
+    // post_title:                      {type: String},        // post title 
     post_description:                {type: String},        // post description 
     // post_reply:                      [reply_schema],
     retweet_count:                   {type: Number, default: 0, min: 0},
@@ -53,9 +53,14 @@ var post_hashtag_links = mongoose.Schema({
 // retweet Schema
 var post_retweet_schema = mongoose.Schema({
     
-    post_id:                         {type: String, ref:'post'},        // post Id
-    ret_user_id:                     {type: String},         // Retweet by   
-    retweet_at :                     {type: Date, default: Date.now}  
+    post_id:                         {type: String, ref:'post'},                 // post Id or retweet id
+    ret_user_id:                     {type: String},                             // Retweet by   
+    post_type :                      {type: String, enum : [1,2,3], default : 1}, // 1 - post, 2 - retweet, 3 - reply
+    retweet_count:                   {type: Number, default: 0, min: 0},
+    like_count:                      {type: Number, default: 0, min: 0},
+    retweet_type:                    {type: String, enum : [1,2], default : 1},  // 1- Simple retweet, 2 - quote 
+    retweet_quote:                   {type: String},
+    retweet_at :                     {type: Date, default: Date.now}
 
 }, { versionKey: false });
 

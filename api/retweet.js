@@ -243,7 +243,43 @@ var setretweetcount = function(post_id, collectionName, res){
     }
     
 }
+
+
+var deleteRetweet = function(req, res){
+
+	var retweet_quote_id = req.body.retweet_quote_id;
+	
+	post_model.retweet_quote
+	.findOneAndRemove({_id: retweet_quote_id})
+	.lean()
+	.exec(function(err, result){
+		
+		if(err)
+		{
+			res.send(err);
+			return;
+		}
+			
+		if(result==null || result == undefined || result=="")
+		{
+			console.log('No Retweet Found');
+			res.send('No Retweet Found');
+			return;
+		}
+		
+		else
+		{
+			console.log('Reply Deleted');
+			res.send('Retweet Deleted Successfully');
+		}
+		
+	})
+
+}
+
+
 module.exports = {
     getretweet : getretweet,
-    setretweet : setretweet
+    setretweet : setretweet,
+	deleteRetweet : deleteRetweet
 }

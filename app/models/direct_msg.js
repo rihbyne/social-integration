@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
 
 var User = mongoose.model('User')
-var Flag = mongoose.model('Flag')
+//var Flag = mongoose.model('Flag')
 
 var util = require('util')
 var log = require('../../config/logging')()
@@ -40,14 +40,9 @@ var oneToOneMsgTextSchema = new mongoose.Schema({
   user_id_fk_key: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   ip: {type: String, required:true},
   msg_time: {type: Date, default: Date.now},
-  one_to_one_msg_session_fk_key: {type: mongoose.Schema.Types.ObjectId, ref: 'OneToOneMsgSession'}
+  one_to_one_msg_session_fk_key: {type: mongoose.Schema.Types.ObjectId, ref: 'OneToOneMsgSession'},
+  flag_msg_as: {type: mongoose.Schema.Types.Number, ref:'Flag', default: null}
 });
-
-var flagMsgSchema = new mongoose.Schema({
-  one_to_one_msgtext_fk_key: {type: mongoose.Schema.Types.ObjectId, ref: 'OneToOneMsgText'},
-  flag_action: {type: mongoose.Schema.Types.Number , ref: 'Flag'}
-})
 
 var OneToOneMsgSession = mongoose.model('OneToOneMsgSession', oneToOneMsgSessionSchema, 'OneToOneMsgSessions')
 mongoose.model('OneToOneMsgText', oneToOneMsgTextSchema, 'OneToOneMsgTexts')
-mongoose.model('FlagMsg', flagMsgSchema, 'FlagMsgs')

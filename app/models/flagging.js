@@ -5,4 +5,4 @@ var flagSchema = new mongoose.Schema({
   flag_type: {type: String, required: true}
 });
 
-module.exports = mongoose.model('Flag', flagSchema, 'Flags')
+module.exports = mongoose.model('Flag', flagSchema, 'flags')

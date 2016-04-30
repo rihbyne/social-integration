@@ -90,7 +90,9 @@ var getDMs = function(user_id, cb) {
 var getDMById = function(user_id, id, cb) {
   var filterOptions = { path: 'user_id_fk_key', select: '_id username'}
   OneToOneMsgText
-                .find({one_to_one_msg_session_fk_key: id})
+                .find({
+                  $and: [{one_to_one_msg_session_fk_key: id}, {flag_msg_as: null}]
+                })
                 .populate(filterOptions)
                 .select('-ip -__v')
                 .sort({msg_time: -1})
@@ -293,8 +295,59 @@ var removeDMByMsgId = function(user_id, id, msg_id, cb) {
                 })
 }
 
-var flagMsgId = function() {
-  
+var getFlagOptions = function(cb) {
+  Flag
+     .find()
+     .exec(function(err, flags) {
+       if(err) {
+         log.error(util.inspect(err))
+         cb({failed: err.message})
+       } else {
+         log.info(flags)
+         var flagObj = { status: 200, content: flags}
+         cb(null, flagObj)
+       }
+     })
+}
+
+var flagMsgId = function(user_id, id, msg_id, flag_id, cb) {
+  OneToOneMsgText
+                .findOne({
+                  $and: [{user_id_fk_key: user_id}, {one_to_one_msg_session_fk_key: id}, {_id: msg_id}]
+                })
+                .select('-__v -ip')
+                .exec(function(err, msgObj) {
+                  try {
+                    if (err) {
+                      log.error(util.inspect(err))
+                      var errMsg = err.name === 'CastError'? {failed: "params dont exist", status: 400}: {failed: err.message}
+                      cb(errMsg)
+                    } else {
+                      msgObj.flag_msg_as = flag_id
+                      msgObj.save(function(err, data) {
+                        if (err) {
+                          log.error(util.inspect(err))
+                          cb({failed: err.message})
+                        } else {
+                          var result = {
+                            status: 200,
+                            content: {
+                              _id: data._id,
+                              user_id: data.user_id_fk_key,
+                              msg_text: data.msg_text,
+                              msg_time: data.msg_time,
+                              flag_msg_as: data.flag_msg_as,
+                              session_id: data.one_to_one_msg_session_fk_key
+                            }
+                          }
+                          cb(null, result)
+                        }
+                      })
+                    }
+                  } catch(err) {
+                    cb({failed: err.message})
+                  }
+                })
 }
 
 module.exports = {
@@ -303,5 +356,6 @@ module.exports = {
   startDM: startDM,
   resumeDMById: resumeDMById,
   removeDMByMsgId: removeDMByMsgId,
+  getFlagOptions: getFlagOptions,
   flagMsgId: flagMsgId
 }

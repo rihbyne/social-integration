@@ -59,7 +59,7 @@ var startDM = function(req, res) {
     })
 
   } else {
-    var content = {"status": "required fields not found"}
+    var content = {"failed": "required fields not found"}
     log.warn(util.inspect(content))
     helpers.sendJsonResponse(res, 400, content)
   }
@@ -85,7 +85,7 @@ var resumeDMById = function(req, res) {
       }
     })
   } else {
-    var content = {"status": "required fields not found"}
+    var content = {"failed": "required fields not found"}
     log.warn(util.inspect(content))
     helpers.sendJsonResponse(res, 400, content)
   }
@@ -106,7 +106,45 @@ var removeDMByMsgId = function(req, res) {
   })
 }
 
+var getFlagOptions = function(req, res) {
+  dmCommon.getFlagOptions(function(err, result) {
+    if (err) {
+      var status = err.status? err.status: 500
+      helpers.sendJsonResponse(res, status, err)
+      return
+    } else {
+      log.info(util.inspect(result))
+      helpers.sendJsonResponse(res, result.status, result.content)
+      return
+    }
+  })
+}
+
 var flagMsgId = function(req, res) {
+  var flagContainer = [1, 2]
+  if (req.params.user_id && req.params.id && req.params.msg_id && req.body.flag_id
+   && (flagContainer.indexOf(parseInt(req.body.flag_id)) >= 0)) {
+     var user_id = req.params.user_id,
+         id = req.params.id,
+         msg_id = req.params.msg_id,
+         flag_id = req.body.flag_id
+
+     dmCommon.flagMsgId(user_id, id, msg_id, flag_id, function(err, result) {
+       if (err) {
+         var status = err.status? err.status: 500
+         helpers.sendJsonResponse(res, status, err)
+         return
+       } else {
+         log.info(util.inspect(result))
+         helpers.sendJsonResponse(res, result.status, result.content)
+         return
+       }
+     })
+  } else {
+    var content = {"failed": "required fields not found"}
+    log.warn(util.inspect(content))
+    helpers.sendJsonResponse(res, 400, content)
+  }
 }
 
 module.exports = {
@@ -115,5 +153,6 @@ module.exports = {
   startDM: startDM,
   resumeDMById: resumeDMById,
   removeDMByMsgId: removeDMByMsgId,
+  getFlagOptions: getFlagOptions,
   flagMsgId: flagMsgId
 }

@@ -34,6 +34,7 @@ var setLike = function(req, res) {
 					};
 
 					console.log('Post Unliked', result);
+					res.send('Post Unliked Successfully');
 				})
 	  
 			} 
@@ -50,7 +51,8 @@ var setLike = function(req, res) {
 					if (err)
 						res.send(err);
 
-					console.log('Post Like');              
+					console.log('Post Like');
+					res.send('Post Liked Successfully');					
 
 				});
 
@@ -87,6 +89,7 @@ var setLike = function(req, res) {
 					};
 
 					console.log('Retweet Unliked', result);
+					res.send('Retweet Unliked Successfully');
 				})
 	  
 			} 
@@ -103,7 +106,8 @@ var setLike = function(req, res) {
 					if (err)
 						res.send(err);
 
-					console.log('Retweet Like');              
+					console.log('Retweet Like');   
+					res.send('Retweet Liked Successfully');
 
 				});
 
@@ -139,7 +143,8 @@ var setLike = function(req, res) {
 						return;
 					};
 
-					console.log('Retweet Unliked', result);
+					console.log('Reply Unliked', result);
+					res.send('Reply Unliked Successfully');
 				})
 	  
 			} 
@@ -156,7 +161,8 @@ var setLike = function(req, res) {
 					if (err)
 						res.send(err);
 
-					console.log('Reply Like');              
+					console.log('Reply Like');       
+					res.send('Reply Unliked Successfully');					
 
 				});
 
@@ -243,7 +249,7 @@ var getLikeByUser = function(req, res) { //get new like
 		
     ], function (err, results){
 
-        console.info(userdetails);
+        res.send(results);
 
     });
 	
@@ -258,7 +264,7 @@ var getLikeByUser = function(req, res) { //get new like
 				res.send(err);
 				return;
 			};
-			
+			console.log(userPostLikeResult);
 			callback(null, userPostLikeResult);
 			
 		});
@@ -314,8 +320,8 @@ var setLikeCount = function(id, type, res){
 			if(err)
 				res.send(err);
 				
-			post_model.post
-            .findOneAndUpdate({_id: post_id}, {like_count: postLikeCount})
+			postModel.post
+            .findOneAndUpdate({_id: id}, {like_count: postLikeCount})
 			.exec(function(err, postUpdateResult){
 			
 				if (err)
@@ -334,14 +340,14 @@ var setLikeCount = function(id, type, res){
 	if(type==2 || type=='2')
 	{
 		postModel.retweet_like
-		.count({post_id:id})
+		.count({retweet_quote_id:id})
 		.lean()
 		.exec(function(err, retweetLikeCount){
 		
 			if(err)
 				res.send(err);
 				
-			postModel.retweet_like
+			postModel.retweet_quote
             .findOneAndUpdate({_id:id}, {like_count: retweetLikeCount})
 			.exec(function(err, retweetUpdateResult){
 			
@@ -361,14 +367,14 @@ var setLikeCount = function(id, type, res){
 	if(type==3 || type=='3')
 	{
 		postModel.reply_like
-		.count({post_id:id})
+		.count({reply_id:id})
 		.lean()
 		.exec(function(err, replyLikeCount){
 		
 			if(err)
 				res.send(err);
 				
-			postModel.reply_like
+			postModel.reply
             .findOneAndUpdate({_id:id}, {like_count: replyLikeCount})
 			.exec(function(err, replytUpdateResult){
 			

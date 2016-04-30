@@ -17,7 +17,10 @@ String.prototype.toObjectId = function() {
 var sessionExists = function(user_id, to, reportback) {
   OneToOneMsgSession
                     .find({
-                      $and: [{user_one_fk_key: user_id}, {user_two_fk_key: to}]
+                      $or: [
+                        {$and: [{user_one_fk_key: user_id}, {user_two_fk_key: to}]},
+                        {$and:[{user_one_fk_key: to}, {user_two_fk_key: user_id}]}
+                      ]
                     }, function(err, data) {
                       if (err) {
                         log.error(err)
@@ -279,7 +282,7 @@ var resumeDMById = function(user_id, id, ip, msgText, cb) {
 var removeDMByMsgId = function(user_id, id, msg_id, cb) {
   OneToOneMsgText
                 .findOneAndRemove({
-                  $and: [{user_id_fk_key: user_id}, {one_to_one_msg_session_fk_key: id}, {_id: msg_id}]
+                  $and: [{one_to_one_msg_session_fk_key: id}, {_id: msg_id}]
                 })
                 .exec(function(err, delObj) {
                   if (err) {

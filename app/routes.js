@@ -199,7 +199,8 @@ module.exports = function(app, passport) {
 	
 	app.post('/deletepost', post.deletepost); 								// delete post
     app.post('/deletereply', reply.deletereply); 							// delete Reply
-
+    app.post('/deleteRetweet', retweet.deleteRetweet); 						                                                                                                                                                                                                                                // delete Retweet
+	
     // app.get('/getRetweetByUserId/:userid', userhome.getRetweetByUserId); // delete post
 	
 	

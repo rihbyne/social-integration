@@ -398,7 +398,7 @@ var setpost = function(req, res) { // create a post
 
     console.log('Add post');
 
-    //var username = req.body.username; // get the post name (comes from the request)
+    var username = req.body.username; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
     //var post_links = req.body.post_links;
 

@@ -123,10 +123,14 @@ var setretweet = function(req, res){
                                     return;
                                 };
 
-                                console.log('Retweet document removed');
+                                setretweetcount(post_id, collectionName, function(){
 
-                                res.json({
-                                    message: 'Remove tweet'
+                                    console.log('Retweet document removed');
+
+                                    res.json({
+                                        message: 'Remove tweet'
+                                    });
+                                    
                                 });
 
                             })

@@ -1,7 +1,7 @@
 var user = require('../app/models/userSchema.js');
-var async = require('async');
 var post_model = require('../app/models/postSchema.js');
 var user_followers = require('../app/models/followersSchema.js');
+var async = require('async');
 
 //Get all post and retweet of user
 var getuserhomeposts = function(req, res) { // get a post 

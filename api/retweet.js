@@ -58,21 +58,47 @@ var setretweet = function(req, res){
 
                 if(post_type == 1){ //if post
 
-                    var retweetUser = retweetResult[0].posted_by
+                    var retweetUser = retweetResult[0].posted_by;
+
+                    var retweet = new post_model.retweet_quote({
+
+                        post_id: post_id,
+                        ret_user_id: ret_user_id,
+                        retweet_quote: retweet_quote
+
+                    });
                 }
                 else if(post_type == 2){ //if retweet
 
                     if (retweet_type == 1){ //simple retweet
-                        var retweetUser = retweetResult[0].ret_user_id
+                        var retweetUser = retweetResult[0].ret_user_id;
                     }
                     else if(retweet_type == 2){
-                        var retweetUser = retweetResult[0].ret_user_id
+                        var retweetUser = retweetResult[0].ret_user_id;
+
+                        var retweet = new post_model.retweet_quote({
+
+                            retweet_quote_id: post_id,
+                            ret_user_id: ret_user_id,
+                            retweet_quote: retweet_quote
+                            
+                        });
+
                     }
 
                 }
                 else if(post_type == 3){ //if reply        
 
-                    var retweetUser = retweetResult[0].reply_user_id
+                    var retweetUser = retweetResult[0].reply_user_id;
+
+                    var retweet = new post_model.retweet_quote({
+
+                        reply_id: post_id,
+                        ret_user_id: ret_user_id,
+                        retweet_quote: retweet_quote
+                        
+                    });
+
                 }
 
 
@@ -141,13 +167,6 @@ var setretweet = function(req, res){
 
                 }
                 else if(retweet_type == 2){//quote retweet
-
-                    var retweet = new post_model.retweet_quote({
-
-                        post_id: post_id,
-                        ret_user_id: ret_user_id,
-                        retweet_quote: retweet_quote
-                    });
 
                     retweet.save(function(err) {
 

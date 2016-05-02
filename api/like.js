@@ -249,7 +249,15 @@ var getLikeByUser = function(req, res) { //get new like
 		
     ], function (err, results){
 
-        res.send(results);
+		var length =results.length;
+		var count = 0;
+		for(var i=0; i<length; i++)
+		{
+			count = count+ + +results[i].length;
+		}
+
+		var data ={result:results, count:count};
+        res.send(data);
 
     });
 	
@@ -264,7 +272,7 @@ var getLikeByUser = function(req, res) { //get new like
 				res.send(err);
 				return;
 			};
-			console.log(userPostLikeResult);
+			//console.log(userPostLikeResult);
 			callback(null, userPostLikeResult);
 			
 		});

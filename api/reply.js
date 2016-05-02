@@ -209,6 +209,8 @@ var getReply = function(req, res){
 		})
 	}
 
+}
+
 var deletereply = function(req, res){
 
     var reply_id = req.body.reply_id;  
@@ -248,4 +250,4 @@ module.exports = ({
     //getreply : getreply,
     deletereply : deletereply,
 	getReply : getReply
-});
+})

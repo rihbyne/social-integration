@@ -3,13 +3,10 @@ var post_model = require('../app/models/postSchema.js');
 //update reply to post
 var setreply =  function(req, res){
 
-    var post_id = req.body.post_id;
     var post_type = req.body.post_type;
     var reply_user_id = req.body.reply_user_id;   
-    var retweet_quote_id = req.body.retweet_quote_id;
-    // var post_owner_id = req.body.post_owner_id;
-    var ref_reply_id = req.body.ref_reply_id;
     var reply_msg = req.body.reply_msg; 
+    var post_id = req.body.post_id;
 
     //blank validation
     if (post_type == 1) {//post
@@ -24,7 +21,7 @@ var setreply =  function(req, res){
     else if(post_type == 2){//retweet
 
         var post_reply = new post_model.reply({
-            retweet_quote_id : retweet_quote_id,
+            retweet_quote_id : post_id,
             reply_user_id : reply_user_id,
             reply_msg : reply_msg
         });
@@ -33,6 +30,7 @@ var setreply =  function(req, res){
     else{//reply
 
         var post_reply = new post_model.reply({
+            reply_id : post_id,
             reply_user_id : reply_user_id,
             reply_msg : reply_msg
         });

@@ -8,7 +8,7 @@ var setretweet = function(req, res){
     var ret_user_id = req.body.ret_user_id;
     var retweet_type = req.body.retweet_type;
     var retweet_quote = req.body.retweet_quote;
-
+    var collectionName, message, userIdFrom;
     console.log('Retweet Api hitted');
 
     console.log('Post Id', req.body.post_id);
@@ -17,28 +17,28 @@ var setretweet = function(req, res){
 
     if(post_type == 1){ //if post
 
-        var collectionName = post_model.post;
-        var userIdFrom = 'posted_by';              
-        var message = 'User retweeted on Post';
+        collectionName = post_model.post;
+        userIdFrom = 'posted_by';              
+        message = 'User retweeted on Post';
 
     }
     else if(post_type == 2){ //if retweet
 
         if (retweet_type == 1){ //simple retweet
-            var collectionName = post_model.retweet;
+            collectionName = post_model.retweet;
         }
         else if(retweet_type == 2){
-            var collectionName = post_model.retweet_quote;
-            var message = 'User retweeted On Retweet'; 
+            collectionName = post_model.retweet_quote;
+            message = 'User retweeted On Retweet'; 
         }
 
         var userIdFrom = 'ret_user_id'; 
     }
     else if(post_type == 3){ //if reply        
 
-        var collectionName = post_model.reply;
-        var userIdFrom = 'reply_user_id';
-        var message = 'User retweeted On Reply';
+        collectionName = post_model.reply;
+        userIdFrom = 'reply_user_id';
+        message = 'User retweeted On Reply';
     }
 
     collectionName
@@ -51,7 +51,7 @@ var setretweet = function(req, res){
         if (err) {
             res.send(err);
             return;
-        };
+        }
 
         if (retweetResult.length !== 0) {
 
@@ -101,10 +101,7 @@ var setretweet = function(req, res){
 
                 }
 
-
-            // console.info(userIdFrom);
-            // return;
-            if (retweetUser !== ret_user_id) {
+           if (retweetUser !== ret_user_id){
 
                 if (retweet_type == 1){ //simple retweet
 
@@ -147,7 +144,7 @@ var setretweet = function(req, res){
                                 if (err) {
                                     res.send(err)
                                     return;
-                                };
+                                }
 
                                 setretweetcount(post_id, collectionName, function(){
 
@@ -207,7 +204,7 @@ var setretweet = function(req, res){
             // res.redirect('about');
         }
 
-    });
+    })
 
 }
 

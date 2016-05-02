@@ -61,9 +61,16 @@ var getuserhomeposts = function(req, res) { // get a post
 
             // console.info(result[0]+''+result[1]);
 
-            res.json({
+            res.render('pages/user_profile_home.ejs', {
+                user: req.user , // get the user out of session and pass to template
                 ProfilePosts: profilePosts
             });
+
+            // res.json({
+            //     ProfilePosts: profilePosts,
+            //     user:req.user
+            // });
+
 
         });
 

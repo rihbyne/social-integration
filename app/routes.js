@@ -57,7 +57,7 @@ module.exports = function(app, passport) {
     // app.post('/login', do all our passport stuff here);
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
-        successRedirect: '/profile', // redirect to the secure profile section
+        successRedirect: '/profile' , // redirect to the secure profile section
         failureRedirect: '/login', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
@@ -131,12 +131,14 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
+    // user home tile line bind to profile EJS , changed in route/path  also
+    app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
+
 
 /*===========================================================================================================================*/
 
     app.use('/about', isLoggedIn, post.getuserdetails); 					// about page
     app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
-    app.get('/:username/gethomepost', userhome.getuserhomeposts); 			// user home timeline post API
 
     // app.get('/getpost', post.getpost); 									// Get all post
     app.get('/getpost/:user', post.getuserposts); 							// Get post by username
@@ -172,7 +174,7 @@ module.exports = function(app, passport) {
     
     //following    
     app.post('/setfollowing', follow.setfollowing);                         // Set follower// dk
-    app.get('/:user_name/following',  follow.getfollowing);                     // Set followings
+    app.get('/:user_name/following', isLoggedIn ,  follow.getfollowing);                     // Set followings
     app.get('/:user_name/followers', isLoggedIn , follow.getfollowers); 					// Set follower
     app.post('/unlink_followings_f', follow.unlink_following); 				// Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower); 			// count follower
@@ -181,7 +183,7 @@ module.exports = function(app, passport) {
 	// app.get('/followLatestPost/:user_id', follow.followLatestPost);
     
     //reply
-    app.get('/Trendsdk', post.Trendsdk); 								// trend keyword
+    // app.get('/Trendsdk', post.Trendsdk); 								// trend keyword
     app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply
     app.post('/setreply', reply.setreply); 									// Set reply
 

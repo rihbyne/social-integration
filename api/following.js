@@ -1,7 +1,7 @@
 // Packages
 var util 		= require('util');
 var async 		= require('async');
-
+var request     = require('request');
 // Pages
 var follower 	= require('../app/models/followersSchema.js');
 var users 		= require('../app/models/userSchema.js');
@@ -204,11 +204,12 @@ var getfollowing = function(req, res) {
                         }, function optionalCallback(err, body) {
 
                             var dk_f_list = {
-                                trend: JSON.parse(body.body),
+                                trend: body,
+                                // trend: JSON.parse(body.body),
                                 following_list: { data:  result}
                             }
                             res.render('pages/following', {
-                                Following_result: { data001: result , data002: JSON.parse(body.body) } ,
+                                Following_result: { data001: result , data002: body } ,
                                 user: req.user
                             });
                             // res.json({
@@ -282,11 +283,13 @@ var getfollowers = function(req, res) {
                         }, function optionalCallback(err, body) {
 
                             var dk_f_list = {
-                                trend: JSON.parse(body.body),
+                                // trend: JSON.parse(body.body),
+                                trend: body,
                                 following_list: { data:  result}
                             }
                             res.render('pages/follower', {
-                                Following_result: { data001: result , data002: JSON.parse(body.body) } ,
+                                Following_result: { data001: result , data002: body } ,
+                                // Following_result: { data001: result , data002: JSON.parse(body.body) } ,
                                 user: req.user
                             });
                             // res.json({

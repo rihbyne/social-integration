@@ -1,15 +1,17 @@
-var follower = require('../app/models/model_followers.js'),
-    users = require('../app/models/user.js');
-    postSchema = require('../app/models/post_model.js');
+// Packages
+var util 		= require('util');
+var async 		= require('async');
 
-var util = require('util');
-var async = require('async');
+// Pages
+var follower 	= require('../app/models/followersSchema.js');
+var users 		= require('../app/models/userSchema.js');
+var postSchema 	= require('../app/models/postSchema.js');
 
 //Set following
 var setfollowing = function(req, res) {
 
-    var user_id = req.body.user_id;
-    var following_id = req.body.following_id;
+    var user_id 		= req.body.user_id;				// User Id
+    var following_id 	= req.body.following_id;	// Following Id
     var follow_back;
 
     //validation for blank variables
@@ -28,38 +30,26 @@ var setfollowing = function(req, res) {
     if (user_id === following_id) {
 
         console.error('You can not follow your own profile');
-
         res.json({
             message: 'You can not follow your own profile'
         })
-
         return;
     };
 
     // validation for the profile if already followed 
     follower
-        .find({
-            $and: [{
-                user_id: user_id
-            }, {
-                following_id: following_id
-            }, {
-                follow_status: true
-            }]
-        })
-        .exec(function(err, result) {
+	.find({$and:[{user_id: user_id},{following_id: following_id},{follow_status: true}]})
+	.exec(function(err, result){
 
-            if (result.length !== 0) {
-
-
-                console.info('User already following');
-
+		if (result.length !== 0){
+		
+			console.info('User already following');
                 res.json({
                     message: 'User already following'
                 })
                 return;
 
-            } else { //add new follower
+		} else { //add new follower
 
                 console.info('update follower status');
                 /*update user follower status true*/

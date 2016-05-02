@@ -119,7 +119,7 @@ var getpostsrtreply = function(req, res) { // get a post
             }
             else{
 
-                var profilePosts = result[0].concat(result[1]).concat(result[2]);//Got two result , concent two results
+                var profilePosts = result[0].concat(result[1]).concat(result[2]).concat(result[3]);//Got two result , concent two results
                
                 function custom_sort(a, b) {
                     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -197,10 +197,30 @@ function getRetweetByUserId(callback){//simple retweet
 
                 function(singleretweet, callback){
 
+                    if (singleretweet.post_id !== 'undefined') {
+
                         var options = {
                             path: 'post_id',
                             model: 'post'
                         };
+
+                    }
+                    else if (singleretweet.retweet_quote_id !== 'undefined') {
+
+                        var options = {
+                            path: 'retweet_quote_id',
+                            model: 'retweet_quote'
+                        };
+                        
+                    }
+                    else if (singleretweet.reply_id !== 'undefined') {
+
+                        var options = {
+                            path: 'reply_id',
+                            model: 'reply'
+                        };
+                        
+                    };
 
                     post_model.retweet
                     .populate(singleretweet, options, function (err, retweet) {
@@ -234,7 +254,7 @@ function getReplyByUserId(callback){
         if (err) {
             res.send(err)
         };
-        // console.info('Reply By user: \n',postReplyResult);
+        console.info('Reply By user: \n',postReplyResult);
 
         async.each(postReplyResult, 
 

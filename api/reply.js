@@ -6,6 +6,7 @@ var setreply =  function(req, res){
     var post_id = req.body.post_id;
     var post_type = req.body.post_type;
     var reply_user_id = req.body.reply_user_id;   
+    var retweet_quote_id = req.body.retweet_quote_id;
     // var post_owner_id = req.body.post_owner_id;
     var ref_reply_id = req.body.ref_reply_id;
     var reply_msg = req.body.reply_msg; 

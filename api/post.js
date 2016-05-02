@@ -126,7 +126,7 @@ var getuserdetails = function(req, res) {
             if (err)
                 res.send(err);
             
-            post_model.post_retweet
+            post_model.retweet
             .count({ret_user_id : user_id})
             .lean()
             .exec(function(err, retweetcount){

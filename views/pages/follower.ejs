@@ -126,7 +126,7 @@
                                 </div>
                                 <div id="test2" class="col s12">
                                     <!-- following tabs -->
-                                     <div class="row">
+                                    <div class="row">
                                         <ul>
                                             <% for(var i=0; i<Following_result.data001.length; i++) {%>
                                             
@@ -137,7 +137,7 @@
                                                         <span class="card-title"><%= Following_result.data001[i].user_id.first_name %><%= Following_result.data001[i].user_id.last_name %></span>
                                                         <span class="card-title handle"><%= Following_result.data001[i].user_id.username %></span>
                                                         <span class="right card-title f-status">
-                                                            <% if (Following_result.data001[i].follow_back == true) { %>
+                                                            <% if (Following_result.data001[i].follow_status == true) { %>
                                                             follows you
                                                             <% } else { %>
                                                             
@@ -150,12 +150,19 @@
                                                     
                                                     <div class="card-action">
                                                         <% if (Following_result.data001[i].follow_back == true) { %>
-                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
-                                                        </button>
+                                                        <form method="post" action="/unlink_followings_f" name="unlink_followings_f" class="forms">
+                                                            <input type="hidden" name="unlink_followings"  value="<%= Following_result.data001[i].user_id._id %>">
+                                                            <input type="hidden" name="user_id"  value="<%= user._id %>">
+                                                            <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
+                                                            </button>
+                                                        </form>
                                                         <% } else { %>
-                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
-                                                        </button>
-                                                        
+                                                        <form method="post" action="/setfollowing" name="setfollowings">
+                                                            <input type="hidden" name="following_id" value="<%= Following_result.data001[i].user_id._id %>">
+                                                            <input type="hidden" name="user_id"  value="<%= user._id %>">
+                                                            <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
+                                                            </button>
+                                                        </form>
                                                         <% } %>
                                                     </div>
                                                 </div>
@@ -163,61 +170,60 @@
                                             <% } %>
                                             
                                         </div>
-
-                                 
-                                    <!-- end following tab -->
+                                        
+                                        <!-- end following tab -->
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <!-- center div post  -->
-                
-                <!-- right div suggesion , footer -->
-            </div>
-        </div>
-        <!-- Modal Trigger -->
-        <a href="#modal1" class=" modal-trigger btn-floating btn-large waves-effect waves-light red btn-tw-st"><i class="material-icons">add</i></a>
-        <!-- <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a> -->
-        <!-- Modal Structure -->
-        <div id="modal1" class="modal">
-            <div class="modal-content">
-                <div class="row">
-                    <form method="post" action="/secure/setnewpost" name="compose_post">
-                        <input type="hidden" name="username" value="">
-                        <h5 class="center-align">Compose a new Post</h5>
-                        <div class="input-field col s12 mb-10">
-                            <!-- <input type="text" name="post_title" value=""> -->
-                            <textarea id="textarea1" name="post_description" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
-                            <label for="textarea1"></label>
+                            </form>
                         </div>
-                        <div class="fixed-action-btn horizontal click-to-toggle">
-                            <a class="btn-floating btn-large red">
-                                <i class="large mdi-navigation-menu"></i>
-                            </a>
-                            <ul>
-                                <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
-                                <!-- <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li> -->
-                                <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
-                                <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
-                                <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
-                                </button></li>
-                                <!--   <li><a ><i class="material-icons btn-ico">library_add
-                                </i> <input class="btn-floating yellow darken-1"  type="submit" value=''></a>
-                            </li> -->
-                        </ul>
                     </div>
+                    <!-- center div post  -->
                     
-                </form>
+                    <!-- right div suggesion , footer -->
+                </div>
             </div>
-        </div>
-        <!--                                     <div class="modal-footer">
-            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-        </div>
-    -->                                </div>
-    <footer>
-        <% include ../partials/footer %>
-    </footer>
-    
-</body>
+            <!-- Modal Trigger -->
+            <a href="#modal1" class=" modal-trigger btn-floating btn-large waves-effect waves-light red btn-tw-st"><i class="material-icons">add</i></a>
+            <!-- <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a> -->
+            <!-- Modal Structure -->
+            <div id="modal1" class="modal">
+                <div class="modal-content">
+                    <div class="row">
+                        <form method="post" action="/setnewpost" name="compose_post">
+                            <input type="hidden" name="username" value="<%= user.username %>">
+                            <h5 class="center-align">Compose a new Post</h5>
+                            <div class="input-field col s12 mb-10">
+                                <!-- <input type="text" name="post_title" value=""> -->
+                                <textarea id="textarea1" name="post_description" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
+                                <label for="textarea1"></label>
+                            </div>
+                            <div class="fixed-action-btn horizontal click-to-toggle">
+                                <a class="btn-floating btn-large red">
+                                    <i class="large mdi-navigation-menu"></i>
+                                </a>
+                                <ul>
+                                    <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+                                    <!-- <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li> -->
+                                    <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+                                    <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+                                    <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
+                                    </button></li>
+                                    <!--   <li><a ><i class="material-icons btn-ico">library_add
+                                    </i> <input class="btn-floating yellow darken-1"  type="submit" value=''></a>
+                                </li> -->
+                            </ul>
+                        </div>
+                        
+                    </form>
+                </div>
+            </div>
+            <!--                                     <div class="modal-footer">
+                <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+            </div>
+        -->                                </div>
+        <footer>
+            <% include ../partials/footer %>
+        </footer>
+        
+    </body>
 </html>

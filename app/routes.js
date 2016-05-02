@@ -138,11 +138,11 @@ module.exports = function(app, passport) {
     app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
     app.get('/gethomepost/:username', userhome.getuserhomeposts); 			// user home timeline post API
 
-    // app.get('/getpost', post.getpost); 										// Get all post
+    // app.get('/getpost', post.getpost); 									// Get all post
     app.get('/getpost/:user', post.getuserposts); 							// Get post by username
     app.get('/getpost/:user/:post_id', post.getuserpost); 					// Get single post of user
     app.get('/getpost/count/:user', post.getuserpostcount); 				// Get post count by username
-    app.get('/getpost/post/:post_title', post.getsinglepost); 				// Get post by post title
+    // app.get('/getpost/post/:post_title', post.getsinglepost); 				// Get post by post title
     app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
     app.post('/hashtags', hashtag.gethashtag); 								// Get all hashtag keyword
@@ -162,11 +162,7 @@ module.exports = function(app, passport) {
     app.get('/like/reply/:reply_id', like.getLikeByReply); 					// Get like by reply
     app.get('/like/user/:user_id', like.getLikeByUser); 					// Get like by User
     app.get('/getretweet/:post_id', retweet.getretweet); 					// Get Retweet by post
-
-    app.post('/setfollowing', follow.setfollowing); 						// Set follower// dk
-
-    app.get('/:user_name/following',  follow.getfollowing); 					// Set followings
-    
+ 
     // app.get('/following/:user_name', isLoggedIn, follow.getfollowing , function(req, res) {
     //     // res.render('pages/following.ejs', {
     //     //     user: req.user // get the user out of session and pass to template
@@ -174,18 +170,22 @@ module.exports = function(app, passport) {
     // });
     app.get('/Trendsdk', post.Trendsdk);                                // trend keyword
     
-
+    //following    
+    app.post('/setfollowing', follow.setfollowing);                         // Set follower// dk
+    app.get('/:user_name/following',  follow.getfollowing);                     // Set followings
     app.get('/:user_name/followers', isLoggedIn , follow.getfollowers); 					// Set follower
     app.post('/unlink_followings_f', follow.unlink_following); 				// Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower); 			// count follower
     app.get('/following/count/:following_id', follow.getCountFollowing); 	// count follower
 	app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
 	// app.get('/followLatestPost/:user_id', follow.followLatestPost);
-
+    
+    //reply
     app.get('/Trendsdk', post.Trendsdk); 								// trend keyword
     //app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply
     app.post('/setreply', reply.setreply); 									// Set reply
 
+    //block
     app.post('/setblockuser', blockuser.setblockuser); 						// Set block user
     app.get('/getblockuser/:userId', blockuser.getblockuser); 				// get block user
 

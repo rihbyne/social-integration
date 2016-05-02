@@ -162,7 +162,7 @@ var setLike = function(req, res) {
 						res.send(err);
 
 					console.log('Reply Like');       
-					res.send('Reply Unliked Successfully');					
+					res.send('Reply Like Successfully');					
 
 				});
 

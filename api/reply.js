@@ -1,4 +1,5 @@
 var post_model = require('../app/models/postSchema.js');
+var async 	   = require('async');
 
 //update reply to post
 var setreply =  function(req, res){
@@ -51,27 +52,163 @@ var setreply =  function(req, res){
 
 };
 
-var getreply = function(req, res){
+// var getreply = function(req, res){
 
-    var post_id = req.params.post_id;
-    var reply_user_id = req.params.reply_user_id;
+    // var post_id = req.params.post_id;
+    // var reply_user_id = req.params.reply_user_id;
 
-    post_model.reply 
-    .find({post_id : post_id})
-    .populate('user_id post_id')
-    .sort({created_at : -1})
-    .exec(function(err, result){
-        if (err) {
-            res.send(err)
-        };
-        console.info(result);
+    // post_model.reply 
+    // .find({post_id : post_id})
+    // .populate('user_id post_id')
+    // .sort({created_at : -1})
+    // .exec(function(err, result){
+        // if (err) {
+            // res.send(err)
+        // };
+        // console.info(result);
 
-        res.json({
-            reply: result
-        })
+        // res.json({
+            // reply: result
+        // })
 
-    })
+    // })
 
+// }
+
+var getReply = function(req, res){
+
+	var type 	= req.params.type;
+	var id 		= req.params.id;
+	
+	if(type==1 || type=='1')
+	{
+		var post_id = id;
+		
+		post_model.reply
+		.find({post_id:post_id})
+		.populate('post_id')
+		.lean()
+		.exec(function(err, postReplys){
+		
+			if(err)
+			{ res.send(err); return;}
+		
+			if(postReplys=="" || postReplys==null || postReplys==undefined)
+			{
+				res.send('No Reply on this Post');
+				return;
+			}
+			
+			async.each(postReplys, function(singlepostReplys, callback){
+				
+				var reply_id = singlepostReplys._id
+				
+				post_model.reply
+				.count({reply_id:reply_id})
+				.lean()
+				.exec(function(err, result){
+					
+					singlepostReplys.count = result;
+					callback();
+					
+				})
+				
+			}, function(err){
+			
+				res.send(postReplys);
+			
+			})
+			
+		})
+	}
+
+	if(type==2 || type=='2')
+	{
+		var retweet_quote_id = id;
+		
+		console.log(retweet_quote_id);
+		
+		post_model.reply
+		.find({retweet_quote_id:retweet_quote_id})
+		.populate('retweet_quote')
+		.lean()
+		.exec(function(err, retweetReplys){
+
+			console.log(retweetReplys);
+		
+			if(err)
+			{ res.send(err); return;}
+		
+			if(retweetReplys=="" || retweetReplys==null || retweetReplys==undefined)
+			{
+				res.send('No Reply on this Retweet');
+				return;
+			}
+			
+			async.each(retweetReplys, function(singleretweetReplys, callback){
+				
+				var reply_id = singleretweetReplys._id
+				
+				post_model.reply
+				.count({reply_id:reply_id})
+				.lean()
+				.exec(function(err, result){
+					
+					singleretweetReplys.count = result;
+					callback();
+					
+				})
+				
+			}, function(err){
+			
+				res.send(retweetReplys);
+			
+			})
+	
+		})
+	}
+	
+	if(type==3 || type=='3')
+	{
+		var reply_id = id;
+		
+		post_model.reply
+		.find({reply_id:reply_id})
+		.populate('reply')
+		.lean()
+		.exec(function(err, replyReplys){
+
+			if(err)
+			{ res.send(err); return;}
+		
+			if(replyReplys=="" || replyReplys==null || replyReplys==undefined)
+			{
+				res.send('No Reply on this Reply');
+				return;
+			}
+			
+			async.each(replyReplys, function(singlereplyReplys, callback){
+				
+				var reply_id = singlereplyReplys._id
+				
+				post_model.reply
+				.count({reply_id:reply_id})
+				.lean()
+				.exec(function(err, result){
+					
+					singlereplyReplys.count = result;
+					callback();
+					
+				})
+				
+			}, function(err){
+			
+				res.send(replyReplys);
+			
+			})
+			
+		})
+	}
 }
 
 var deletereply = function(req, res){
@@ -110,6 +247,7 @@ var deletereply = function(req, res){
 
 module.exports = ({
     setreply : setreply,
-    getreply : getreply,
-    deletereply : deletereply
+    //getreply : getreply,
+    deletereply : deletereply,
+	getReply : getReply
 });

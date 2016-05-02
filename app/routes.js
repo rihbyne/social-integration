@@ -183,7 +183,7 @@ module.exports = function(app, passport) {
 	// app.get('/followLatestPost/:user_id', follow.followLatestPost);
 
     app.get('/Trendsdk', post.Trendsdk); 								// trend keyword
-    app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply
+    //app.get('/getreply/:post_id/:reply_user_id', reply.getreply); 			// Get reply
     app.post('/setreply', reply.setreply); 									// Set reply
 
     app.post('/setblockuser', blockuser.setblockuser); 						// Set block user
@@ -201,6 +201,7 @@ module.exports = function(app, passport) {
     app.post('/deletereply', reply.deletereply); 							// delete Reply
     app.post('/deleteRetweet', retweet.deleteRetweet); 						                                                                                                                                                                                                                                // delete Retweet
 	
+	app.get('/getReply/:type/:id',reply.getReply);
     // app.get('/getRetweetByUserId/:userid', userhome.getRetweetByUserId); // delete post
 	
 	

@@ -66,7 +66,8 @@ process.on('SIGTERM', function () {
   })
 })
 
-require('./user')
+require('./userSchema')
 require('./flagging')
 require('./direct_msg')
 
+mongoose.set('debug', true);

@@ -117,7 +117,7 @@
                     <div class="row">
                         
                         <!-- <a href="/logout" class="btn btn-default btn-sm">Logout</a> -->
-                        <form class="col s12">
+                        <div class="col s12">
                             <div class="row">
                                 <% include ../partials/tweet_type_tab.ejs %>
                                 <div id="test1" class="col s12">
@@ -148,12 +148,21 @@
                                                     </div>
                                                     
                                                     <div class="card-action">
-                                                        <% if (Following_result.data001[i].follow_status == true) { %>
-                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
-                                                        </button>
+                                                        <% if (Following_result.data001[i].follow_back == true) { %>
+                                                       
+                                                          <form name="unlinkform" method="post" action="/unlink_following">
+                                                                <input type="hidden" name="unlink_followings"  value="<%= Following_result.data001[i].following_id._id %>">
+                                                                <input type="hidden" name="user_id"  value="<%= user._id %>">
+                                                                <button class="btn waves-effect waves-light blue light-blue lighten-1 btn-following" type="submit" name="action">following
+                                                                </button>
+                                                            </form>
                                                         <% } else { %>
-                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
-                                                        </button>
+                                                        <form name="setfollowings" method="post" action="/setfollowing">
+                                                                <input type="hidden" name="following_id" value="<%= Following_result.data001[i].user_id._id %>">
+                                                                <input type="hidden" name="user_id"  value="<%= user._id %>">
+                                                                <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
+                                                                </button>
+                                                            </form>
                                                         
                                                         <% } %>
                                                     </div>
@@ -165,7 +174,7 @@
                                         <!-- end following tab -->
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                     <!-- center div post  -->

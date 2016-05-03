@@ -150,14 +150,14 @@
                                                     
                                                     <div class="card-action">
                                                          <% if (Following_result.data001[i].follow_back == true) { %>
-                                                        <div>
-                                                            <form name="unlinkform" method="post" action="/unlink_followings_f">
+                                                      
+                                                            <form name="unlinkform" method="post" action="/unlink_following">
                                                                 <input type="hidden" name="unlink_followings"  value="<%= Following_result.data001[i].user_id._id %>">
                                                                 <input type="hidden" name="user_id"  value="<%= user._id %>">
                                                                 <button class="btn waves-effect waves-light blue light-blue lighten-1 btn-following" type="submit" name="action">following
                                                                 </button>
                                                             </form>
-                                                        </div>
+                                                      
                                                         <% } else { %>
                                                         <div>
                                                             <form name="setfollowings" method="post" action="/setfollowing">

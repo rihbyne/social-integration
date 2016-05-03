@@ -7,36 +7,19 @@ module.exports.getmentionuser = function(req, res) { // get a post
     var post_mention = req.params.mention_user;
     console.log(post_mention);
     // find by mention collection using populate and check for errors
-    // post_model.post_mention
-    // .find({
-    //     mention_users: post_mention
-    // })
-    // .populate('post_id')
-    // .exec(function(err, mentionspost) {
-    //     if (err)
-    //         res.send(err);
-    //     if (mentionspost) {
-    //         console.log(mentionspost);
-    //         res.json({
-    //             posts: mentionspost
-    //         });
-    //     } else {
-    //         res.json('No Post Found')
-    //     }
-    // });
-
-    //find by description from post collection
-    post_model.post
-    .find({
-        post_description : new RegExp(post_mention, 'i')
-    })
+    post_model.post_mention
+    .find({mention_users: post_mention})
+    .select('post_id')
+    .populate('post_id')
     .exec(function(err, mentionspost) {
+
         if (err)
             res.send(err);
-        
-        if (mentionspost.length !== 0) {
+
+        if (mentionspost.length !== '') {
+
             console.log(mentionspost);
-            
+
             res.json({
                 posts: mentionspost
             });
@@ -46,5 +29,27 @@ module.exports.getmentionuser = function(req, res) { // get a post
         }
 
     });
+
+    //find by description from post collection
+    // post_model.post
+    // .find({
+    //     post_description : new RegExp(post_mention, 'i')
+    // })
+    // .exec(function(err, mentionspost) {
+    //     if (err)
+    //         res.send(err);
+        
+    //     if (mentionspost.length !== 0) {
+    //         console.log(mentionspost);
+            
+    //         res.json({
+    //             posts: mentionspost
+    //         });
+
+    //     } else {
+    //         res.json('No Post Found')
+    //     }
+
+    // });
 
 };

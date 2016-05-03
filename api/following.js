@@ -120,15 +120,15 @@ var setfollowing = function(req, res) {
                         });
 
                     });
-                // var u_name = req.user.username
-                // res.redirect('/' + u_name + '/following');
+              
 
                 res.json({
 
                     message: 'following/followers set'
 
                 })
-
+                // var u_name = req.user.username
+                // res.redirect('/' + u_name + '/following');
                 // console.log('following/ followers set')
 
                 // var url = req.url;

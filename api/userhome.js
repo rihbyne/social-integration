@@ -1,6 +1,7 @@
 var user = require('../app/models/userSchema.js');
 var post_model = require('../app/models/postSchema.js');
 var user_followers = require('../app/models/followersSchema.js');
+var master = require('./master.js');
 var async = require('async');
 
 //Get all post and retweet of user
@@ -15,8 +16,19 @@ var getuserhomeposts = function(req, res) { // get a post
     var result1, result2;
 
     //Get My Post
-    getUserId(username, function(userid){
+    master.getUserId(username, function(err, userid){
 
+        if (err) {
+            
+            console.info(userid);
+
+            res.json({
+                Result: userid
+                // PostRTReply : result
+            });
+
+            return;
+        };
         console.info(userid);
 
         //using async series function get all post 
@@ -90,8 +102,19 @@ var getpostsrtreply = function(req, res) { // get a post
     var result1, result2;
 
     //Get My Post
-    getUserId(username, function(userid){
+    master.getUserId(username, function(err, userid){
 
+        if (err) {
+            
+            console.info(userid);
+
+            res.json({
+                Result: userid
+                // PostRTReply : result
+            });
+
+            return;
+        };
         console.info(userid);
 
         //using async series function get all post 
@@ -149,6 +172,7 @@ var getpostsrtreply = function(req, res) { // get a post
 
 }
 
+//find post from userid
 function getPostByUserId(callback){
 
     //use userid to find all post of users
@@ -181,6 +205,7 @@ function getPostByUserId(callback){
 
 }
 
+//find retweet from userid
 function getRetweetByUserId(callback){//simple retweet
 
     post_model.retweet
@@ -204,7 +229,7 @@ function getRetweetByUserId(callback){//simple retweet
 
                 function(singleretweet, callback){
 
-                    if (singleretweet.post_id !== 'undefined') {
+                    if (singleretweet.post_id !== undefined) {
 
                         var options = {
                             path: 'post_id',
@@ -212,7 +237,7 @@ function getRetweetByUserId(callback){//simple retweet
                         };
 
                     }
-                    else if (singleretweet.retweet_quote_id !== 'undefined') {
+                    else if (singleretweet.retweet_quote_id !== undefined) {
 
                         var options = {
                             path: 'retweet_quote_id',
@@ -220,7 +245,7 @@ function getRetweetByUserId(callback){//simple retweet
                         };
                         
                     }
-                    else if (singleretweet.reply_id !== 'undefined') {
+                    else if (singleretweet.reply_id !== undefined) {
 
                         var options = {
                             path: 'reply_id',
@@ -239,7 +264,7 @@ function getRetweetByUserId(callback){//simple retweet
 
                 }, function(err){
                 
-                console.info(retweets);
+                // console.info(retweets);
 
                 return callback(null, retweets);
 
@@ -250,6 +275,7 @@ function getRetweetByUserId(callback){//simple retweet
     });
 }
 
+//find reply from userid
 function getReplyByUserId(callback){
 
     post_model.reply 
@@ -261,29 +287,28 @@ function getReplyByUserId(callback){
         if (err) {
             res.send(err)
         };
-        console.info('Reply By user: \n',postReplyResult);
+        // console.info('Reply By user: \n',postReplyResult);
 
         async.each(postReplyResult, 
 
             function(singleReplyResult, callback){
 
-                if (singleReplyResult.post_id !== 'undefined') {
-
+                if (singleReplyResult.post_id !== undefined) {
+                    
                     var options = {
                         path: 'post_id',
                         model: 'post'
                     };
 
                 }
-                else if (singleReplyResult.retweet_quote_id !== 'undefined') {
+                else if (singleReplyResult.retweet_quote_id !== undefined) {
 
                     var options = {
                         path: 'retweet_quote_id',
                         model: 'retweet_quote'
                     };
-                    
                 }
-                else if (singleReplyResult.reply_id !== 'undefined') {
+                else if (singleReplyResult.reply_id !== undefined) {
 
                     var options = {
                         path: 'reply_id',
@@ -291,9 +316,9 @@ function getReplyByUserId(callback){
                     };
                     
                 };
-
+                console.info(singleReplyResult);
                 post_model.reply
-                .populate(singleReplyResult, options, function (err, retweet) {
+                .populate(singleReplyResult, options, function (err, reply) {
 
                     callback();
 
@@ -315,30 +340,7 @@ function getReplyByUserId(callback){
 
 };
 
-//find id of user from user collection
-var getUserId = function(username, res){
-
-    user
-    .find({
-        username: username
-    }).
-    select('_id')
-    .exec(function(err, userdata) {
-
-        if (err)
-            res.send(err);
-
-        else if (userdata.length !== 0) {
-
-            userid = userdata[0]._id;
-
-            return res(userid);
-        }
-
-    });
-
-}
-
+//find quote retweet from userid
 function getQuoteRetweetByUserId(callback){//simple retweet
 
     post_model.retweet_quote
@@ -361,8 +363,8 @@ function getQuoteRetweetByUserId(callback){//simple retweet
             async.each(retweets, 
 
                 function(singleretweet, callback){
-                    console.info(singleretweet);
-                    if (singleretweet.post_id !== 'undefined') {
+
+                    if (singleretweet.post_id !== undefined) {
 
                         var options = {
                             path: 'post_id',
@@ -370,7 +372,7 @@ function getQuoteRetweetByUserId(callback){//simple retweet
                         };
 
                     }
-                    else if (singleretweet.retweet_quote_id !== 'undefined') {
+                    else if (singleretweet.retweet_quote_id !== undefined) {
 
                         var options = {
                             path: 'retweet_quote_id',
@@ -378,7 +380,7 @@ function getQuoteRetweetByUserId(callback){//simple retweet
                         };
                         
                     }
-                    else if (singleretweet.post_id !== 'undefined') {
+                    else if (singleretweet.post_id !== undefined) {
 
                         var options = {
                             path: 'reply_id',
@@ -397,7 +399,7 @@ function getQuoteRetweetByUserId(callback){//simple retweet
 
                 }, function(err){
                 
-                console.info(retweets);
+                // console.info(retweets);
 
                 return callback(null, retweets);
 
@@ -407,71 +409,6 @@ function getQuoteRetweetByUserId(callback){//simple retweet
 
     });
 }
-// var getRetweetByUserId = function(req, res){
-// var userid = req.params.userid;
-
-//     post_model.post_retweet
-//     .find({ret_user_id: userid})
-//     .sort({retweet_at: -1})
-//     .limit(10)
-//     .lean()
-//     .exec(function(err, retweets){
-
-//         if (err)
-//             res.send(err);
-
-//         else if (retweets.length == 0) {
-
-//              callback(null, []);//No post found
-
-//         } 
-//         else{
-
-//             async.each(retweets, 
-
-//                 function(singleretweet, callback){
-
-//                     if (singleretweet.retweet_type == '1') {
-
-//                         var options = {
-//                             path: 'post_id',
-//                             model: 'post'
-//                         };
-
-//                     }
-//                     else if(singleretweet.retweet_type == '2'){
-
-//                         var options = {
-//                             path: 'post_id',
-//                             model: 'post_retweet'
-//                         };
-
-//                     }
-
-//                     singleretweet['created_at'] = singleretweet.retweet_at;
-
-//                     post_model.post_retweet
-//                     .populate(singleretweet, options, function (err, retweet) {
-
-//                         // finalObj.push(singleretweet)
-//                         callback();
-
-//                     });
-                        
-
-//                 }, function(err){
-                
-//                 console.info(retweets);
-//                 // callback(null, retweets);
-//                 return callback(retweets);
-
-//             });
-
-//         }
-
-//     });
-
-// }
 
 module.exports = ({
     getuserhomeposts : getuserhomeposts,

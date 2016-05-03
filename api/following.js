@@ -285,14 +285,14 @@ var getfollowers = function(req, res) {
                                 trend: JSON.parse(body.body),
                                 following_list: { data:  result}
                             }
-                            res.render('pages/follower', {
-                                Following_result: { data001: result , data002: JSON.parse(body.body) } ,
-                                user: req.user
-                            });
-                            // res.json({
-                            //     Following_result: { data001: result , data002: JSON.parse(body.body) } 
-                            //     // Following_result: [dk_f_list]
-                            // })
+                            // res.render('pages/follower', {
+                            //     Following_result: { data001: result , data002: JSON.parse(body.body) } ,
+                            //     user: req.user
+                            // });
+                            res.json({
+                                Following_result: { data001: result , data002: JSON.parse(body.body) } 
+                                // Following_result: [dk_f_list]
+                            })
                         })
 
                 })
@@ -308,11 +308,11 @@ var unlink_following = function(req, res) {
 
     console.info('unlink_followings api called');
     var user_id = req.body.user_id;
-    var unlink_followings = req.body.unlink_followings;
+    var unlink_following = req.body.unlink_following;
 
     //validation for blank variables
     req.checkBody('user_id', 'User id is mandatory').notEmpty();
-    req.checkBody('unlink_followings', 'unlink_followings is mandatory').notEmpty();
+    req.checkBody('unlink_following', 'unlink_following is mandatory').notEmpty();
 
     var errors = req.validationErrors();
 
@@ -327,7 +327,7 @@ var unlink_following = function(req, res) {
             $and: [{
                 user_id: user_id
             }, {
-                following_id: unlink_followings
+                following_id: unlink_following
             }]
         }, {
             follow_status: false

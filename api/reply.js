@@ -1,6 +1,6 @@
 var post_model = require('../app/models/postSchema.js');
 var async 	   = require('async');
-var master = require('./master.js');
+var master     = require('./master.js');
 
 
 //update reply to post
@@ -17,7 +17,10 @@ var setreply =  function(req, res){
     var regexat = /@([^\s]+)/g;
     var regexhash = /#([^\s]+)/g;
 
-    req.checkBody('reply_msg', 'Can not post empty tweet').notEmpty();
+    req.checkBody('post_type', 'post type').notEmpty();
+    req.checkBody('reply_user_id', 'reply user id').notEmpty();
+    req.checkBody('reply_msg', 'reply msg').notEmpty();
+    req.checkBody('post_id', 'post id').notEmpty();
 
     var errors = req.validationErrors();
 
@@ -61,7 +64,7 @@ var setreply =  function(req, res){
         });
 
     }
-    else{//reply
+    else if(post_type == 3){//reply
 
         var post_reply = new post_model.reply({
             reply_id : post_id,

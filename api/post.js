@@ -6,8 +6,9 @@ var router = express.Router(); // get an instance of the express Router
 
 // Pages
 var master = require('./master.js');
+var user_model = require('../app/models/userSchema.js');
 var post_model = require('../app/models/postSchema.js');
-user_followers = require('../app/models/followersSchema.js');
+var user_followers = require('../app/models/followersSchema.js');
 
 
 // //Get all post and other details
@@ -264,8 +265,8 @@ var Trendsdk = function(req, res) {
 // var getpost = function(req, res) {
 
 //     post_model.post
-// 	.find()
-// 	.exec(function(err, allpost) {
+//  .find()
+//  .exec(function(err, allpost) {
 //         if (err)
 //             res.send(err);
 
@@ -502,15 +503,15 @@ var setpost = function(req, res) { // create a post
             if (err)
                 res.send(err);
 
-			// user_followers
-			// .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
-			// .lean()
-			// .exec(function(err, resValue){
-			
-				// if (err)
-					// res.send(err);
-					
-			// })
+            // user_followers
+            // .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
+            // .lean()
+            // .exec(function(err, resValue){
+            
+                // if (err)
+                    // res.send(err);
+                    
+            // })
             master.hashtagMention(1, post, mentionusers, hashtags, function(err, result){
 
                 if (err) {
@@ -524,7 +525,7 @@ var setpost = function(req, res) { // create a post
                 console.log('post created.');
 
             });
-			
+            
         });        
 
     });
@@ -551,7 +552,7 @@ var setuser = function(req, res) { //Create new user
         return;
     }
 
-    var setuser = new User({
+    var setuser = new user_model({
         first_name: first_name,
         last_name: last_name,
         email: email,

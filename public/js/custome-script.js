@@ -23,6 +23,23 @@
        // show count is RT more then 0
        $( ".btn-retweet span:contains(0)" ).css( "display", "none" );
        $( ".btn-like span:contains(0)" ).css( "display", "none" );
+
+
+       // following hover 
+       $( ".btn-following" ).hover(
+        function() {
+          $( this ).addClass( "red" );
+          $( this ).removeClass( "blue light-blue" );
+          $(this).text("unfollow");
+
+        }, function() {
+          $( this ).removeClass( "red" );
+          $( this ).addClass( "blue light-blue" );
+          $(this).text("following");
+        }
+      );
+       // $( "btn-following").off( "mouseenter mouseleave" );
+
        
 //        // $( ".btn-like span:contains(0)" ).css( "display", "none" ).removeClass("btn-like-active");
 // // $( "div:contains('John')" ).css( "text-decoration", "underline" );

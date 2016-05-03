@@ -131,13 +131,17 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
-	app.use('/about', isLoggedIn, post.getuserdetails); 					// about page
+	app.get('/about', isLoggedIn, post.getuserdetails); 					// about page
+
+   // user home tile line bind to profile EJS , changed in route/path  also
+    app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
+
 
 /*===========================================================================================================================*/
 
 
     // UserHome
-    app.get('/gethomepost/:username', userhome.getuserhomeposts);    // user home timeline post API
+    // app.get('/gethomepost/:username', userhome.getuserhomeposts);    // user home timeline post API
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);   // tweet,retweet & reply post
  
     // Mention

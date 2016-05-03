@@ -10,7 +10,6 @@ var user_model = require('../app/models/userSchema.js');
 var post_model = require('../app/models/postSchema.js');
 var user_followers = require('../app/models/followersSchema.js');
 
-
 // //Get all post and other details
 // var home_userdetails = function(req, res) {
 //         request.get({
@@ -109,13 +108,13 @@ var getuserdetails = function(req, res) {
                 }
 
             );
-            
                         
         }); 
 
     }
 
     function tweetcount(callback) {
+
 
         async.parallel([    
         
@@ -124,7 +123,6 @@ var getuserdetails = function(req, res) {
                 post_model.post
                 .count({posted_by: userid})
                 .exec(function(err, postcount) {
-
 
                     if (err)
                         res.send(err);

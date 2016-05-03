@@ -1,5 +1,7 @@
 var post_model = require('../app/models/postSchema.js');
 var async 	   = require('async');
+var master = require('./master.js');
+
 
 //update reply to post
 var setreply =  function(req, res){
@@ -9,6 +11,37 @@ var setreply =  function(req, res){
     var reply_msg = req.body.reply_msg; 
     var post_id = req.body.post_id;
 
+    var mentionusers = new Array();
+    var hashtags = new Array();
+
+    var regexat = /@([^\s]+)/g;
+    var regexhash = /#([^\s]+)/g;
+
+    req.checkBody('reply_msg', 'Can not post empty tweet').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+
+    while (match_at = regexat.exec(reply_msg)) {
+        mentionusers.push(match_at[1]);
+    }
+
+    while (match_hash = regexhash.exec(reply_msg)) {
+        hashtags.push(match_hash[1]);
+    }
+
+    // while (match_url = regexat.exec(post_description)) {
+    //     urls.push(match_url[1]);
+    // }
+
+    console.log('Mention Users : ', mentionusers);
+    console.log('Hash Tags : ', hashtags);
+    
     //blank validation
     if (post_type == 1) {//post
 
@@ -43,9 +76,23 @@ var setreply =  function(req, res){
         if (err)
             res.send(err);
 
-        res.json({
-            message: 'Reply Inserted'
+        master.hashtagMention(3, post_reply, mentionusers, hashtags, function(err, result){
+
+            if (err) {
+                res.send(err)
+            };
+
+            res.json({
+                message: result
+            });
+
+            console.log('post created.');
+
         });
+
+        // res.json({
+        //     message: 'Reply Inserted'
+        // });
 
     });
 

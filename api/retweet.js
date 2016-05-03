@@ -1,4 +1,5 @@
 var post_model = require('../app/models/postSchema.js');
+var master = require('./master.js');
 
 //Set retweet
 var setretweet = function(req, res){
@@ -165,18 +166,60 @@ var setretweet = function(req, res){
                 }
                 else if(retweet_type == 2){//quote retweet
 
-                    retweet.save(function(err) {
+                    var mentionusers = new Array();
+                    var hashtags = new Array();
 
-                        if (err)
-                            res.send(err);
-                        
-                            console.info(message);
+                    var regexat = /@([^\s]+)/g;
+                    var regexhash = /#([^\s]+)/g;
+
+                    req.checkBody('retweet_quote', 'Can not post empty tweet').notEmpty();
+
+                    var errors = req.validationErrors();
+
+                    if (errors) {
+                        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+                        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+                        return;
+                    }
+
+                    while (match_at = regexat.exec(retweet_quote)) {
+                        mentionusers.push(match_at[1]);
+                    }
+
+                    while (match_hash = regexhash.exec(retweet_quote)) {
+                        hashtags.push(match_hash[1]);
+                    }
+
+                    // while (match_url = regexat.exec(post_description)) {
+                    //     urls.push(match_url[1]);
+                    // }
+
+                    console.log('Mention Users : ', mentionusers);
+                    console.log('Hash Tags : ', hashtags);
+
+                        retweet.save(function(err) {
+
+                            if (err)
+                                res.send(err);
                             
-                            res.json({
-                                message: message
-                            });
-                        
-                    });
+                                console.info(message);
+                                
+                                master.hashtagMention(2, retweet, mentionusers, hashtags, function(err, result){
+
+                                    if (err) {
+                                        res.send(err)
+                                    };
+
+                                    res.json({
+                                        message: message
+                                    });
+
+                                    console.log('post created.');
+
+                                });                           
+                                
+                            
+                        });
 
                 }                
 

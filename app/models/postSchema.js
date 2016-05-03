@@ -21,23 +21,6 @@ var post_url = mongoose.Schema({
     
 }, { versionKey: false });
 
-// Post Mention Schema
-var post_mention = mongoose.Schema({
-    
-    post_id:                         {type: String, ref:"post"},        			// Post Id
-    posted_by:                       {type: String},        						// Posted By (User Id From user Colloction) 
-    mention_users:					 {type: Array}        							// Mention Users
-
-}, { versionKey: false });
-
-// Post HashTag Schema
-var post_hashtag = mongoose.Schema({
-
-    post_id:                         {type: String, ref:'post'},					// Post Id
-    hashtag:                         {type: Array}									// HashTags
-
-}, { versionKey: false });
-
 // Retweet Schema (Simple)
 var retweet_schema = mongoose.Schema({
     
@@ -115,8 +98,6 @@ var reply_schema = mongoose.Schema({
 // Models
 module.exports.post 				= mongoose.model('post', post);
 module.exports.post_url 			= mongoose.model('post_url', post_url);
-module.exports.post_mention 		= mongoose.model('post_mention', post_mention);
-module.exports.post_hashtag 		= mongoose.model('post_hashtag', post_hashtag);
 module.exports.post_like 			= mongoose.model('post_like', post_like_schema);
 module.exports.retweet_like 		= mongoose.model('retweet_like', retweet_like_schema);
 module.exports.reply_like 			= mongoose.model('reply_like', reply_like_schema);

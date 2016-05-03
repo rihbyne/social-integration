@@ -65,6 +65,42 @@ var startDM = function(req, res) {
   }
 }
 
+var removeSessionById = function(req, res) {
+  dmCommon.removeSessionById(req.params.user_id, req.params.id, function(err, result) {
+    if (err) {
+      var status = err.status? err.status: 500
+      helpers.sendJsonResponse(res, status, err)
+      return
+    } else {
+      log.info(util.inspect(result))
+      helpers.sendJsonResponse(res, result.status, result.content)
+      return
+    }
+  })
+}
+
+var flagSessionById = function(req, res) {
+  var flagContainer = [1,2]
+  if (req.params.user_id && req.params.id && req.body.flag_id
+   && (flagContainer.indexOf(parseInt(req.body.flag_id)) >= 0)) {
+     dmCommon.flagSessionById(req.params.user_id, req.params.id, req.body.flag_id, function(err, result) {
+       if (err) {
+         var status = err.status? err.status: 500
+         helpers.sendJsonResponse(res, status, err)
+         return
+       } else {
+         log.info(util.inspect(result))
+         helpers.sendJsonResponse(res, result.status, result.content)
+         return
+       }
+     })
+  } else {
+    var content = {"failed": "required fields not found"}
+    log.warn(util.inspect(content))
+    helpers.sendJsonResponse(res, 400, content)
+  }
+}
+
 var resumeDMById = function(req, res) {
   //update session object with last msg id and save new msgText object
   if (req.params.user_id && req.params.id && req.body.ip && req.body.msgText) {
@@ -151,6 +187,8 @@ module.exports = {
   getDMs: getDMs,
   getDMById: getDMById,
   startDM: startDM,
+  removeSessionById: removeSessionById,
+  flagSessionById: flagSessionById,
   resumeDMById: resumeDMById,
   removeDMByMsgId: removeDMByMsgId,
   getFlagOptions: getFlagOptions,

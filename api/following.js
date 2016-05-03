@@ -96,28 +96,53 @@ var setfollowing = function(req, res) {
                                 })
 
                             follow_back = 'true';
-                        } else {
+                        
+                        } 
+                        else {
 
                             follow_back = 'false';
 
                         };
 
-                        var followingModel = new follower({
+                        isFollowing(user_id, following_id, function(result){
+                            console.info(result);
+                            if(result){
+                             
+                                var followingModel = new follower({
 
-                            user_id: user_id,
-                            following_id: following_id,
-                            follow_back: follow_back
+                                    user_id: user_id,
+                                    following_id: following_id,
+                                    follow_back: follow_back
 
-                        });
+                                });
 
-                        followingModel.save(function(err) {
+                                followingModel.save(function(err) {
 
-                            if (err)
-                                res.send(err);
+                                    if (err)
+                                        res.send(err);
 
-                            console.info('following/followers set saved');
+                                    console.info('following/followers set saved');
 
-                        });
+                                });
+
+                            }
+                            else{
+
+                                follower
+                                .update({user_id: user_id, following_id: following_id, follow_status: false},{follow_status:true})
+                                .exec(function(err, result){
+                                    if (err)
+                                        res.send(err);
+
+                                    console.info('following/followers update');
+
+                                });
+
+                                console.info('update following');
+
+                            }                            
+
+                        });                        
 
                     });
               
@@ -137,6 +162,29 @@ var setfollowing = function(req, res) {
             }
 
         })
+
+}
+
+var isFollowing = function(user_id, following_id, callback){
+
+    follower
+    .find({user_id: user_id, following_id: following_id, follow_status: 'false'})
+    .lean()
+    .exec(function(err, result){
+
+        console.info(result);
+        if (result.length == 0) {
+
+            return callback(true);
+
+        }
+        else{
+
+            return callback(false);
+
+        }
+
+    })
 
 }
 
@@ -221,7 +269,6 @@ var getfollowing = function(req, res) {
 
                         var dk_f_list = {
                             trend: body,
-                            // trend: JSON.parse(body.body),
                             following_list: {
                                 data: result
                             }
@@ -234,8 +281,7 @@ var getfollowing = function(req, res) {
                             user: req.user
                         });
                         // res.json({
-                        //     Following_result: { data001: result , data002: JSON.parse(body.body) } 
-                        //     // Following_result: [dk_f_list]
+                        //     Following_result: { data001: result , data002:body } 
                         // })
                     })
                 })
@@ -372,7 +418,7 @@ var unlink_following = function(req, res) {
                         $and: [{
                             following_id: user_id
                         }, {
-                            user_id: unlink_followings
+                            user_id: unlink_following
                         }]
                     }, {
                         follow_back: false

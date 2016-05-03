@@ -6,6 +6,7 @@ var bunyan = require('bunyan'),
 
 var bunyanOpts = {
   name: 'st-social-network',
+  src: true,
   streams: [
     {
       level: 'debug',

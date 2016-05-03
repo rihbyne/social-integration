@@ -1,6 +1,7 @@
 var user = require('../app/models/userSchema.js');
 var post_model = require('../app/models/postSchema.js');
 var user_followers = require('../app/models/followersSchema.js');
+var master = require('./master.js');
 var async = require('async');
 
 //Get all post and retweet of user
@@ -15,8 +16,19 @@ var getuserhomeposts = function(req, res) { // get a post
     var result1, result2;
 
     //Get My Post
-    getUserId(username, function(userid){
+    master.getUserId(username, function(err, userid){
 
+        if (err) {
+            
+            console.info(userid);
+
+            res.json({
+                Result: userid
+                // PostRTReply : result
+            });
+
+            return;
+        };
         console.info(userid);
 
         //using async series function get all post 
@@ -83,7 +95,20 @@ var getpostsrtreply = function(req, res) { // get a post
     var result1, result2;
 
     //Get My Post
-    getUserId(username, function(userid){
+    master.getUserId(username, function(err, userid){
+
+        if (err) {
+            
+            console.info(userid);
+
+            res.json({
+                Result: userid
+                // PostRTReply : result
+            });
+
+            return;
+        };
+        console.info(userid);
 
         //using async series function get all post 
         async.parallel([
@@ -376,30 +401,6 @@ function getQuoteRetweetByUserId(callback){//simple retweet
         }
 
     });
-}
-
-//find id of user from user collection
-var getUserId = function(username, res){
-
-    user
-    .find({
-        username: username
-    }).
-    select('_id')
-    .exec(function(err, userdata) {
-
-        if (err)
-            res.send(err);
-
-        else if (userdata.length !== 0) {
-
-            userid = userdata[0]._id;
-
-            return res(userid);
-        }
-
-    });
-
 }
 
 module.exports = ({

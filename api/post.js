@@ -7,8 +7,8 @@ var router = express.Router(); // get an instance of the express Router
 // Pages
 var master = require('./master.js');
 var post_model = require('../app/models/postSchema.js');
-User = require('../app/models/userSchema.js'),
-user_final_followers_schema = require('../app/models/followersSchema.js');
+// User = require('../app/models/userSchema.js'),
+// user_final_followers_schema = require('../app/models/followersSchema.js');
 
 
 // //Get all post and other details

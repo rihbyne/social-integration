@@ -11,3 +11,6 @@ var notification = mongoose.Schema({
     created_at :                      	{type: Date, default: Date.now},          	// Created date
     
 }, { versionKey: false });
+
+// Models
+module.exports.notification 	= mongoose.model('notification', notification);

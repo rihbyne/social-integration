@@ -137,7 +137,7 @@ module.exports = function(app, passport) {
 
 /*===========================================================================================================================*/
 
-    app.use('/about', isLoggedIn, post.getuserdetails); 					// about page
+    app.get('/about', isLoggedIn, post.getuserdetails); 					// about page
     app.get('/mention/:mention_user', mention.getmentionuser); 				// Get Mention User Details
 
     // app.get('/getpost', post.getpost); 									// Get all post

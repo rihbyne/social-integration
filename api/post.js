@@ -8,7 +8,14 @@ var router = express.Router(); // get an instance of the express Router
 var master = require('./master.js');
 var user_model = require('../app/models/userSchema.js');
 var post_model = require('../app/models/postSchema.js');
+<<<<<<< HEAD
+var User = require('../app/models/userSchema.js');
+var notificationModel = require('../app/models/notificationSchema.js');
+// user_final_followers_schema = require('../app/models/followersSchema.js');
+
+=======
 var user_followers = require('../app/models/followersSchema.js');
+>>>>>>> 708506382e3d26a3440077cafa2716fefe48057a
 
 // //Get all post and other details
 // var home_userdetails = function(req, res) {
@@ -115,6 +122,76 @@ var getuserdetails = function(req, res) {
 
     function tweetcount(callback) {
 
+<<<<<<< HEAD
+        async.parallel([
+
+			function(callback){
+				// show count of post and check for errors
+				post_model.post
+				.count({posted_by: userid})
+				.exec(function(err, postcount) {
+
+
+					if (err)
+						res.send(err);
+
+					callback(null, postcount);
+
+				});                
+
+			},
+			function(callback){
+
+				// show count of post and check for errors
+				post_model.retweet_quote
+				.count({ret_user_id: userid})
+				.exec(function(err, retweetcount) {
+
+					if (err)
+						res.send(err);
+
+						callback(null, retweetcount);
+
+				});
+
+			},
+			function(callback){
+
+				// show count of post and check for errors
+				post_model.reply
+				.count({reply_user_id: userid})
+				.exec(function(err, replycount) {
+
+					if (err)
+						res.send(err);
+
+						callback(null, replycount);
+
+				});
+
+			}],
+			function(err, result){
+
+				var sumArray = function() {
+					// Use one adding function rather than create a new one each
+					// time sumArray is called
+					function add(a, b) {
+						return a + b;
+					}
+
+					return function(arr) {
+						return arr.reduce(add);
+					};
+				}();
+
+				var allCount = sumArray(result);
+
+				userdetails.tweetcount = allCount   
+				callback(null, userdetails);
+				// res.json({count : allCount});
+
+			}
+=======
 
         async.parallel([    
         
@@ -183,6 +260,7 @@ var getuserdetails = function(req, res) {
                 // res.json({count : allCount});
 
             }
+>>>>>>> 708506382e3d26a3440077cafa2716fefe48057a
 
         ) 
         
@@ -484,7 +562,9 @@ var setpost = function(req, res) { // create a post
 
     //call to getuserid function to get _id of user collection
     master.getUserId(username, function(err, data) {
-
+		
+		console.log('Data : '+data);
+		
         if (data == '') {
 
             res.json({
@@ -501,15 +581,62 @@ var setpost = function(req, res) { // create a post
             if (err)
                 res.send(err);
 
-            // user_followers
-            // .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
-            // .lean()
-            // .exec(function(err, resValue){
-            
-                // if (err)
-                    // res.send(err);
-                    
-            // })
+			// user_final_followers_schema
+			// .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
+			// .lean()
+			// .exec(function(err, resValue){
+			
+				// if (err)
+					// res.send(err);
+					
+			// })
+			
+			var notification_user = [];
+			var i = -1;
+			
+			var notification_message = username+' Has Mentioned you in post';
+			
+			async.each(mentionusers, function(mentionuser, callback){
+				
+				master.getUserId(mentionuser, function(err, getId) {
+				
+					if (err)
+						res.send(err);
+					
+					if(getId != 'No user found')
+					{
+						i++;
+						var result = {username:mentionuser, userId:getId};
+						notification_user[i] = result
+					}
+					
+					callback();
+					
+				})
+				
+			}, function(err){
+			
+				var notification = new notificationModel.notification({
+
+					notification_message: notification_message,
+					notification_user: notification_user,
+					post_id:post._id,
+					usrname: username
+					
+				});
+			
+				// console.log(notification_user);
+				notification.save(function(err) {
+				
+					if (err)
+						res.send(err);
+						
+					console.log('Notification Saved');
+				
+				})
+			
+			})
+			
             master.hashtagMention(1, post, mentionusers, hashtags, function(err, result){
 
                 if (err) {

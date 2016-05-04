@@ -1,18 +1,15 @@
-// user.js
-// load the things we need
-var mongoose        = require('mongoose'),
-Schema = mongoose.Schema 
-var bcrypt   = require('bcrypt-nodejs');
+var mongoose        = require('mongoose'); 
+var bcrypt   		= require('bcrypt-nodejs');
 
-// define the schema for our user model
+// User Schema
 var userSchema = mongoose.Schema({
 
-    first_name  :   {type: String},          // First Name of User
-    last_name   :   {type: String},          // Last Name of Use
-    email       :   {type: String},
-    password     :  {type:  String},
-    username    :   {type: String},
-    posts 		: [{ type: Schema.ObjectId, ref: 'post' }]
+    first_name  :   {type: String},          							// First Name of User
+    last_name   :   {type: String},          							// Last Name of User
+    email       :   {type: String},										// Email of User
+    password     :  {type: String},										// Password of User		
+    username    :   {type: String}										// Username of User
+	
 }, { versionKey: false });
 
 // methods ======================

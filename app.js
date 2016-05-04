@@ -8,11 +8,11 @@ var passport 			= require('passport');							// Used For Authentication
 var flash    			= require('connect-flash');						// For Flash Messages
 var expressValidator 	= require('express-validator');					// For validation
 var bodyParser          = require('body-parser');						// To Accept Post Request
-var path                = require('path');
+var path                = require('path');								// Path Module
 var morgan       		= require('morgan');							// Request To The Console
-var bformat = require('bunyan-format');
+var bformat 			= require('bunyan-format');						// Bunyan Format
 var cookieParser 		= require('cookie-parser');						// Read cookies (needed for auth)
-var session      		= require('express-session');
+var session      		= require('express-session');					// Express Session
 
 var log = require('./config/logging')()
 
@@ -21,9 +21,6 @@ require('./app/models/db') //initialize db collections and its data
 
 // Pages
 var server              = require('http').Server(app);
-var notificationschema  = require('./model/notification_model.js');
-var notification        = require('./api/notification.js');  
-var mailer              = require('./api/mail.js');                     // Mail Functionality
 var routeDirectMsgApi = require('./app/routes/api_direct_msg')
 
 // Middleware

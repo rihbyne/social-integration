@@ -1,57 +1,12 @@
-var follower 	= require('../app/models/model_followers.js'),
-    users 		= require('../app/models/user.js')
+var follower 	= require('../app/models/followersSchema.js'),
+    users 		= require('../app/models/userSchema.js')
 	util 		= require('util'),
 	async		= require('async')
 	request     = require('request');                               // Request Module
-	
-// var getSuggestion1 = function(req,res){
 
-    // var user_id = req.params.user_id;
-	
-    // req.checkParams('user_id', 'User Id is mandatory').notEmpty();
+var	ip			= 'http://192.168.2.16:4000/';
 
-    // var errors = req.validationErrors();
-
-    // if (errors) {
-        // res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-        // return;
-    // }
-	
-	// follower
-	// .find({$and:[{user_id : user_id},{follow_status:true}]})
-	// .select('following_id')
-	// .sort({"follower_since":-1})
-	// .limit(3)
-	// .exec(function(err, followingIds){
-	
-		// if(err)
-			// res.send(err);
-			
-		// async.forEach(followingIds, function (item, cb) {
-			
-			// var followerId = item.following_id;
-			
-			// follower
-			// .find({$and:[{user_id : followerId},{follow_status:true}]})
-			// .select('following_id')
-			// .sort({"follower_since":-1})
-			// .limit(5)
-			// .exec(function(err, suggestIds){
-				
-				// if(err)
-				// res.send(err);
-				
-				// console.log(suggestIds);
-				// cb();
-			
-			// })
-		
-		// })
-		
-	// })
-// }
-	
-	
+// Get Suggestion
 var getSuggestion = function(req, res){
 
 	var user_id = req.params.user_id;
@@ -60,7 +15,6 @@ var getSuggestion = function(req, res){
 	var loop = 0;
 	
     req.checkParams('user_id', 'User Id is mandatory').notEmpty();
-
     var errors = req.validationErrors();
 
     if (errors) {
@@ -84,6 +38,8 @@ var getSuggestion = function(req, res){
 		.limit(6)
 		.lean()
 		.exec(function(err, followingIds){
+			
+			console.log(followingIds);
 			
 			if(err)
 				res.send(err);	
@@ -123,7 +79,7 @@ var getSuggestion = function(req, res){
 											firstname : firstName,
 											lastname:lastName
 										};
-							i++
+							i++;
 						}
 						
 						if(loop == arrayLength)
@@ -143,6 +99,7 @@ var getSuggestion = function(req, res){
 	})
 }	
 	
+// Random Suggestion
 var randomSuggestion = function(req, res){
 
 	follower
@@ -170,13 +127,12 @@ var randomSuggestion = function(req, res){
 	
 }
 
+// All Suggestion
 var allSuggestion = function(req, res){
 	
 	var user_id = req.params.user_id;
 	var list_data = new Array;
-	
 	req.checkParams('user_id', 'User Id is mandatory').notEmpty();
-
     var errors = req.validationErrors();
 
     if (errors) {
@@ -249,12 +205,11 @@ var allSuggestion = function(req, res){
 
 }
 
+// Wrapper Suggestion
 var wrapperSuggest = function(req, res){
 
 	var user_id = req.params.user_id;
-	
 	req.checkParams('user_id', 'User Id is mandatory').notEmpty();
-
     var errors = req.validationErrors();
 
     if (errors) {
@@ -273,7 +228,7 @@ var wrapperSuggest = function(req, res){
 		{
 			request.get({
                                 
-				url: 'http://192.168.2.16:4000/randomSuggestion',
+				url: ip+'randomSuggestion',
 				headers: {"content-type": "application/json"}
 				
 			},function optionalCallback(err, body){
@@ -288,7 +243,7 @@ var wrapperSuggest = function(req, res){
 		{
 			request.get({
                                 
-				url: 'http://192.168.2.16:4000/suggestion/'+user_id,
+				url: ip+'suggestion/'+user_id,
 				headers: {"content-type": "application/json"}
 				
 			},function optionalCallback(err, body){
@@ -301,11 +256,12 @@ var wrapperSuggest = function(req, res){
 	
 	});
 }
-	
-	
+
+
+// Exports	
 module.exports = ({
-    getSuggestion : getSuggestion,
-	randomSuggestion : randomSuggestion,
-	allSuggestion : allSuggestion,
-	wrapperSuggest : wrapperSuggest
+    getSuggestion 		: getSuggestion,
+	randomSuggestion 	: randomSuggestion,
+	allSuggestion 		: allSuggestion,
+	wrapperSuggest 		: wrapperSuggest
 })

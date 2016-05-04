@@ -38,11 +38,11 @@
                 </div>
                 <!-- END left div -->
                 <div class="col s12 m12 l6">
-                
+                    
                     <div class="row">
                         <div class="col s12">
                             <div class="row">
-                                <form method="post" action="/setnewpost" name="compose_post">
+                                <form method="post" action="/setpost" name="compose_post">
                                     <input type="hidden" name="username" value="<%= user.username %>">
                                     <div class="input-field col s12 mb-10">
                                         <textarea id="textarea1" type="text" name="post_description" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
@@ -59,172 +59,169 @@
                                             
                                             <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
                                             </button></li>
-                                            <!--                                             <li><a ><i class="material-icons btn-ico">library_add
-                                            </i> <input class="btn-floating yellow darken-1"  type="submit" value=''></a>
-                                        </li>
-                                    -->                                    </ul>
-                                </div>
-                            </form>
+                                        </ul>
+                                    </div>
+                                </form>
+                            </div>
+                            <ul class="collection social_post">
+                                <% userdetails.allpost.forEach(function(userdetail, i){ %>
+                                <li class="collection-item avatar">
+                                    <img src="images/pro_01.jpg" alt="" class="circle">
+                                    <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time"><%= userdetail.created_at %></a><br>
+                                    <p><%= userdetail.post_description %>
+                                    </p>
+                                    <div class="card-action">
+                                        <a href="#modalREP<%= i %>" class="modal-trigger btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
+                                        <a href="#modalrt<%= i %>" class="modal-trigger tooltipped btn-retweet" data-position="top" data-delay="50" data-tooltip="retweet">
+                                            <i class="fa fa-retweet rt-btn"></i>
+                                            <span class="rt-count"> <%= userdetail.tweet_count %></span>
+                                        </a>
+                                        <form   method="post" action="/setlike" class="frm-inline"  name='likeform'>
+                                            <input type="hidden" name="like_user_id" value="<%= user._id %>">
+                                            <input type="hidden" name="post_id" value="<%= userdetail._id %>">
+                                            <input type="hidden" name="like_user_name" value="<%= userdetail.username %>">
+                                            <button href="#" class="btn-like  tooltipped" data-position="top" data-delay="50" data-tooltip="like"  ><i class="fa fa-heart"></i>
+                                            <span class="rt-count"> <%= userdetail.postLikeCount %></span>
+                                            </button>
+                                        </form>
+                                        <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'>
+                                        <i class="fa fa-ellipsis-h"></i></a>
+                                        <!-- Dropdown Structure -->
+                                        <ul id='dropdown<%= i %>' class='dropdown-content'>
+                                            <li><a href="#!">Share via Direct Message</a></li>
+                                            <li><a href="#!">Copy link to Tweet</a></li>
+                                            <li><a href="#!">Embed Tweet</a></li>
+                                            <li><a href="#!">Pin to your profile page</a></li>
+                                            <li><a href="#!">Unpin from profile page</a></li>
+                                            <li><a href="#!">Delete Tweet</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <% }) %>
+                                
+                            </ul>
                         </div>
-                        <ul class="collection social_post">
-                            <% userdetails.allpost.forEach(function(userdetail, i){ %>
-                            <li class="collection-item avatar">
-                                <img src="images/pro_01.jpg" alt="" class="circle">
-                                <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time"><%= userdetail.created_at %></a><br>
-                                <p><%= userdetail.post_description %>
-                                </p>
-                                <div class="card-action">
-                                    <a href="#modalREP<%= i %>" class="modal-trigger btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
-                                    <a href="#modalrt<%= i %>" class="modal-trigger tooltipped btn-retweet" data-position="top" data-delay="50" data-tooltip="retweet">
-                                        <i class="fa fa-retweet rt-btn"></i>
-                                         <span class="rt-count"> <%= userdetail.tweet_count %></span>
-                                    </a>
-                                    <form   method="post" action="/setlike" class="frm-inline"  name='likeform'>
-                                        <input type="hidden" name="like_user_id" value="<%= user._id %>">
-                                        <input type="hidden" name="post_id" value="<%= userdetail._id %>">
-                                        <input type="hidden" name="like_user_name" value="<%= userdetail.username %>">
-                                        <button href="#" class="btn-like  tooltipped" data-position="top" data-delay="50" data-tooltip="like"  ><i class="fa fa-heart"></i>
-                                         <span class="rt-count"> <%= userdetail.postLikeCount %></span>
-                                        </button>
-                                    </form>
-                                    <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'>
-                                    <i class="fa fa-ellipsis-h"></i></a>
-                                    <!-- Dropdown Structure -->
-                                    <ul id='dropdown<%= i %>' class='dropdown-content'>
-                                        <li><a href="#!">Share via Direct Message</a></li>
-                                        <li><a href="#!">Copy link to Tweet</a></li>
-                                        <li><a href="#!">Embed Tweet</a></li>
-                                        <li><a href="#!">Pin to your profile page</a></li>
-                                        <li><a href="#!">Unpin from profile page</a></li>
-                                        <li><a href="#!">Delete Tweet</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <% }) %>
-                            
-                        </ul>
                     </div>
                 </div>
+                <!-- </div> -->
+                <!-- </div> -->
+                <!-- END  center div post  -->
+                <div class="col s12 m12 l3">
+                    <a href="#">Who to follow</a>
+                    <a href="#1" class="right">view all</a>
+                    <ul class="collection">
+                        <li class="collection-item avatar">
+                            <img src="images/pro_01.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname">Damon Jernstad</b></a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                            <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                        </li>
+                        <li class="collection-item avatar">
+                            <img src="images/pro_02.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname">Harrison Bonardi</b></a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Aiko</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                            <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                        </li>
+                        <li class="collection-item avatar">
+                            <img src="images/pro_03.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname">Linnie Escalona</b></a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                            <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- right div suggesion , footer -->
             </div>
-            <!-- </div> -->
-            <!-- </div> -->
-            <!-- END  center div post  -->
-            <div class="col s12 m12 l3">
-                <a href="#">Who to follow</a>
-                <a href="#1" class="right">view all</a>
-                <ul class="collection">
-                    <li class="collection-item avatar">
-                        <img src="images/pro_01.jpg" alt="" class="circle">
-                        <a href=""><b class="fullname">Damon Jernstad</b></a><br>
-                        <small>
-                        Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
-                        </small>
-                        <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                        <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
-                    </li>
-                    <li class="collection-item avatar">
-                        <img src="images/pro_02.jpg" alt="" class="circle">
-                        <a href=""><b class="fullname">Harrison Bonardi</b></a><br>
-                        <small>
-                        Followed by <a href="#12"><b>Aiko</b></a> and <a href="#" class=""><b>others</b></a>
-                        </small>
-                        <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                        <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
-                    </li>
-                    <li class="collection-item avatar">
-                        <img src="images/pro_03.jpg" alt="" class="circle">
-                        <a href=""><b class="fullname">Linnie Escalona</b></a><br>
-                        <small>
-                        Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
-                        </small>
-                        <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
-                        <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
-                    </li>
-                </ul>
-            </div>
-            <!-- right div suggesion , footer -->
         </div>
-    </div>
-    
-    <% userdetails.allpost.forEach(function(userdetail, i){ %>
-    <div id="modalrt<%= i %>" class="modal">
-        <div class="modal-content">
-            <div class="row">
-                
-                
-                <h5 class="center-align">Share this post to you follower..?</h5>
-                <ul class="collection">
-                    <li class="collection-item avatar">
-                        <img src="images/pro_03.jpg" alt="" class="circle">
-                        <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time">3hr</a><br>
-                        <small>
-                        Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
-                        </small>
-                        <p><%= userdetail.post_description %> </p>
-                        
-                    </li>
-                </ul>
-                <form action="/setretweet" method="post" name='retweetform' style="display: inline;">
-                    <input type="hidden" name="tweetstatus" value="1">
-                    <input type="hidden" name="retweet_user_id" value="<%= user._id %>">
-                    <input type="hidden" name="post_id" value="<%= userdetail._id %>">
+        
+        <% userdetails.allpost.forEach(function(userdetail, i){ %>
+        <div id="modalrt<%= i %>" class="modal">
+            <div class="modal-content">
+                <div class="row">
                     
-                    <button  type="submit" class="waves-effect waves-light light-blue lighten-1 btn right"  value="" ><i class="material-icons left">repeat</i>Retweet</button>
-                </form>
-                
-                
-                
+                    
+                    <h5 class="center-align">Share this post to you follower..?</h5>
+                    <ul class="collection">
+                        <li class="collection-item avatar">
+                            <img src="images/pro_03.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time">3hr</a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <p><%= userdetail.post_description %> </p>
+                            
+                        </li>
+                    </ul>
+                    <form action="/setretweet" method="post" name='retweetform' style="display: inline;">
+                        <input type="hidden" name="tweetstatus" value="1">
+                        <input type="hidden" name="retweet_user_id" value="<%= user._id %>">
+                        <input type="hidden" name="post_id" value="<%= userdetail._id %>">
+                        
+                        <button  type="submit" class="waves-effect waves-light light-blue lighten-1 btn right"  value="" ><i class="material-icons left">repeat</i>Retweet</button>
+                    </form>
+                    
+                    
+                    
+                </div>
             </div>
         </div>
-    </div>
-    <% })%>
-    <!-- Reply Modal popup -->
-    <% userdetails.allpost.forEach(function(userdetail, i){ %>
-    <div id="modalREP<%= i %>" class="modal">
-        <div class="modal-content">
-            <div class="row">
-                
-                
-                <h5 class="center-align">Reply to @posted by user name </h5>
-                <ul class="collection">
-                    <li class="collection-item avatar">
-                        <img src="images/pro_03.jpg" alt="" class="circle">
-                        <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time">3hr</a><br>
-                        <small>
-                        Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
-                        </small>
-                        <p><%= userdetail.post_description %> </p>
-                        
-                    </li>
-                </ul>
-                <form action="" method="post" name='replyform' style="display: inline;">
-                    <input type="hidden" name="tweetstatus" value="1">
-                    <input type="hidden" name="retweet_user_id" value="<%= userdetail._id %>">
-                    <input type="hidden" name="post_id" value="<%= userdetail._id %>">
-                    <div class="row">
-                        <div class="col s12">
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input  id="icon_prefix2" class="materialize-textarea"></input>
-                                    
+        <% })%>
+        <!-- Reply Modal popup -->
+        <% userdetails.allpost.forEach(function(userdetail, i){ %>
+        <div id="modalREP<%= i %>" class="modal">
+            <div class="modal-content">
+                <div class="row">
+                    
+                    
+                    <h5 class="center-align">Reply to @posted by user name </h5>
+                    <ul class="collection">
+                        <li class="collection-item avatar">
+                            <img src="images/pro_03.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time">3hr</a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <p><%= userdetail.post_description %> </p>
+                            
+                        </li>
+                    </ul>
+                    <form action="" method="post" name='replyform' style="display: inline;">
+                        <input type="hidden" name="tweetstatus" value="1">
+                        <input type="hidden" name="retweet_user_id" value="<%= userdetail._id %>">
+                        <input type="hidden" name="post_id" value="<%= userdetail._id %>">
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <input  id="icon_prefix2" class="materialize-textarea"></input>
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <button  type="submit" class="waves-effect waves-light light-blue lighten-1 btn right"  value="" ><i class="material-icons left">library_add</i>Reply Post</button>
-                    <!-- <span class="rt-count"> <%= userdetail.tweet_count %></span> -->
-                </form>
-                
-                
-                
+                        <button  type="submit" class="waves-effect waves-light light-blue lighten-1 btn right"  value="" ><i class="material-icons left">library_add</i>Reply Post</button>
+                        <!-- <span class="rt-count"> <%= userdetail.tweet_count %></span> -->
+                    </form>
+                    
+                    
+                    
+                </div>
             </div>
         </div>
-    </div>
-    <% })%>
-    <!-- ENd modal popup -->
-    <footer>
-        <% include ../partials/footer %>
-    </footer>
-</body>
-<!-- <a class="waves-effect waves-light btn right"><i class="material-icons left">repeat</i>Retweet</a> -->
+        <% })%>
+        <!-- ENd modal popup -->
+        <footer>
+            <% include ../partials/footer %>
+        </footer>
+    </body>
+    <!-- <a class="waves-effect waves-light btn right"><i class="material-icons left">repeat</i>Retweet</a> -->
 </html>

@@ -8,8 +8,7 @@ var userSchema = mongoose.Schema({
     last_name   :   {type: String},          							// Last Name of User
     email       :   {type: String},										// Email of User
     password     :  {type: String},										// Password of User		
-    username    :   {type: String},										// Username of User
-    posts 		: 	[{ type: mongoose.Schema.ObjectId, ref: 'post' }]	// This feild Points to post Collection
+    username    :   {type: String}										// Username of User
 	
 }, { versionKey: false });
 

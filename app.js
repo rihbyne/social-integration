@@ -21,6 +21,7 @@ require('./app/models/db') //initialize db collections and its data
 
 // Pages
 var server              = require('http').Server(app);
+var routeDirectMsgApi = require('./app/routes/api_direct_msg')
 
 // Middleware
 app.use(morgan('dev')); // log every request to the console
@@ -47,7 +48,9 @@ require('./config/passport.js')(passport); // pass passport for configuration
 // routes ======================================================================
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
+//============ direct messaging router====================
+app.use('/api/direct_messages', routeDirectMsgApi)
 
 // launch ======================================================================
-app.listen(port);
-console.log('Connected To server at port ' + port);
+server.listen(port);
+log.info('Connected To server at port ' + port);

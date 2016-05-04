@@ -65,4 +65,9 @@ process.on('SIGTERM', function () {
     process.exit(0)
   })
 })
+
+require('./userSchema')
+require('./flagging')
+require('./direct_msg')
+
 mongoose.set('debug', true);

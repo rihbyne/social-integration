@@ -10,11 +10,25 @@ var setretweet = function(req, res){
     var retweet_type = req.body.retweet_type;
     var retweet_quote = req.body.retweet_quote;
     var collectionName, message, userIdFrom;
+
     console.log('Retweet Api hitted');
 
     console.log('Post Id', req.body.post_id);
     console.log('Retweet User Id', req.body.ret_user_id);
     console.log('Retweet Type', req.body.retweet_type);
+
+    req.checkBody('post_type', 'post type').notEmpty();
+    req.checkBody('ret_user_id', 'ret_user_id').notEmpty();
+    req.checkBody('retweet_type', 'retweet_type').notEmpty();
+    req.checkBody('post_id', 'post id').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
 
     if(post_type == 1){ //if post
 
@@ -25,13 +39,13 @@ var setretweet = function(req, res){
     }
     else if(post_type == 2){ //if retweet
 
-        if (retweet_type == 1){ //simple retweet
-            collectionName = post_model.retweet;
-        }
-        else if(retweet_type == 2){
+        // if (retweet_type == 1){ //simple retweet
+        //     collectionName = post_model.retweet;
+        // }
+        // else if(retweet_type == 2){
             collectionName = post_model.retweet_quote;
             message = 'User retweeted On Retweet'; 
-        }
+        // }
 
         var userIdFrom = 'ret_user_id'; 
     }
@@ -113,11 +127,34 @@ var setretweet = function(req, res){
 
                         if (simpleRetweet.length == 0) { //save new tweet
 
-                            var retweet = new post_model.retweet({
+                            if (post_type == 1) {
 
-                                post_id: post_id,
-                                ret_user_id: ret_user_id
-                            });
+                                var retweet = new post_model.retweet({
+
+                                    post_id: post_id,
+                                    ret_user_id: ret_user_id
+                                });
+
+                            }
+                            else if(post_type == 2){
+
+                                var retweet = new post_model.retweet({
+
+                                    retweet_quote_id: post_id,
+                                    ret_user_id: ret_user_id
+                                });
+
+                            }
+                            else if(post_type == 3){
+
+                                var retweet = new post_model.retweet({
+
+                                    reply_id: post_id,
+                                    ret_user_id: ret_user_id
+                                });
+
+                            }
+                            
 
                             retweet.save(function(err) {
 
@@ -209,7 +246,7 @@ var setretweet = function(req, res){
                                     if (err) {
                                         res.send(err)
                                     };
-
+                                    
                                     res.json({
                                         message: message
                                     });

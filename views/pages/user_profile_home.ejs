@@ -1,4 +1,5 @@
 <!-- views/pages/index.ejs -->
+<!-- using while logged in user is watching others profile  -->
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -11,25 +12,25 @@
         <div  class="container big">
             <div class="row bg-color">
                 <div class="col s12 m12 l3">
-                  <div class="card">
+                    <div class="card">
                         <div class="card-image waves-effect waves-block waves-light">
                             <img class="activator" src="images/CeoXGIuWQAAtrZN.jpg">
                         </div>
                         <div class="card-content">
                             <img src="images/pro_01.jpg" alt="" class="circle user_pro_p">
-                            <span class="card-title activator grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%><i class="material-icons right">more_vert</i></span>
+                            <span class="card-title activator grey-text text-darken-4"><%= pro_user.first_name %> <%= pro_user.last_name%><i class="material-icons right">more_vert</i></span>
                             <p></p>
-                            <p><a href="#">@<%= user.username %></a></p>
+                            <p><a href="/<%= pro_user.username %>">@<%= pro_user.username %></a></p>
                         </div>
                         <div class="card-reveal">
-                            <span class="card-title grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%></b><i class="material-icons right">close</i></span>
+                            <span class="card-title grey-text text-darken-4"><%= pro_user.first_name %> <%= pro_user.last_name%></b><i class="material-icons right">close</i></span>
                             <p>I strongly believe that we can change our country's fate we r the future of our country.Full stack programmer. <a href="http://sudeepdk.com ">http://sudeepdk.com</a></p>
                         </div>
                         <div class="card-action t-count">
                             <ul>
                                 <li><a href="/userhome">tweet<span><%=  %></span></a></li>
-                                <li><a href="/<%= user.username%>/following">Following<span><%=  %></span></a></li>
-                                <li><a href="/<%= user.username%>/followers">Follower<span><%=  %></span></a></li>
+                                <li><a href="/<%= pro_user.username%>/following">Following<span><%=  %></span></a></li>
+                                <li><a href="/<%= pro_user.username%>/followers">Follower<span><%=  %></span></a></li>
                             </ul>
                         </div>
                     </div>
@@ -80,7 +81,14 @@
                     <div class="row">
                         <form class="col s12">
                             <div class="row">
-                                <% include ../partials/tweet_type_tab.ejs %>
+                                <div class="col s12">
+                                    <ul class="link-pro-tabs main-tab">
+                                        <li><a  href="/<%= pro_user.username%>">TWEETS<br><span>744</span></a></li>
+                                        <li><a href="/<%= pro_user.username%>/following" class="">FOLLOWING<br><span>744</span></a></li>
+                                        <li><a href="/<%= pro_user.username%>/followers">FOLLOWERS<br><span>744</span></a></li>
+                                        <li><a href="/like">LIKES<br><span>744</span></a></li>
+                                    </ul>
+                                </div>
                                 <div id="test1" class="col s12">
                                     <ul class="link-pro-tabs">
                                         <li><a href="/userhome">tweets</a></li>
@@ -90,7 +98,7 @@
                                         <% ProfilePosts.forEach(function(ProfilePosts, i){ %>
                                         <li class="collection-item avatar">
                                             <img src="images/pro_01.jpg" alt="" class="circle">
-                                            <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time"><%= ProfilePosts.created_at %></a><br>
+                                            <a href=""><b class="fullname"><%= ProfilePosts.posted_by.first_name %> <%= ProfilePosts.posted_by.last_name%></b></a><a href="#" class="u_id">@<%= ProfilePosts.posted_by.username %></a><a href="#" class="post-time"><%= ProfilePosts.created_at %></a><br>
                                             <p><%= ProfilePosts.post_description %>
                                             </p>
                                             <div class="card-action">
@@ -102,7 +110,6 @@
                                                 <form method="post" action="/setlike" class="frm-inline"  name='likeform'>
                                                     <input type="hidden" name="like_user_id" value="<%= user._id %>">
                                                     <input type="hidden" name="post_id" value="<%= ProfilePosts._id %>">
-                                                    <input type="hidden" name="like_user_name" value="<%= ProfilePosts.username %>">
                                                     <button href="#" class="btn-like  tooltipped" data-position="top" data-delay="50" data-tooltip="like"  ><i class="fa fa-heart"></i>
                                                     <span class="rt-count"> <%= ProfilePosts.like_count %></span>
                                                     </button>
@@ -181,7 +188,7 @@
         <div id="modal1" class="modal">
             <div class="modal-content">
                 <div class="row">
-                    <form method="post" action="/setnewpost" name="compose_post">
+                    <form method="post" action="/setpost" name="compose_post">
                         <input type="hidden" name="username" value="<%= user.username %>">
                         <h5 class="center-align">Compose a new Post</h5>
                         <div class="input-field col s12 mb-10">
@@ -209,12 +216,12 @@
         <div id="modal2" class="modal">
             <div class="modal-content">
                 <div class="row">
-                    <form method="post" action="/setnewpost" name="compose_post">
+                    <form method="post" action="/setpost" name="compose_post">
                         <input type="hidden" name="username" value="<%= user.username %>">
-                        <h5 class="center-align">tweet to username</h5>
+                        <h5 class="center-align">tweet to <%= pro_user.username %></h5>
                         <div class="input-field col s12 mb-10">
                             <!-- <input type="text" name="post_title" value=""> -->
-                            <textarea id="textarea1" name="post_description" placeholder="@username" class="materialize-textarea" length="350"></textarea>
+                            <textarea id="textarea1" name="post_description" placeholder="Please write some messege to tweet@<%= user.username %>" class="materialize-textarea" length="350">@<%= pro_user.username %></textarea>
                             <label for="textarea1"></label>
                         </div>
                         <div class="fixed-action-btn horizontal click-to-toggle">

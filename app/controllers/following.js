@@ -208,7 +208,7 @@ var getfollowing = function(req, res) {
         .find({
             username: user_name
         })
-        .select('_id')
+        .select()
     // .exec(function(err, result) {
 
     //     // console.info(result[0]._id);
@@ -280,9 +280,15 @@ var getfollowing = function(req, res) {
                             },
                             user: req.user
                         });
-                        // res.json({
-                        //     Following_result: { data001: result , data002:body } 
-                        // })
+                       // res.status(status).send(body)
+                        // res.send('pages/following', {
+                        //     Following_result: {
+                        //         data001: result,
+                        //         data002: body
+                        //     },
+                        //     user: req.user
+                        // });
+
                     })
                 })
 

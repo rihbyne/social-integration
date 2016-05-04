@@ -571,7 +571,7 @@ var setpost = function(req, res) { // create a post
                 //     message: result
                 // });
 
-                res.redirect('/about')
+                res.redirect('/')
 
                 console.log('post created.');
 

@@ -9,7 +9,7 @@ var getUserId = function(username, res){
 
     user
     .find({ username: username })
-    .select('_id')
+    // .select('_id')
     .exec(function(err, userdata) {
 
         if (err)
@@ -18,8 +18,9 @@ var getUserId = function(username, res){
         else if (userdata.length !== 0) {
 
             userid = userdata[0]._id;
+            user_details_all = userdata[0];
 
-            return res(null, userid);
+            return res(null, userid , user_details_all);
         }
         else{
 

@@ -82,11 +82,19 @@ function getPostByMentionUser(callback){
 
 function getRetweetByMentionUser(callback){
     console.info(mention_user);
+
+    var filterOptions = [
+        {path: 'retweet_quote_id'},
+        {
+          path: 'retweet_quote_id',
+          populate: {path: 'ret_user_id'}
+        }
+    ]
     // find by mention collection from post_mention and check for errors
     mention_model.retweet_quote_mention
     .find({mention_users: mention_user})
     .select('retweet_quote_id')
-    .populate('retweet_quote_id')
+    .populate(filterOptions)
     .lean()
     .exec(function(err, mentionspostdata) {
 
@@ -95,14 +103,8 @@ function getRetweetByMentionUser(callback){
 
         if (mentionspostdata.length !== '') {
 
-            mention_model.retweet_quote_mention.populate(mentionspostdata, {path: 'retweet_quote_id.reply_id'}, function(err, mentionspost){
+                callback(null, mentionspostdata);
 
-                if(err)
-                    res.send(err);
-                
-                callback(null, mentionspost);
-
-            })
             // res.json({
             //     posts: mentionspost
             // });
@@ -118,12 +120,21 @@ function getRetweetByMentionUser(callback){
 }
 
 function getReplyByMentionUser(callback){
+
+    var filterOptions = [
+        {path: 'reply_id'},
+        {
+          path: 'reply_id',
+          populate: {path: 'reply_user_id'}
+        }
+    ];
+
     console.info(mention_user);
     // find by mention collection from post_mention and check for errors
     mention_model.reply_mention
     .find({mention_users: mention_user})
     .select('reply_id')
-    .populate('reply_id')
+    .populate(filterOptions)
     .lean()
     .exec(function(err, mentionspost) {
 

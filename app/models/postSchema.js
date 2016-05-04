@@ -38,7 +38,7 @@ var retweet_quote_schema = mongoose.Schema({
     post_id:                         {type: String, ref:'post'},                 	// Post Id
 	retweet_quote_id:				 {type: String, ref:'retweet_quote'},			// Retweet Quote Id (Mongoose Id of Retweet Quote Document on which retweet quote is made[Retweet Quote on Retweet Quote])
 	reply_id:						 {type: String, ref:'reply'},					// Reply Id (Mongoose Id of Reply document on which retweet is Made)
-    ret_user_id:                     {type: String},                             	// User Id Who Retweeted (User Id From user Colloction) 
+    ret_user_id:                     {type: String, ref:'User'},                             	// User Id Who Retweeted (User Id From user Colloction) 
     retweet_count:                   {type: Number, default: 0, min: 0},			// Number of Retweets Made on this 
     like_count:                      {type: Number, default: 0, min: 0},			// Number of Likes on this
     retweet_quote:                   {type: String},								// String of Message							
@@ -86,7 +86,7 @@ var reply_schema = mongoose.Schema({
     post_id :                        {type: String, ref:'post'},  					// Post Id
 	retweet_quote_id:				 {type: String, ref:'retweet_quote'},			// Retweet Id (Moongoose Id of retweet Document on which reply is Made)
 	reply_id:						 {type: String, ref:'reply'},					// Reply Id (Mongoose Id of Reply Document on which Replay is made[Reply on Reply])
-    reply_user_id :                  {type: String},   								// User Id Who replied on post
+    reply_user_id :                  {type: String, ref:'User'},   								// User Id Who replied on post
     reply_msg :                      {type: String},  								// String of Reply Message
     retweet_count:                   {type: Number, default: 0, min: 0},			// Number of Retweets Made on this 	
     like_count:                      {type: Number, default: 0, min: 0},			// Number of Likes on this

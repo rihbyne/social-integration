@@ -4,16 +4,16 @@ var router 			= express.Router();
 var path 			= require('path');
 
 // Pages
-var post 			= require('../api/post.js');
-var mention 		= require('../api/mention.js');
-var follow 			= require('../api/following.js');
-var hashtag 		= require('../api/hashtag.js');
-var like 			= require('../api/like.js');
-var retweet 		= require('../api/retweet.js');
-var userhome 		= require('../api/userhome.js');
-var reply 			= require('../api/reply.js');
-var blockuser 		= require('../api/blockuser.js');
-var suggest			= require('../api/suggestion.js');
+var post 			= require('./controllers/post.js');
+var mention 		= require('./controllers/mention.js');
+var follow 			= require('./controllers/following.js');
+var hashtag 		= require('./controllers/hashtag.js');
+var like 			= require('./controllers/like.js');
+var retweet 		= require('./controllers/retweet.js');
+var userhome 		= require('./controllers/userhome.js');
+var reply 			= require('./controllers/reply.js');
+var blockuser 		= require('./controllers/blockuser.js');
+var suggest			= require('./controllers/suggestion.js');
 
 // app/routes.js
 module.exports = function(app, passport) {

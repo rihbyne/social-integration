@@ -136,7 +136,7 @@
                                                         <span class="card-title"><%= Following_result.data001[i].following_id.first_name %><%= Following_result.data001[i].following_id.last_name %></span>
                                                         <span class="card-title handle"><%= Following_result.data001[i].following_id.username %></span>
                                                         <span class="right card-title f-status">
-                                                            <% if (Following_result.data001[i].follow_back == true) { %>
+                                                            <% if (Following_result.data001[i].follow_back == false) { %>
                                                             follows you
                                                             <% } else { %>
                                                             

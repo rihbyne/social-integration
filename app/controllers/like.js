@@ -1,4 +1,4 @@
-var postModel 	= require('../app/models/postSchema.js');		// Including postModel File
+var postModel 	= require('../models/postSchema.js');		// Including postModel File
 var async		= require('async');
 
 //Set Post Like

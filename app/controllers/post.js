@@ -6,11 +6,11 @@ var router = express.Router(); // get an instance of the express Router
 
 // Pages
 var master = require('./master.js');
-var user_model = require('../app/models/userSchema.js');
-var post_model = require('../app/models/postSchema.js');
-var User = require('../app/models/userSchema.js');
-var notificationModel = require('../app/models/notificationSchema.js');
-// user_final_followers_schema = require('../app/models/followersSchema.js');
+var user_model = require('../models/userSchema.js');
+var post_model = require('../models/postSchema.js');
+var User = require('../models/userSchema.js');
+var notificationModel = require('../models/notificationSchema.js');
+var user_followers = require('../models/followersSchema.js');
 
 // //Get all post and other details
 // var home_userdetails = function(req, res) {
@@ -122,7 +122,7 @@ var getuserdetails = function(req, res) {
 			function(callback){
 				// show count of post and check for errors
 				post_model.post
-				.count({posted_by: userid})
+				.count({posted_by: user_id})
 				.exec(function(err, postcount) {
 
 
@@ -138,7 +138,7 @@ var getuserdetails = function(req, res) {
 
 				// show count of post and check for errors
 				post_model.retweet_quote
-				.count({ret_user_id: userid})
+				.count({ret_user_id: user_id})
 				.exec(function(err, retweetcount) {
 
 					if (err)
@@ -153,7 +153,7 @@ var getuserdetails = function(req, res) {
 
 				// show count of post and check for errors
 				post_model.reply
-				.count({reply_user_id: userid})
+				.count({reply_user_id: user_id})
 				.exec(function(err, replycount) {
 
 					if (err)
@@ -567,9 +567,11 @@ var setpost = function(req, res) { // create a post
                     res.send(err)
                 };
 
-                res.json({
-                    message: result
-                });
+                // res.json({
+                //     message: result
+                // });
+
+                res.redirect('/about')
 
                 console.log('post created.');
 

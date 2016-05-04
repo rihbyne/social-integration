@@ -39,6 +39,8 @@ var getSuggestion = function(req, res){
 		.lean()
 		.exec(function(err, followingIds){
 			
+			console.log(followingIds);
+			
 			if(err)
 				res.send(err);	
 				

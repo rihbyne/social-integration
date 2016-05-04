@@ -7,7 +7,8 @@ var router = express.Router(); // get an instance of the express Router
 // Pages
 var master = require('./master.js');
 var post_model = require('../app/models/postSchema.js');
-// User = require('../app/models/userSchema.js'),
+var User = require('../app/models/userSchema.js');
+var notificationModel = require('../app/models/notificationSchema.js');
 // user_final_followers_schema = require('../app/models/followersSchema.js');
 
 
@@ -119,82 +120,72 @@ var getuserdetails = function(req, res) {
 
         async.parallel([
 
-            if (err)
-                res.send(err);
-            
-            post_model.retweet
-            .count({ret_user_id : user_id})
-            .lean()
-            .exec(function(err, retweetcount){
-                if (err)
-                res.send(err);
-
-                function(callback){
-                    // show count of post and check for errors
-                    post_model.post
-                    .count({posted_by: userid})
-                    .exec(function(err, postcount) {
+			function(callback){
+				// show count of post and check for errors
+				post_model.post
+				.count({posted_by: userid})
+				.exec(function(err, postcount) {
 
 
-                        if (err)
-                            res.send(err);
+					if (err)
+						res.send(err);
 
-                        callback(null, postcount);
+					callback(null, postcount);
 
-                    });                
+				});                
 
-                },
-                function(callback){
+			},
+			function(callback){
 
-                    // show count of post and check for errors
-                    post_model.retweet_quote
-                    .count({ret_user_id: userid})
-                    .exec(function(err, retweetcount) {
+				// show count of post and check for errors
+				post_model.retweet_quote
+				.count({ret_user_id: userid})
+				.exec(function(err, retweetcount) {
 
-                        if (err)
-                            res.send(err);
+					if (err)
+						res.send(err);
 
-                            callback(null, retweetcount);
+						callback(null, retweetcount);
 
-                    });
+				});
 
-                },
-                function(callback){
+			},
+			function(callback){
 
-                    // show count of post and check for errors
-                    post_model.reply
-                    .count({reply_user_id: userid})
-                    .exec(function(err, replycount) {
+				// show count of post and check for errors
+				post_model.reply
+				.count({reply_user_id: userid})
+				.exec(function(err, replycount) {
 
-                        if (err)
-                            res.send(err);
+					if (err)
+						res.send(err);
 
-                            callback(null, replycount);
+						callback(null, replycount);
 
-                    });
+				});
 
-                }],
-                function(err, result){
+			}],
+			function(err, result){
 
-                    var sumArray = function() {
-                        // Use one adding function rather than create a new one each
-                        // time sumArray is called
-                        function add(a, b) {
-                            return a + b;
-                        }
+				var sumArray = function() {
+					// Use one adding function rather than create a new one each
+					// time sumArray is called
+					function add(a, b) {
+						return a + b;
+					}
 
-                        return function(arr) {
-                            return arr.reduce(add);
-                        };
-                    }();
+					return function(arr) {
+						return arr.reduce(add);
+					};
+				}();
 
-                    var allCount = sumArray(result);
+				var allCount = sumArray(result);
 
-                    userdetails.tweetcount = allCount   
-                    callback(null, userdetails);
-                    // res.json({count : allCount});
+				userdetails.tweetcount = allCount   
+				callback(null, userdetails);
+				// res.json({count : allCount});
 
-                }
+			}
 
         ) 
         
@@ -496,7 +487,9 @@ var setpost = function(req, res) { // create a post
 
     //call to getuserid function to get _id of user collection
     master.getUserId(username, function(err, data) {
-
+		
+		console.log('Data : '+data);
+		
         if (data == '') {
 
             res.json({
@@ -522,6 +515,53 @@ var setpost = function(req, res) { // create a post
 					// res.send(err);
 					
 			// })
+			
+			var notification_user = [];
+			var i = -1;
+			
+			var notification_message = username+' Has Mentioned you in post';
+			
+			async.each(mentionusers, function(mentionuser, callback){
+				
+				master.getUserId(mentionuser, function(err, getId) {
+				
+					if (err)
+						res.send(err);
+					
+					if(getId != 'No user found')
+					{
+						i++;
+						var result = {username:mentionuser, userId:getId};
+						notification_user[i] = result
+					}
+					
+					callback();
+					
+				})
+				
+			}, function(err){
+			
+				var notification = new notificationModel.notification({
+
+					notification_message: notification_message,
+					notification_user: notification_user,
+					post_id:post._id,
+					usrname: username
+					
+				});
+			
+				// console.log(notification_user);
+				notification.save(function(err) {
+				
+					if (err)
+						res.send(err);
+						
+					console.log('Notification Saved');
+				
+				})
+			
+			})
+			
             master.hashtagMention(1, post, mentionusers, hashtags, function(err, result){
 
                 if (err) {

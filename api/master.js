@@ -8,9 +8,7 @@ var hashtag_model = require('../app/models/hashtagSchema.js');
 var getUserId = function(username, res){
 
     user
-    .find({
-        username: username
-    })
+    .find({ username: username })
     .select('_id')
     .exec(function(err, userdata) {
 

@@ -323,24 +323,30 @@ var unlink_following = function(req, res) {
     }
 
     follower
-        .update({
-            $and: [{
-                user_id: user_id
-            }, {
-                following_id: unlink_followings
-            }]
-        }, {
-            follow_status: false
-        })
-        .exec(function(err, result) {
-            if (err) {
-                console.log("found err" + err);
-            } else {
-                res.json({
-                    message: 'Removed following'
-                })
-            }
-        })
+	.update({ $and: [{ user_id: user_id }, { following_id: unlink_followings }]}, { follow_status: false, follow_back:false })
+	.exec(function(err, result) {
+		if (err) {
+			console.log("found err" + err);
+		} else {
+		
+		follower
+		.update({ $and: [{ following_id: user_id }, { user_id: unlink_followings }]}, {follow_back:false })
+		.exec(function(err, result) {
+		
+			 if (err) {
+					console.log("found err" + err);
+			} else {
+			
+				res.json({
+					message: 'Removed following'
+				})
+			
+			}
+		
+		})
+
+		}
+	})
 
 }
 

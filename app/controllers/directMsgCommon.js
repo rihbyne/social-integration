@@ -108,9 +108,9 @@ var getDMs = function(user_id, cb) {
                                  sessionObj.latest_msg_text_id_fk_key.user_id_fk_key
                                ): null,
                                last_msg: {
-                                 _id: sessionObj.latest_msg_text_id_fk_key? latest_msg_text_id_fk_key._id: null,
-                                 msg_text: sessionObj.latest_msg_text_id_fk_key? latest_msg_text_id_fk_key.msg_text: null,
-                                 msg_time: sessionObj.latest_msg_text_id_fk_key? latest_msg_text_id_fk_key.msg_time: null
+                                 _id: sessionObj.latest_msg_text_id_fk_key? sessionObj.latest_msg_text_id_fk_key._id: null,
+                                 msg_text: sessionObj.latest_msg_text_id_fk_key? sessionObj.latest_msg_text_id_fk_key.msg_text: null,
+                                 msg_time: sessionObj.latest_msg_text_id_fk_key? sessionObj.latest_msg_text_id_fk_key.msg_time: null
                                }
                              }
                              tempSessionList.push(obj)
@@ -126,9 +126,9 @@ var getDMs = function(user_id, cb) {
                                ): null,
                                last_msg: {
                                  failed: "This session is flagged",
-                                 _id: sessionObj.latest_msg_text_id_fk_key? latest_msg_text_id_fk_key._id: null,
-                                 msg_text: sessionObj.latest_msg_text_id_fk_key? latest_msg_text_id_fk_key.msg_text: null,
-                                 msg_time: sessionObj.latest_msg_text_id_fk_key? latest_msg_text_id_fk_key.msg_time: null
+                                 _id: sessionObj.latest_msg_text_id_fk_key? sessionObj.latest_msg_text_id_fk_key._id: null,
+                                 msg_text: sessionObj.latest_msg_text_id_fk_key? sessionObj.latest_msg_text_id_fk_key.msg_text: null,
+                                 msg_time: sessionObj.latest_msg_text_id_fk_key? sessionObj.latest_msg_text_id_fk_key.msg_time: null
                                }
                              }
                              tempSessionList.push(obj)

@@ -23,7 +23,7 @@ var getuserhomeposts = function(req, res) { // get a post
             console.info(userid);
 
             res.json({
-                Result: userid
+                Error: userid
                 // PostRTReply : result
             });
 
@@ -73,16 +73,14 @@ var getuserhomeposts = function(req, res) { // get a post
 
             // console.info(result[0]+''+result[1]);
 
-            res.render('pages/user_profile_home.ejs', {
-                user: req.user , // get the user out of session and pass to template
-                ProfilePosts: profilePosts
-            });
-
-            // res.json({
-            //     ProfilePosts: profilePosts,
-            //     user:req.user
+            // res.render('pages/user_profile_home.ejs', {
+            //     user: req.user , // get the user out of session and pass to template
+            //     ProfilePosts: profilePosts
             // });
 
+            res.json({
+                ProfilePosts: profilePosts
+            });
 
         });
 
@@ -174,7 +172,7 @@ var getpostsrtreply = function(req, res) { // get a post
 
 //find post from userid
 function getPostByUserId(callback){
-
+    
     //use userid to find all post of users
     post_model.post
     .find({

@@ -1,4 +1,4 @@
-var mention_model = require('../app/models/mentionSchema.js');
+var mention_model = require('../models/mentionSchema.js');
 var async = require('async');
 
 //Get mentionuser's post

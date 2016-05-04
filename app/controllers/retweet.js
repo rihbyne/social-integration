@@ -1,4 +1,4 @@
-var post_model = require('../app/models/postSchema.js');
+var post_model = require('../models/postSchema.js');
 var master = require('./master.js');
 
 //Set retweet

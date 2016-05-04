@@ -1,7 +1,7 @@
-var user = require('../app/models/userSchema.js');
-var post_model = require('../app/models/postSchema.js');
-var mention_model = require('../app/models/mentionSchema.js');
-var hashtag_model = require('../app/models/hashtagSchema.js');
+var user = require('../models/userSchema.js');
+var post_model = require('../models/postSchema.js');
+var mention_model = require('../models/mentionSchema.js');
+var hashtag_model = require('../models/hashtagSchema.js');
 
 
 //find id of user from username

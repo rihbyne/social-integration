@@ -1,6 +1,6 @@
-var user = require('../app/models/userSchema.js');
-var post_model = require('../app/models/postSchema.js');
-var user_followers = require('../app/models/followersSchema.js');
+var user = require('../models/userSchema.js');
+var post_model = require('../models/postSchema.js');
+var user_followers = require('../models/followersSchema.js');
 var master = require('./master.js');
 var async = require('async');
 
@@ -73,15 +73,15 @@ var getuserhomeposts = function(req, res) { // get a post
 
             // console.info(result[0]+''+result[1]);
 
-            res.render('pages/user_profile_home.ejs', {
-                user: req.user , // get the user out of session and pass to template
-                ProfilePosts: profilePosts
-            });
-
-            // res.json({
-            //     ProfilePosts: profilePosts,
-            //     user:req.user
+            // res.render('pages/user_profile_home.ejs', {
+            //     user: req.user , // get the user out of session and pass to template
+            //     ProfilePosts: profilePosts
             // });
+
+            res.json({
+                ProfilePosts: profilePosts,
+                user:req.user
+            });
 
 
         });

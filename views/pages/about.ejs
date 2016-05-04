@@ -19,7 +19,7 @@
                             <img src="images/pro_01.jpg" alt="" class="circle user_pro_p">
                             <span class="card-title activator grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%><i class="material-icons right">more_vert</i></span>
                             <p></p>
-                            <p><a href="#">@<%= user.username %></a></p>
+                            <p><a href="/<%= user.username %>">@<%= user.username %></a></p>
                         </div>
                         <div class="card-reveal">
                             <span class="card-title grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%></b><i class="material-icons right">close</i></span>
@@ -67,7 +67,9 @@
                                 <% userdetails.allpost.forEach(function(userdetail, i){ %>
                                 <li class="collection-item avatar">
                                     <img src="images/pro_01.jpg" alt="" class="circle">
-                                    <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time"><%= userdetail.created_at %></a><br>
+                                    <a href="/<%= user.username %>"><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a>
+                                    <a href="/<%= user.username %>" class="u_id">@<%= user.username %></a>
+                                    <a href="#12" class="post-time"><%= userdetail.created_at %></a><br>
                                     <p><%= userdetail.post_description %>
                                     </p>
                                     <div class="card-action">

@@ -6,11 +6,11 @@ var router = express.Router(); // get an instance of the express Router
 
 // Pages
 var master = require('./master.js');
-var user_model = require('../app/models/userSchema.js');
-var post_model = require('../app/models/postSchema.js');
-var User = require('../app/models/userSchema.js');
-var notificationModel = require('../app/models/notificationSchema.js');
-var user_followers = require('../app/models/followersSchema.js');
+var user_model = require('../models/userSchema.js');
+var post_model = require('../models/postSchema.js');
+var User = require('../models/userSchema.js');
+var notificationModel = require('../models/notificationSchema.js');
+var user_followers = require('../models/followersSchema.js');
 
 // //Get all post and other details
 // var home_userdetails = function(req, res) {

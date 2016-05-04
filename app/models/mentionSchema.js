@@ -20,7 +20,7 @@ var retweet_quote_mention = mongoose.Schema({
 // Reply Mention Schema
 var reply_mention = mongoose.Schema({
     
-    reply_id:                {type: String, ref:"retweet_quote"},                    // Post Id
+    reply_id:                		 {type: String, ref:"reply"},                    // Post Id
     mention_users:                   {type: Array}                                  // Mention Users
 
 }, { versionKey: false });

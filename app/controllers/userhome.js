@@ -107,7 +107,7 @@ var getuserhomeposts = function(req, res) { // get a post
             console.info(userid);
 
             res.json({
-                Result: userid
+                Error: userid
                 // PostRTReply : result
             });
 
@@ -257,7 +257,7 @@ var getpostsrtreply = function(req, res) { // get a post
 
 //find post from userid
 function getPostByUserId(callback){
-
+    
     //use userid to find all post of users
     post_model.post
     .find({

@@ -130,7 +130,7 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
-	app.get('/about', isLoggedIn, post.getuserdetails); 					// about page
+	app.get('/about', post.getuserdetails); 					// about page
 
    // user home tile line bind to profile EJS , changed in route/path  also
     app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
@@ -140,12 +140,12 @@ module.exports = function(app, passport) {
 
 
     // UserHome
-    // app.get('/gethomepost/:username', userhome.getuserhomeposts);    // user home timeline post API
-    app.get('/getpostsrtreply/:username', isLoggedIn, userhome.getpostsrtreply);   // tweet,retweet & reply post
+    app.get('/gethomepost/:username', userhome.getuserhomeposts);    // user home timeline post API
+    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);   // tweet,retweet & reply post
  
     // Mention
-    app.get('/mention/:mention_user', mention.getmentionuser);     // Get Mention User Details
-    app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
+    app.get('/mention/:mention_user', mention.getmentionuser);     // Get post of user by mention user
+    // app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
     // HashTags
     //app.post('/hashtags', hashtag.gethashtag);         // Get all hashtag keyword

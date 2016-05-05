@@ -208,6 +208,7 @@ var getfollowing = function(req, res) {
         .find({
             username: user_name
         })
+    // .select('_id')
     // .exec(function(err, result) {
 
     //     // console.info(result[0]._id);
@@ -312,7 +313,7 @@ var getfollowers = function(req, res) {
         .find({
             username: user_name
         })
-        .select('_id')
+        // .select('_id')
         .exec(function(err, result) {
 
             // console.info(result[0]._id);
@@ -328,7 +329,7 @@ var getfollowers = function(req, res) {
                     })
                     .populate('following_id user_id')
 
-                .exec(function(err, result) {
+                .exec(function(err, followerResult) {
                     // console.info(result);
                     // var f_list = result;
 
@@ -349,26 +350,18 @@ var getfollowers = function(req, res) {
 
                     }, function optionalCallback(err, body) {
 
-                        var dk_f_list = {
-                            // trend: JSON.parse(body.body),
-                            trend: body,
-                            following_list: {
-                                data: result
-                            }
-
-                        }
-                        res.render('pages/follower', {
-                            Following_result: {
-                                data001: result,
-                                data002: body
-                            },
-                            // Following_result: { data001: result , data002: JSON.parse(body.body) } ,
-                            user: req.user
-                        });
-                        // res.json({
-                        //     Following_result: { data001: result , data002: JSON.parse(body.body) } 
-                        //     // Following_result: [dk_f_list]
-                        // })
+                        // res.render('pages/follower', {
+                        //     Following_result: {
+                        //         data001: followerResult,
+                        //         data002: body
+                        //     },
+                        //     // Following_result: { data001: result , data002: JSON.parse(body.body) } ,
+                        //     user: req.user
+                        // });
+                        res.json({
+                            Following_result: { data001: result , data002: JSON.parse(body.body) }
+                            // Following_result: [dk_f_list]
+                        })
                     })
 
                 })

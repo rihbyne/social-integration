@@ -1,4 +1,6 @@
 var mongoose        = require('mongoose');           								// For Mongoose
+var post 			= require('./postSchema.js');									// For Post Schema
+// var reply 			= require('./')
 
 // Notification Schema
 var notification = mongoose.Schema({

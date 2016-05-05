@@ -261,10 +261,8 @@ function getPostByUserId(callback){
     
     //use userid to find all post of users
     post_model.post
-    .find({
+    .find({ 
         posted_by: userid
-    }, {
-        _id: 0
     })
     .populate('posted_by')
     .sort({

@@ -114,7 +114,20 @@
                                                 </a>
                                                 <form method="post" action="/setlike" class="frm-inline"  name='likeform'>
                                                     <input type="hidden" name="like_user_id" value="<%= user._id %>">
+                                                    <input type="hidden" name="type" value="<%= ProfilePosts.post_type %>">
+                                                    <% if (ProfilePosts.post_type = 1) { %>
+
                                                     <input type="hidden" name="post_id" value="<%= ProfilePosts._id %>">
+
+                                                    <% } else if (ProfilePosts.post_type = 2){ %>
+
+                                                    <input type="hidden" name="retweet_quote_id" value="<%= ProfilePosts._id %>">
+
+                                                    <% } else{ %>
+
+                                                    <input type="hidden" name="reply_id" value="<%= ProfilePosts._id %>">
+                                                        
+                                                    <% } %>
                                                     <button href="#" class="btn-like  tooltipped" data-position="top" data-delay="50" data-tooltip="like"  ><i class="fa fa-heart"></i>
                                                     <span class="rt-count"> <%= ProfilePosts.like_count %></span>
                                                     </button>

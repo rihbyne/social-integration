@@ -1,5 +1,6 @@
 var postModel 	= require('../models/postSchema.js');		// Including postModel File
 var async		= require('async');
+var log = require('../../config/logging')()
 
 //Set Post Like
 var setLike = function(req, res) {
@@ -34,7 +35,8 @@ var setLike = function(req, res) {
 					};
 
 					console.log('Post Unliked', result);
-					res.send('Post Unliked Successfully');
+					log.info('Post Unliked Successfully');
+					res.redirect('/')
 				})
 	  
 			} 
@@ -52,8 +54,8 @@ var setLike = function(req, res) {
 						res.send(err);
 
 					console.log('Post Like');
-					res.send('Post Liked Successfully');					
-
+					log.info('Post Liked Successfully');					
+             		res.redirect('/')
 				});
 
 			}

@@ -1,7 +1,7 @@
 var post_model = require('../models/postSchema.js');
 var async 	   = require('async');
 var master     = require('./master.js');
-
+var notificationModel = require('../models/notificationSchema.js');
 
 //update reply to post
 var setreply =  function(req, res){
@@ -92,7 +92,7 @@ var setreply =  function(req, res){
             console.log('post created.');
 
         });
-
+		
         // res.json({
         //     message: 'Reply Inserted'
         // });

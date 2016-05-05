@@ -208,7 +208,6 @@ var getfollowing = function(req, res) {
         .find({
             username: user_name
         })
-        .select()
     // .exec(function(err, result) {
 
     //     // console.info(result[0]._id);
@@ -256,8 +255,8 @@ var getfollowing = function(req, res) {
                     }]
                 })
                 .populate('user_id following_id')
-                .exec(function(err, result) {
-                    console.info(result);
+                .exec(function(err, followerResult) {
+                    console.info(followerResult);
                     request.get({
 
                         url: 'http://localhost:4000/Trendsdk',
@@ -267,27 +266,22 @@ var getfollowing = function(req, res) {
 
                     }, function optionalCallback(err, body) {
 
-                        var dk_f_list = {
-                            trend: body,
-                            following_list: {
-                                data: result
-                            }
-                        }
-                        res.render('pages/following', {
-                            Following_result: {
-                                data001: result,
-                                data002: body
-                            },
-                            user: req.user
-                        });
-                       // res.status(status).send(body)
-                        // res.send('pages/following', {
+                        // res.render('pages/following', {
                         //     Following_result: {
                         //         data001: result,
                         //         data002: body
                         //     },
                         //     user: req.user
                         // });
+                       // res.status(status).send(body)
+
+                        res.send('pages/following', {
+                            Following_result: {
+                                data001: followerResult,
+                                data002:  JSON.parse(body.body)
+                            },
+                            user: result
+                        });
 
                     })
                 })

@@ -5,7 +5,7 @@ var master = require('./master.js');
 var async = require('async');
 var request = require('request');
 
-// to get details @logged in user home page using same API 
+// to get details @logged in user home page using same API for ejs
 var loggednin_home_userdetails = function(req, res) {
    
     console.log('Show all posts for single user on home page');
@@ -156,16 +156,14 @@ var getuserhomeposts = function(req, res) { // get a post
 
             // console.info(result[0]+''+result[1]);
 
-            res.render('pages/user_profile_home.ejs', {
-                ProfilePosts: profilePosts ,
-                pro_user: user_details_all , 
-                user : req.user
-            });
-            // res.json({
+            // res.render('pages/user_profile_home.ejs', {
             //     ProfilePosts: profilePosts ,
             //     pro_user: user_details_all , 
             //     user : req.user
             // });
+            res.json({
+                ProfilePosts: profilePosts 
+            });
 
         });
 

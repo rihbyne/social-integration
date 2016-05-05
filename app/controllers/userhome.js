@@ -156,14 +156,17 @@ var getuserhomeposts = function(req, res) { // get a post
 
             // console.info(result[0]+''+result[1]);
 
-            // res.render('pages/user_profile_home.ejs', {
+            res.render('pages/user_profile_home.ejs', {
+                ProfilePosts: profilePosts ,
+                pro_user: user_details_all , 
+                user : req.user
+            });
+            // res.json({
             //     ProfilePosts: profilePosts ,
             //     pro_user: user_details_all , 
             //     user : req.user
+
             // });
-            res.json({
-                ProfilePosts: profilePosts 
-            });
 
         });
 

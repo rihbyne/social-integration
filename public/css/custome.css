@@ -628,3 +628,14 @@ li.ChatLog__entry.ChatLog__entry_mine .ChatLog__avatar {
   font-size: 80%;
   color: #444;
 }
+
+
+.wrap-link {
+    position: relative;
+}
+form.follow-form {
+    position: absolute;
+    right: 0;
+    top: 15px;
+    right: 23px;
+}

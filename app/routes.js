@@ -4,43 +4,42 @@ var router 			= express.Router();
 var path 			= require('path');
 
 // Pages
-var post 			= require('../api/post.js');
-var mention 		= require('../api/mention.js');
-var follow 			= require('../api/following.js');
-var hashtag 		= require('../api/hashtag.js');
-var like 			= require('../api/like.js');
-var retweet 		= require('../api/retweet.js');
-var userhome 		= require('../api/userhome.js');
-var reply 			= require('../api/reply.js');
-var blockuser 		= require('../api/blockuser.js');
-var suggest			= require('../api/suggestion.js');
-var notification	= require('../api/notification.js');
+var post 			= require('./controllers/post.js');
+var mention 		= require('./controllers/mention.js');
+var follow 			= require('./controllers/following.js');
+var hashtag 		= require('./controllers/hashtag.js');
+var like 			= require('./controllers/like.js');
+var retweet 		= require('./controllers/retweet.js');
+var userhome 		= require('./controllers/userhome.js');
+var reply 			= require('./controllers/reply.js');
+var blockuser 		= require('./controllers/blockuser.js');
+var suggest			= require('./controllers/suggestion.js');
+var notification	= require('./controllers/notification.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
 
-    app.get('/', isLoggedIn, function(req, res) {
-        // save the bear and check for errors
-        var drinks = [{
-						name: 'Bloody Mary',
-						drunkness: 3
-					},{
-						name: 'Martini',
-						drunkness: 5
-					},{
-						name: 'Scotch',
-						drunkness: 10
-					}];
+    // app.get('/', isLoggedIn, function(req, res) {
+    //     // save the bear and check for errors
+    //     var drinks = [{
+				// 		name: 'Bloody Mary',
+				// 		drunkness: 3
+				// 	},{
+				// 		name: 'Martini',
+				// 		drunkness: 5
+				// 	},{
+				// 		name: 'Scotch',
+				// 		drunkness: 10
+				// 	}];
 					
-        var tagline = "Any code of your own that you haven't looked at for six or more months might as well have been written by someone else.";
+    //     var tagline = "Any code of your own that you haven't looked at for six or more months might as well have been written by someone else.";
 
-        res.render('pages/index', {
-            drinks: drinks,
-            tagline: tagline,
-            user: req.user,
-        });
+    //     res.render('pages/index', {
+          
+    //     });
 
-    });
+    // });
+    app.get('/' ,  isLoggedIn , userhome.loggednin_home_userdetails);
 
     // =====================================
     // LOGIN ===============================
@@ -132,33 +131,33 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
-	app.get('/about', isLoggedIn, post.getuserdetails); 					// about page
+	app.get('/about', post.getuserdetails); 					// about page
 
    // user home tile line bind to profile EJS , changed in route/path  also
-    app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
+    // app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
 
 
 /*===========================================================================================================================*/
 
 
     // UserHome
-    // app.get('/gethomepost/:username', userhome.getuserhomeposts);    // user home timeline post API
+    app.get('/gethomepost/:username', userhome.getuserhomeposts);    // user home timeline post API
     app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);   // tweet,retweet & reply post
  
     // Mention
-    app.get('/mention/:mention_user', mention.getmentionuser);     // Get Mention User Details
-    app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
+    app.get('/mention/:mention_user', mention.getmentionuser);     // Get post of user by mention user
+    // app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
     // HashTags
-    //app.post('/hashtags', hashtag.gethashtag);         // Get all hashtag keyword
-    app.get('/hashtags/:hashtag', hashtag.gethashposts);      // Get post from hashtag
-    //app.get('/hashtag/count', hashtag.allhashtagcount);      // Get the count of all hashtag
+    app.get('/hashtag/:hashtag', hashtag.gethashposts);      // Get post from hashtag
     app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);     // Get the count of specifiedhashtag
+    //app.post('/hashtags', hashtag.gethashtag);         // Get all hashtag keyword    
+    //app.get('/hashtag/count', hashtag.allhashtagcount);      // Get the count of all hashtag
     //app.post('/gethashtaglistcount', hashtag.gethashtaglist);     // Get all hashtag keyword
 
     // Retweet
     app.post('/setretweet', retweet.setretweet);        // Set new user
-    app.get('/getretweet/:post_id', retweet.getretweet);      // Get Retweet by post
+    app.get('/retweet/:post_type/:post_id', retweet.getretweet);      // Get Retweet by post
     app.post('/deleteRetweet', retweet.deleteRetweet);       // delete retweet
 
     //Post
@@ -197,9 +196,10 @@ module.exports = function(app, passport) {
                                                                                                                                                                            
     //Like
     app.post('/setLike', like.setLike);          // Set Like
-    app.get('/like/post/:post_id', like.getLikeByPost);      // Get like by post
-    app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   // Get like by retweet
-    app.get('/like/reply/:reply_id', like.getLikeByReply);      // Get like by reply
+    app.get('/like/:post_type/:post_id', like.getlike);      // Get like by reply
+    // app.get('/like/post/:post_id', like.getLikeByPost);      // Get like by post
+    // app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   // Get like by retweet
+    // app.get('/like/reply/:reply_id', like.getLikeByReply);      // Get like by reply
     app.get('/like/user/:user_id', like.getLikeByUser);      // Get like by User
     
 	

@@ -1,4 +1,4 @@
-var notificationModel = require('../app/models/notificationSchema.js');
+var notificationModel = require('../models/notificationSchema.js');
 
 var getNotification = function (req, res){
 

@@ -1,4 +1,4 @@
-var postModel 	= require('../app/models/postSchema.js');		// Including postModel File
+var postModel 	= require('../models/postSchema.js');		// Including postModel File
 var async		= require('async');
 
 //Set Post Like
@@ -399,7 +399,58 @@ var setLikeCount = function(id, type, res){
 	}
 }
 
+//Get Retweets of single post
+var getlike = function(req, res) { 
+
+    var post_id = req.params.post_id;
+    var post_type = req.params.post_type;
+    var query, collectionName;
+
+    if(post_type == 1){
+    	collectionName = postModel.post_like;
+        query = {post_id: post_id}
+    }
+    else if(post_type == 2){
+    	collectionName = postModel.retweet_like;
+        query = {retweet_quote_id: post_id}
+    }
+    else if(post_type == 3){
+    	collectionName = postModel.reply_id;
+        query = {reply_id: post_id}
+    }
+    else{
+        console.info('wrong post type');
+        res.json({
+            Result : 'No post_type found'
+        })
+        return;
+    }
+
+    collectionName
+    .find(query)
+    .select('like_user_id')
+    .populate('like_user_id')
+    .lean()
+    .exec(function(err, getRetweetResult){
+
+        if (err) {
+            res.send(err);
+            return
+        };
+
+        console.info(getRetweetResult.length);
+        console.info(getRetweetResult);
+
+        res.json({
+            count: getRetweetResult.length,
+            likeinfo :getRetweetResult
+        })
+
+    });
+
+}
 module.exports = ({
+	getlike 			: getlike,
     getLikeByUser 		: getLikeByUser,
     getLikeByPost 		: getLikeByPost,
     getLikeByRetweet 	: getLikeByRetweet,

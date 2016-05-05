@@ -1,7 +1,7 @@
-var user = require('../app/models/userSchema.js');
-var post_model = require('../app/models/postSchema.js');
-var mention_model = require('../app/models/mentionSchema.js');
-var hashtag_model = require('../app/models/hashtagSchema.js');
+var user = require('../models/userSchema.js');
+var post_model = require('../models/postSchema.js');
+var mention_model = require('../models/mentionSchema.js');
+var hashtag_model = require('../models/hashtagSchema.js');
 
 
 //find id of user from username
@@ -9,7 +9,7 @@ var getUserId = function(username, res){
 
     user
     .find({ username: username })
-    .select('_id')
+    // .select('_id')
     .exec(function(err, userdata) {
 
         if (err)
@@ -18,8 +18,9 @@ var getUserId = function(username, res){
         else if (userdata.length !== 0) {
 
             userid = userdata[0]._id;
+            user_details_all = userdata[0];
 
-            return res(null, userid);
+            return res(null, userid , user_details_all);
         }
         else{
 

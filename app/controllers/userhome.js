@@ -1,22 +1,22 @@
-var user = require('../app/models/userSchema.js');
-var post_model = require('../app/models/postSchema.js');
-var user_followers = require('../app/models/followersSchema.js');
+var user = require('../models/userSchema.js');
+var post_model = require('../models/postSchema.js');
+var user_followers = require('../models/followersSchema.js');
 var master = require('./master.js');
 var async = require('async');
+var request = require('request');
 
-//Get all post and retweet of user
-var getuserhomeposts = function(req, res) { // get a post 
-
+// to get details @logged in user home page using same API for ejs
+var loggednin_home_userdetails = function(req, res) {
+   
     console.log('Show all posts for single user on home page');
-
-    var username = req.params.username; // find posts of user and check for errors
-
-    console.log('user ', req.params.username);
+    var username_param = req.user.username 
+    console.log('user name default is ' +username_param)
+    var username = username_param; // find posts of user and check for errors
 
     var result1, result2;
 
     //Get My Post
-    master.getUserId(username, function(err, userid){
+    master.getUserId(username, function(err, userid , user_details_all){
 
         if (err) {
             
@@ -58,7 +58,90 @@ var getuserhomeposts = function(req, res) { // get a post
                 //     message: result
                 // });
                 // return;
+            }
+            else{
 
+                var profilePosts = result[0].concat(result[1]);//Got two result , concent two results
+                    function custom_sort(a, b) {
+                        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                    }
+
+                profilePosts.sort(custom_sort);
+                
+            };
+
+
+            res.render('pages/index.ejs', {
+                ProfilePosts: profilePosts ,
+                pro_user: user_details_all , 
+                user : req.user
+            });
+            // res.json({
+            //     ProfilePosts: profilePosts ,
+            //     pro_user: user_details_all , 
+            //     user : req.user
+            // });
+
+        });
+
+    });
+
+}
+
+//Get all post and retweet of user
+var getuserhomeposts = function(req, res) { // get a post 
+
+    console.log('Show all posts for single user on home page');
+
+    var username = req.params.username; // find posts of user and check for errors
+
+    console.log('user ', req.params.username);
+
+    var result1, result2;
+
+    //Get My Post
+    master.getUserId(username, function(err, userid , user_details_all){
+
+        if (err) {
+            
+            console.info(userid);
+
+            res.json({
+                Error: userid
+                // PostRTReply : result
+            });
+
+            return;
+        };
+        console.info(userid);
+
+        //using async series function get all post 
+        async.parallel([
+            getPostByUserId,
+            getRetweetByUserId,
+            getQuoteRetweetByUserId
+        ],
+        function (err, result) {
+                
+            console.info(result);
+
+            var profilePosts;
+
+            if (err) {
+
+                if (result[0] === 0) {
+                    console.info('Own posts are zero');
+                    var profilePosts = result[1]
+                }
+
+                if (result[1] === 0) {
+                    console.info('Retweet posts are zero');
+                    var profilePosts = result[0]
+                }
+                // res.json({
+                //     message: result
+                // });
+                // return;
             }
             else{
 
@@ -73,16 +156,14 @@ var getuserhomeposts = function(req, res) { // get a post
 
             // console.info(result[0]+''+result[1]);
 
-            res.render('pages/user_profile_home.ejs', {
-                user: req.user , // get the user out of session and pass to template
-                ProfilePosts: profilePosts
-            });
-
-            // res.json({
-            //     ProfilePosts: profilePosts,
-            //     user:req.user
+            // res.render('pages/user_profile_home.ejs', {
+            //     ProfilePosts: profilePosts ,
+            //     pro_user: user_details_all , 
+            //     user : req.user
             // });
-
+            res.json({
+                ProfilePosts: profilePosts 
+            });
 
         });
 
@@ -174,7 +255,7 @@ var getpostsrtreply = function(req, res) { // get a post
 
 //find post from userid
 function getPostByUserId(callback){
-
+    
     //use userid to find all post of users
     post_model.post
     .find({
@@ -412,6 +493,7 @@ function getQuoteRetweetByUserId(callback){//simple retweet
 
 module.exports = ({
     getuserhomeposts : getuserhomeposts,
-    getpostsrtreply : getpostsrtreply
+    getpostsrtreply : getpostsrtreply,
+    loggednin_home_userdetails:loggednin_home_userdetails
     // getRetweetByUserId:getRetweetByUserId
 })

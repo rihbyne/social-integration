@@ -1,7 +1,7 @@
-var post_model = require('../app/models/postSchema.js');
+var post_model = require('../models/postSchema.js');
 var async 	   = require('async');
 var master     = require('./master.js');
-var notificationModel = require('../app/models/notificationSchema.js');
+var notificationModel = require('../models/notificationSchema.js');
 
 //update reply to post
 var setreply =  function(req, res){
@@ -92,78 +92,6 @@ var setreply =  function(req, res){
             console.log('post created.');
 
         });
-
-		
-		if(mentionusers != "")
-		{
-			// console.log('Users : ',mentionusers);
-			//var notification_user = [];
-			var i = -1;
-			
-			var notification_message = username+' Has Mentioned you in post';
-			
-			var notification = new notificationModel.notification({
-
-				notification_message: notification_message,
-				notification_user: mentionusers,
-				post_id:post._id,
-				usrname: username
-				
-			});
-			
-			// console.log(notification_user);
-			notification.save(function(err) {
-			
-				if (err)
-					res.send(err);
-					
-				console.log('Notification Saved');
-				
-			})
-			
-			
-			// async.each(mentionusers, function(mentionuser, callback){
-				
-				// master.getUserId(mentionuser, function(err, getId) {
-				
-					// if (err)
-						// res.send(err);
-					
-					// if(getId != 'No user found')
-					// {
-						// i++;
-						// var result = {username:mentionuser, userId:getId};
-						// notification_user[i] = result
-					// }
-					
-					// callback();
-					
-				// })
-				
-			// }, function(err){
-			
-				// var notification = new notificationModel.notification({
-
-					// notification_message: notification_message,
-					// notification_user: notification_user,
-					// post_id:post._id,
-					// usrname: username
-					
-				// });
-			
-				// console.log(notification_user);
-				// notification.save(function(err) {
-				
-					// if (err)
-						// res.send(err);
-						
-					// console.log('Notification Saved');
-				
-				// })
-			
-			// })
-		}
-		
 		
         // res.json({
         //     message: 'Reply Inserted'

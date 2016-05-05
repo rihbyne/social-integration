@@ -1,34 +1,295 @@
 <!-- views/pages/index.ejs -->
+
+<!-- data coming from loggednin_home_userdetails API  -->
+
+
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<% include ../partials/head %>
-	</head>
-	<body>
-		<header>
-			<% include ../partials/header %>
-		</header>
-		<main>
-		<div class="jumbotron">
-			<p><%= tagline %></p>
-			<ul>
-				<% drinks.forEach(function(drink) { %>
-				<li><%= drink.name %> - <%= drink.drunkness %></li>
-				<% }); %>
-			</ul>
-			  <a class="waves-effect waves-light btn-large" href="#">Wave</a>
-
-			  <h5>logged in user details</h5>
-			  <p> First name :<%= user.first_name %></p>
-			  <p> last name :<%= user.last_name %></p>
-			  <p> Username :<%= user.username %></p>
-			  <p> email :<%= user.email %></p>
-			  <p> Password :<%= user.password %></p>
-		</div>
-		</main>
-		<footer>
-			<% include ../partials/footer %>
-		</footer>
-		
-	</body>
+    <head>
+        <% include ../partials/head %>
+    </head>
+    <body>
+        <header>
+            <% include ../partials/header %>
+        </header>
+        <div  class="container big">
+            <div class="row bg-color">
+                <div class="col s12 m12 l3">
+                  <div class="card">
+                        <div class="card-image waves-effect waves-block waves-light">
+                            <img class="activator" src="images/CeoXGIuWQAAtrZN.jpg">
+                        </div>
+                        <div class="card-content">
+                            <img src="images/pro_01.jpg" alt="" class="circle user_pro_p">
+                            <span class="card-title activator grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%><i class="material-icons right">more_vert</i></span>
+                            <p></p>
+                            <p><a href="/<%= user.username %>">@<%= user.username %></a></p>
+                        </div>
+                        <div class="card-reveal">
+                            <span class="card-title grey-text text-darken-4"><%= user.first_name %> <%= user.last_name%></b><i class="material-icons right">close</i></span>
+                            <p>I strongly believe that we can change our country's fate we r the future of our country.Full stack programmer. <a href="http://sudeepdk.com ">http://sudeepdk.com</a></p>
+                        </div>
+                        <div class="card-action t-count">
+                            <ul>
+                                <li><a href="/userhome">tweet<span><%=  %></span></a></li>
+                                <li><a href="/<%= user.username%>/following">Following<span><%=  %></span></a></li>
+                                <li><a href="/<%= user.username%>/followers">Follower<span><%=  %></span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                   <div class="trend-wrap z-depth-1">
+                        <h5>Trends</h5>
+                        <ul>
+                            <li><a href="#12">#india</a><span>26.7K Tweets</span></li>
+                            <li><a href="#12">#india</a><span>26.7K Tweets</span></li>
+                            <li><a href="#12">#india</a><span>26.7K Tweets</span></li>
+                            <li><a href="#12">#india</a><span>26.7K Tweets</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- END left div -->
+                <div class="col s12 m12 l6">
+                    <div class="row">
+                        <form class="col s12">
+                            <div class="row">
+                                <% include ../partials/tweet_type_tab.ejs %>
+                                <div id="test1" class="col s12">
+                                    <ul class="link-pro-tabs">
+                                        <li><a href="/userhome">tweets</a></li>
+                                        <li><a href="/userhome">tweets&reply</a></li>
+                                    </ul>
+                                    <ul class="collection social_post">
+                                        <% ProfilePosts.forEach(function(ProfilePosts, i){ %>
+                                        <li class="collection-item avatar">
+                                            <img src="images/pro_01.jpg" alt="" class="circle">
+                                            <a href=""><b class="fullname"><%= user.first_name %> <%= user.last_name%></b></a><a href="#" class="u_id">@<%= user.username %></a><a href="#" class="post-time"><%= ProfilePosts.created_at %></a><br>
+                                            <p><%= ProfilePosts.post_description %>
+                                            </p>
+                                            <div class="card-action">
+                                                <a href="#modalREP<%= i %>" class="modal-trigger btn-reply tooltipped" data-position="top" data-delay="50" data-tooltip="reply"><i class="fa fa-reply"></i></a>
+                                                <a href="#modalrt<%= i %>" class="modal-trigger tooltipped btn-retweet" data-position="top" data-delay="50" data-tooltip="retweet">
+                                                    <i class="fa fa-retweet rt-btn"></i>
+                                                    <span class="rt-count"> <%= ProfilePosts.retweet_count %></span>
+                                                </a>
+                                                <form method="post" action="/setlike" class="frm-inline"  name='likeform'>
+                                                    <input type="hidden" name="like_user_id" value="<%= user._id %>">
+                                                    <input type="hidden" name="post_id" value="<%= ProfilePosts._id %>">
+                                                    <input type="hidden" name="like_user_name" value="<%= ProfilePosts.username %>">
+                                                    <button href="#" class="btn-like  tooltipped" data-position="top" data-delay="50" data-tooltip="like"  ><i class="fa fa-heart"></i>
+                                                    <span class="rt-count"> <%= ProfilePosts.like_count %></span>
+                                                    </button>
+                                                </form>
+                                                <a class='dropdown-button right' href='#' data-activates='dropdown<%= i %>'>
+                                                <i class="fa fa-ellipsis-h"></i></a>
+                                                <!-- Dropdown Structure -->
+                                                <ul id='dropdown<%= i %>' class='dropdown-content'>
+                                                    <li><a href="#!">Share via Direct Message</a></li>
+                                                    <li><a href="#!">Copy link to Tweet</a></li>
+                                                    <li><a href="#!">Embed Tweet</a></li>
+                                                    <li><a href="#!">Pin to your profile page</a></li>
+                                                    <li><a href="#!">Unpin from profile page</a></li>
+                                                    <li><a href="#!">Delete Tweet</a></li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <% }) %>
+                                    </ul>
+                                </div>
+                                
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- END center div post  -->
+                <div class="col s12 m12 l3">
+                    <a href="#">Who to follow</a>
+                    <a href="#1" class="right">view all</a>
+                    <ul class="collection">
+                        <li class="collection-item avatar">
+                            <img src="images/pro_01.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname">Damon Jernstad</b></a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Leonel</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                            <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                        </li>
+                        <li class="collection-item avatar">
+                            <img src="images/pro_02.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname">Harrison Bonardi</b></a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Aiko</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                            <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                        </li>
+                        <li class="collection-item avatar">
+                            <img src="images/pro_03.jpg" alt="" class="circle">
+                            <a href=""><b class="fullname">Linnie Escalona</b></a><br>
+                            <small>
+                            Followed by <a href="#12"><b>Collette</b></a> and <a href="#" class=""><b>others</b></a>
+                            </small>
+                            <!-- <a href="../icon/user-plus"><i class="fa fa-user-plus"></i></a> -->
+                            <a href="#!" class="secondary-content"><i class="fa fa-user-plus"></i></a>
+                        </li>
+                    </ul>
+                   
+                </div>
+                <!-- right div suggesion , footer -->
+            </div>
+        </div>
+        <!-- Modal Trigger -->
+        <a href="#modal1" class=" modal-trigger btn-floating btn-large waves-effect waves-light red btn-tw-st"><i class="material-icons">add</i></a>
+        <!-- <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a> -->
+        <!-- Modal Structure -->
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <div class="row">
+                    <form method="post" action="/setpost" name="compose_post">
+                        <input type="hidden" name="username" value="<%= user.username %>">
+                        <h5 class="center-align">Compose a new Post</h5>
+                        <div class="input-field col s12 mb-10">
+                            <!-- <input type="text" name="post_title" value=""> -->
+                            <textarea id="textarea1" name="post_description" placeholder="what's happening?" class="materialize-textarea" length="350"></textarea>
+                            <label for="textarea1"></label>
+                        </div>
+                        <div class="fixed-action-btn horizontal click-to-toggle">
+                            <a class="btn-floating btn-large red">
+                                <i class="large mdi-navigation-menu"></i>
+                            </a>
+                            <ul>
+                                <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+                                <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+                                <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+                                <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
+                                </button></li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- tweet to user modal -->
+        <div id="modal2" class="modal">
+            <div class="modal-content">
+                <div class="row">
+                    <form method="post" action="/setpost" name="compose_post">
+                        <input type="hidden" name="username" value="<%= user.username %>">
+                        <h5 class="center-align">tweet to <%= user.username %></h5>
+                        <div class="input-field col s12 mb-10">
+                            <!-- <input type="text" name="post_title" value=""> -->
+                            <textarea id="textarea1" name="post_description" placeholder="Please write some messege to tweet@<%= user.username %>" class="materialize-textarea" length="350">@<%= user.username %></textarea>
+                            <label for="textarea1"></label>
+                        </div>
+                        <div class="fixed-action-btn horizontal click-to-toggle">
+                            <a class="btn-floating btn-large red">
+                                <i class="large mdi-navigation-menu"></i>
+                            </a>
+                            <ul>
+                                <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+                                <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+                                <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+                                <li><button class="btn-floating yellow"><i class="material-icons">library_add</i>
+                                </button></li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- messege modal -->
+        <div id="modal_messege" class="modal msg-box-modal">
+            <div class="modal-content">
+                <div class="row">
+                    <div class="messege-header">
+                        <p class="center">sudeep_dk
+                            <a class='dropdown-button right' href='#' data-activates='dropdown_msg'><i class="fa fa-ellipsis-h"></i></a>
+                        </p>
+                        <!-- Dropdown Structure -->
+                        <ul id='dropdown_msg' class='dropdown-content'>
+                            <li><a href="#!">Turn off notifications</a></li>
+                            <li><a href="#!">Delete conversation</a></li>
+                            <li><a href="#!">Flag</a></li>
+                        </ul>
+                    </div>
+                    <div class="messege-body-wrap col m12 s12">
+                        <!--  <ul>
+                            <li>
+                                <a href="">test</a>
+                            </li>
+                            <li>
+                                <a href="">test</a>
+                            </li> <li>
+                            <a href="">test</a>
+                        </li> <li>
+                        <a href="">test</a>
+                    </li> <li>
+                    <a href="">test</a>
+                </li> <li>
+                <a href="">test</a>
+            </li> <li>
+            <a href="">test</a>
+        </li> <li>
+        <a href="">test</a>
+    </li>
+</ul> -->
+<div class="arrow"></div>
+<ul class="ChatLog">
+    <li class="ChatLog__entry">
+        <img class="ChatLog__avatar" src="//placekitten.com/g/50/50" />
+        <p class="ChatLog__message">
+            Hello!
+            <time class="ChatLog__timestamp">6 minutes ago</time>
+        </p>
+    </li>
+    <li class="ChatLog__entry">
+        <img class="ChatLog__avatar" src="//placekitten.com/g/50/50" />
+        <p class="ChatLog__message">
+            What is going on here?
+            <time class="ChatLog__timestamp">5 minutes ago</time>
+        </p>
+    </li>
+    <li class="ChatLog__entry ChatLog__entry_mine">
+        <img class="ChatLog__avatar" src="//placekitten.com/56/56" />
+        <p class="ChatLog__message">
+            I have no idea.
+            <time class="ChatLog__timestamp">4 minutes ago</time>
+        </p>
+    </li>
+    <li class="ChatLog__entry">
+        <img class="ChatLog__avatar" src="//placekitten.com/g/50/50" />
+        <p class="ChatLog__message">
+            I have a neat idea. Maybe I should explain it to you in detail?
+            <time class="ChatLog__timestamp">3 minutes ago</time>
+        </p>
+    </li>
+    <li class="ChatLog__entry ChatLog__entry_mine">
+        <img class="ChatLog__avatar" src="//placekitten.com/50/50" />
+        <p class="ChatLog__message">
+            Sure thing. The more detail the better. In fact, if you could provide definitions for every single term you use, that would be terrific!
+            <time class="ChatLog__timestamp">2 minutes ago</time>
+        </p>
+    </li>
+</ul>
+</div>
+<div class="msg-footer">
+<div class="row">
+    <div class="input-field col s12 m12">
+        <input id="msg" type="text" class="col m11 s11">
+        <a class="btn-floating right blue waves-effect"><i class="material-icons">send</i></a>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- messege modal -->
+<!--                                     <div class="modal-footer">
+<a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+</div>
+-->
+<footer>
+<% include ../partials/footer %>
+</footer>
+</body>
 </html>

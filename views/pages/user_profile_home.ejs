@@ -79,15 +79,20 @@
                 <!-- END left div -->
                 <div class="col s12 m12 l6">
                     <div class="row">
-                        <form class="col s12">
+                        <div class="col s12">
                             <div class="row">
-                                <div class="col s12">
+                                <div class="col s12 wrap-link">
                                     <ul class="link-pro-tabs main-tab">
                                         <li><a  href="/<%= pro_user.username%>">TWEETS<br><span>744</span></a></li>
                                         <li><a href="/<%= pro_user.username%>/following" class="">FOLLOWING<br><span>744</span></a></li>
                                         <li><a href="/<%= pro_user.username%>/followers">FOLLOWERS<br><span>744</span></a></li>
                                         <li><a href="/like">LIKES<br><span>744</span></a></li>
                                     </ul>
+                                    <form name="setfollowings" class="follow-form" method="post" action="/setfollowing">
+                                        <input type="hidden" name="following_id" value="<%= pro_user._id %>">
+                                        <input type="hidden" name="user_id"  value="<%= user._id %>">
+                                        <button class="waves-effect waves-light blue btn">Follow </button>
+                                    </form>
                                 </div>
                                 <div id="test1" class="col s12">
                                     <ul class="link-pro-tabs">
@@ -132,7 +137,7 @@
                                 </div>
                                 
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
                 <!-- END center div post  -->

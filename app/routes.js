@@ -134,7 +134,7 @@ module.exports = function(app, passport) {
 	app.get('/about', post.getuserdetails); 					// about page
 
    // user home tile line bind to profile EJS , changed in route/path  also
-    // app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
+    app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
 
 
 /*===========================================================================================================================*/
@@ -171,7 +171,7 @@ module.exports = function(app, passport) {
     
     //Following - Follower   
     app.post('/setfollowing', follow.setfollowing);                         // Set follower// dk
-    app.get('/:user_name/following',  follow.getfollowing);                 // Set followings
+    app.get('/:user_name/following', isLoggedIn , follow.getfollowing);                 // Set followings
     app.get('/:user_name/followers', isLoggedIn , follow.getfollowers);  // Set follower
     app.post('/unlink_following', follow.unlink_following);     // Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower);    // count follower

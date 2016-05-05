@@ -14,6 +14,7 @@ var userhome 		= require('../api/userhome.js');
 var reply 			= require('../api/reply.js');
 var blockuser 		= require('../api/blockuser.js');
 var suggest			= require('../api/suggestion.js');
+var notification	= require('../api/notification.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -201,6 +202,11 @@ module.exports = function(app, passport) {
     app.get('/like/reply/:reply_id', like.getLikeByReply);      // Get like by reply
     app.get('/like/user/:user_id', like.getLikeByUser);      // Get like by User
     
+	
+	// Notification
+	app.get('/notification/:username', notification.getNotification);
+	
+	
 /*===========================================================================================================================*/
 
 };

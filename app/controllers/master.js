@@ -31,6 +31,32 @@ var getUserId = function(username, res){
 
 }
 
+var getusername = function(id, res){
+
+    user
+    .find({ _id: id })
+    .select('username')
+    .exec(function(err, userdata) {
+
+        if (err)
+            res.send(err);
+
+        else if (userdata.length !== 0) {
+
+            username = userdata[0].username;
+            //user_details_all = userdata[0];
+
+            return res(null, username);
+        }
+        else{
+
+            return res(true, 'No user found');
+        }
+
+    });
+
+}
+
 var hashtagMention = function(type, post, mentionusers, hashtags, res){
 
     console.info(post._id);
@@ -159,5 +185,6 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
 
 module.exports = ({
     getUserId : getUserId,
-    hashtagMention : hashtagMention
+    hashtagMention : hashtagMention,
+	getusername : getusername
 })

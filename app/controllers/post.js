@@ -442,7 +442,7 @@ var setpost = function(req, res) { // create a post
 
     console.log('Add post');
 
-    var username = req.body.username; // get the post name (comes from the request)
+    var userid = req.body.userid; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
     //var post_links = req.body.post_links;
 
@@ -479,31 +479,18 @@ var setpost = function(req, res) { // create a post
 
     var post = new post_model.post({
 
-        username: username,
+        posted_by : userid,
         post_description: post_description
         
     }); // create a new instance of the post model
 
-    //call to getuserid function to get _id of user collection
-    master.getUserId(username, function(err, data) {
-		
-		console.log('Data : '+data);
-		
-        if (data == '') {
-
-            res.json({
-                message: 'User not found'
-            });
-            return;
-        };
-
-        post.posted_by = data;
-
         // save the post and check for errors
-        post.save(function(err) {
+    post.save(function(err, result) {
 
-            if (err)
-                res.send(err);
+        if (err)
+            res.send(err);
+
+        master.getusername(result.posted_by, function(username){
 
 			// user_final_followers_schema
 			// .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
@@ -543,7 +530,6 @@ var setpost = function(req, res) { // create a post
 					console.log('Notification Saved');
 					
 				})
-				
 				
 				// async.each(mentionusers, function(mentionuser, callback){
 					
@@ -602,10 +588,10 @@ var setpost = function(req, res) { // create a post
                 console.log('post created.');
 
             });
-            
-        });        
 
-    });
+        })
+        
+    });        
 
     // res.redirect('/about');
 

@@ -15,6 +15,33 @@ var oneToOneMsgSessionSchema = new mongoose.Schema({
   session_time: {type: Date, default: Date.now}
 });
 
+var userMsgSessionUnreadSchema = new mongoose.Schema({
+  session_id_fk_key: {type: mongoose.Schema.Types.ObjectId, ref:'OneToOneMsgSession'},
+  user_id_fk_key: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
+  msg_unread_state: {type: Boolean}
+})
+
+userMsgSessionUnreadSchema.pre('save', true, function(next, done) {
+  var self = this
+  UserMsgSessionUnread
+                     .findOne({
+                       $and: [{user_id_fk_key: this.user_id_fk_key}, {session_id_fk_key: this.session_id_fk_key}]
+                     }, function(err, data) {
+                       if (err) {
+                         log.error(err)
+                         next(err)
+                       } else if (!_.isEmpty(data)) {
+                         log.warn(util.inspect(data))
+                         self.invalidate("_id", "message session unread count object already exist")
+                         next(new Error("message session unread count object already exist"))
+                       } else {
+                         log.info("message session unread count pre hook passed")
+                         next()
+                       }
+                     })
+  done()
+})
+
 var flagMsgSessionSchema = new mongoose.Schema({
   session_id_fk_key: {type: mongoose.Schema.Types.ObjectId, ref: 'OneToOneMsgSession'},
   flag_session_as: {type: mongoose.Schema.Types.Number, ref: 'Flag'},
@@ -72,5 +99,6 @@ var oneToOneMsgTextSchema = new mongoose.Schema({
 });
 
 var OneToOneMsgSession = mongoose.model('OneToOneMsgSession', oneToOneMsgSessionSchema, 'OneToOneMsgSessions')
+var UserMsgSessionUnread = mongoose.model('UserMsgSessionUnread', userMsgSessionUnreadSchema, 'UserMsgSessionUnreads')
 var FlagMsgSession = mongoose.model('FlagMsgSession', flagMsgSessionSchema, 'FlagMsgSessions')
 mongoose.model('OneToOneMsgText', oneToOneMsgTextSchema, 'OneToOneMsgTexts')

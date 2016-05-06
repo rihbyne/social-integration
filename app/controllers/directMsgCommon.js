@@ -8,6 +8,7 @@ var log = require('../../config/logging')()
 var User = mongoose.model('User')
 var Flag = mongoose.model('Flag')
 var OneToOneMsgSession = mongoose.model('OneToOneMsgSession')
+var UserMsgSessionUnread = mongoose.model('UserMsgSessionUnread')
 var FlagMsgSession = mongoose.model('FlagMsgSession')
 var OneToOneMsgText = mongoose.model('OneToOneMsgText')
 
@@ -41,7 +42,7 @@ var sessionExists = function(user_id, to, reportback) {
                     })
 }
 
-isSessionFlaggedByUser = function(user_id, session_id, flagstatus) {
+var isSessionFlaggedByUser = function(user_id, session_id, flagstatus) {
   FlagMsgSession
                .findOne({session_id_fk_key: session_id})
                .exec(function(err, result) {
@@ -65,6 +66,22 @@ isSessionFlaggedByUser = function(user_id, session_id, flagstatus) {
                    }
                  }
                })
+}
+
+var toggleUnreadMsgState = function(user_id, session_id, unreadState, unreadcb) {
+  UserMsgSessionUnread
+  .findOneAndUpdate({
+    $and: [{user_id_fk_key: user_id}, {session_id_fk_key: session_id}]
+  },{$set: {msg_unread_state: unreadState}}, {upsert: true, new: true},
+                    function(err, finalop) {
+                      if (err) {
+                        log.error(err)
+                        unreadcb(err)
+                      } else {
+                        log.info("UnreadMsgState for " + session_id + " -> " + finalop)
+                        unreadcb(null, true)
+                      }
+                    })
 }
 
 var getDMs = function(user_id, cb) {
@@ -142,19 +159,66 @@ var getDMs = function(user_id, cb) {
                                    log.error(err)
                                    cb({failed: err.message})
                                  } else {
-                                   var result = {
-                                     status: 200,
-                                     content: tempSessionList
-                                   }
-                                   cb(null, result)
+                                   log.info("setting unread state to false for user -> " + user_id)
+                                   UserMsgSessionUnread
+                                                      .where({user_id_fk_key: user_id})
+                                                      .setOptions({multi: true, overwrite: true})
+                                                      .update({$set: {msg_unread_state: false}}, function(err, unreadState) {
+                                                        if (err) {
+                                                          log.error(err)
+                                                          cb({failed: err.message})
+                                                        } else {
+                                                          log.info(util.inspect(unreadState))
+                                                          var result = {
+                                                            status: 200,
+                                                            content: tempSessionList
+                                                          }
+                                                          cb(null, result)
+                                                        }
+                                                      })
                                  }
                        })
                      }
                    })
 }
 
-var getDMById = function(user_id, id, cb) {
+var getDMUnreadCount = function(user_id, cb) {
+  UserMsgSessionUnread
+                     .find({
+                       $and: [{user_id_fk_key: user_id}, {msg_unread_state: true}]
+                     })
+                     .count()
+                     .exec(function(err, countObjs) {
+                       if (err) {
+                         log.error(err)
+                         cb({failed: err.message})
+                       } else {
+                         log.info("total unread session objects for " + user_id + " -> " + countObjs)
+                         var result = {
+                           status: 200,
+                           content: {total_unread_count: countObjs}
+                         }
+                         cb(null, result)
+                       }
+
+                     })
+}
+
+var getDMById = function(user_id, id, pollState, ts, cb) {
   var filterOptions = { path: 'user_id_fk_key', select: '_id username'}
+  var nonTSquery = {
+    $and: [{one_to_one_msg_session_fk_key: id}, {flag_msg_as: null}]
+  }
+
+  var withTSquery = {
+    $and: [{one_to_one_msg_session_fk_key: id},
+           {flag_msg_as: null},
+           {user_id_fk_key: { $ne: user_id}},
+           {msg_time: { $gte: new Date(ts).toISOString()}}
+    ]
+  }
+
+  var toggleMsgQuery = pollState? withTSquery: nonTSquery
 
   isSessionFlaggedByUser(user_id, id, function(err, flag) {
     if (err) {
@@ -170,9 +234,7 @@ var getDMById = function(user_id, id, cb) {
       cb(null, result)
     } else {
       OneToOneMsgText
-                .find({
-                  $and: [{one_to_one_msg_session_fk_key: id}, {flag_msg_as: null}]
-                })
+                .find(toggleMsgQuery)
                 .populate(filterOptions)
                 .select('-ip -__v')
                 .sort({msg_time: -1})
@@ -183,42 +245,38 @@ var getDMById = function(user_id, id, cb) {
                     cb(errMsg)
                   } else {
                     log.info('session conversation history \n')
-                    var alteredData = _.map(data, function(msgObj) {
-                      var obj = {
-                        msg_time: msgObj.msg_time,
-                        msg_text: msgObj.msg_text,
-                        session_id: msgObj.one_to_one_msg_session_fk_key,
-                        sender: msgObj.user_id_fk_key,
-                        _id: msgObj._id
-                      }
-                      return obj
-                    })
+                    toggleUnreadMsgState(user_id, id, false, function(err, unreadState) {
+                      if (err) {
+                        log.error(err)
+                        cb({failed: err.message})
+                      } else {
+                        log.info("set unread state to false for user -> " + user_id)
+                        var alteredData = _.map(data, function(msgObj) {
+                          var obj = {
+                            msg_time: msgObj.msg_time,
+                            msg_text: msgObj.msg_text,
+                            session_id: msgObj.one_to_one_msg_session_fk_key,
+                            sender: msgObj.user_id_fk_key,
+                            _id: msgObj._id
+                          }
+                          return obj
+                        })
 
-                    var result = {
-                      status: 200,
-                      content: alteredData
-                    }
-                    cb(null, result)
+                        var result = {
+                          status: 200,
+                          content: alteredData
+                        }
+                        cb(null, result)
+                      }
+                    })
                   }
                 })
     }
   })
+}
 
-  //OneToOneMsgText.aggregate(
-  //  [
-  //    { $match: {"one_to_one_msg_session_fk_key": id.toObjectId()}},
-  //    //{ "$project": {"msg_time": 1 }},
-  //    { "$group": {"_id": id.toObjectId()}},
-  //    { "$sort": {"msg_time": -1}}
-  //  ], function(err, results) {
-  //  if (err) {
-  //    log.error(util.inspect(err))
-  //    var errMsg = err.name === 'CastError'? {failed: "params dont exist", status: 400}: {failed: err.message}
-  //    cb(errMsg)
-  //  } else {
-  //    console.log(results)
-  //  }
-  //})
+var pollNewDMs = function(user_id, id) {
+  
 }
 
 var startDM = function(user_id, to, msgText, ip, cb) {
@@ -263,6 +321,13 @@ var startDM = function(user_id, to, msgText, ip, cb) {
                    ip: ip
                  })
 
+                 //make unread set to true for opposite persion in the conversation
+                 var msgUnreadCount = new UserMsgSessionUnread({
+                   session_id_fk_key: sessionObj._id,
+                   user_id_fk_key: to,
+                   msg_unread_state: true
+                 })
+
                  msgTextObj.save(function(err, recordMsg) {
                    if (err) {
                      log.error("error saving message text object ->" + util.inspect(err))
@@ -277,20 +342,29 @@ var startDM = function(user_id, to, msgText, ip, cb) {
                          cb({"Error": err.message})
                        } else {
                          log.info("msg_text_id saved in session for " + user_id + " -> " + util.inspect(revisedSessionObj))
-
-                         var data = {
-                           status: 200,
-                           content:  {
-                             session_id: sessionObj._id,
-                             messaging_id: recordMsg._id,
-                             sender_user_id: user_id,
-                             receiver_user_id: to,
-                             text: recordMsg.msg_text,
-                             ip: recordMsg.ip,
-                             mtime: recordMsg.msg_time
+                         
+                         msgUnreadCount.save(function(err, unreadObj) {
+                           if (err) {
+                             log.error("error saving message text object ->" + util.inspect(err))
+                             cb({"Error": err.message})
+                           } else {
+                             log.info("saving user message unread state")
+                             
+                             var data = {
+                               status: 200,
+                               content:  {
+                                 session_id: sessionObj._id,
+                                 messaging_id: recordMsg._id,
+                                 sender_user_id: user_id,
+                                 receiver_user_id: to,
+                                 text: recordMsg.msg_text,
+                                 ip: recordMsg.ip,
+                                 mtime: recordMsg.msg_time
+                               }
+                             }
+                             cb(null, data)
                            }
-                         }
-                         cb(null, data)
+                         })
                        }
                      })// end of updating msg session
                    }
@@ -341,6 +415,23 @@ var removeSessionById = function(user_id, id, cb) {
                         done(null, tempMsg)
                       }
                     })
+    },
+    function(done) {
+      UserMsgSessionUnread
+                         .remove({
+                           $and: [{user_id_fk_key: user_id}, {session_id_fk_key: id}]
+                         })
+                         .exec(function(err, delUnreadObj) {
+                           if (err) {
+                             log.error(util.inspect(err))
+                             var errMsg = err.name === 'CastError'? {failed: "params dont exist", status: 400}: {failed: err.message}
+                             done(errMsg)
+                           } else {
+                             var tempMsg = "cleared unread state object"
+                             log.info(tempMsg)
+                             done(null, tempMsg)
+                           }
+                         })
     }
   ], function(err, data) {
     if (err) {
@@ -432,7 +523,7 @@ var resumeDMById = function(user_id, id, ip, msgText, cb) {
                    .findOne({
                      $and: [{_id: id}, {$or:[{user_two_fk_key: user_id}, {user_one_fk_key: user_id}]}]
                    })
-                   .select('latest_msg_text_id_fk_key')
+                   .select('latest_msg_text_id_fk_key user_one_fk_key user_two_fk_key')
                    .exec(function(err, sessionObj) {
                      try {
                        if (err) {
@@ -486,18 +577,29 @@ var resumeDMById = function(user_id, id, ip, msgText, cb) {
                                      log.error(util.inspect(err))
                                      cb({"failed": err.message})
                                    } else {
-                                     var obj = {
-                                       _id: msgObj._id,
-                                       msg_text: msgObj.msg_text,
-                                       msg_time: msgObj.msg_time,
-                                       sender_id: msgObj.user_id_fk_key,
-                                       session_id: updatedsession._id
-                                     }
-                                     var result = {
-                                       status: 200,
-                                       content: obj
-                                     }
-                                     cb(null, result)
+                                     console.log(typeof(user_id))
+                                     console.log(typeof(sessionObj.user_one_fk_key))
+                                     var toggleForUser = user_id === sessionObj.user_one_fk_key.toString()?
+                                                         sessionObj.user_two_fk_key:sessionObj.user_one_fk_key
+                                     toggleUnreadMsgState(toggleForUser, sessionObj._id, true, function(err, unreadState) {
+                                       if (err) {
+                                         log.error(err)
+                                         cb({failed: err.message})
+                                       } else {
+                                         var obj = {
+                                           _id: msgObj._id,
+                                           msg_text: msgObj.msg_text,
+                                           msg_time: msgObj.msg_time,
+                                           sender_id: msgObj.user_id_fk_key,
+                                           session_id: updatedsession._id
+                                         }
+                                         var result = {
+                                           status: 200,
+                                           content: obj
+                                         }
+                                         cb(null, result)
+                                       }
+                                     })
                                    }
                                  }) //end of sessionObj
                                } // end of else
@@ -590,7 +692,9 @@ var flagMsgId = function(user_id, id, msg_id, flag_id, cb) {
 
 module.exports = {
   getDMs: getDMs,
+  getDMUnreadCount: getDMUnreadCount,
   getDMById: getDMById,
+  pollNewDMs: pollNewDMs,
   startDM: startDM,
   removeSessionById: removeSessionById,
   flagSessionById: flagSessionById,

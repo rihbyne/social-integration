@@ -17,7 +17,7 @@
                         </div>
                         <div class="card-content">
                             <img src="/images/pro_01.jpg" alt="" class="circle user_pro_p">
-                            <span class="card-title activator grey-text text-darken-4">Sudeep B Makwana<i class="material-icons right">more_vert</i></span>
+                            <span class="card-title activator grey-text text-darken-4"><%= user.first_name %><i class="material-icons right">more_vert</i></span>
                             <p></p>
                             <p><a href="#">@sudeep_dk</a></p>
                         </div>
@@ -117,7 +117,7 @@
                     <div class="row">
                         
                         <!-- <a href="/logout" class="btn btn-default btn-sm">Logout</a> -->
-                        <form class="col s12">
+                        <div class="col s12">
                             <div class="row">
                                 <% include ../partials/tweet_type_tab.ejs %>
                                 <div id="test1" class="col s12">
@@ -136,7 +136,7 @@
                                                         <span class="card-title"><%= Following_result.data001[i].following_id.first_name %><%= Following_result.data001[i].following_id.last_name %></span>
                                                         <span class="card-title handle"><%= Following_result.data001[i].following_id.username %></span>
                                                         <span class="right card-title f-status">
-                                                            <% if (Following_result.data001[i].follow_back == true) { %>
+                                                            <% if (Following_result.data001[i].follow_back == false) { %>
                                                             follows you
                                                             <% } else { %>
                                                             
@@ -149,11 +149,20 @@
                                                     
                                                     <div class="card-action">
                                                         <% if (Following_result.data001[i].follow_status == true) { %>
-                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">following
-                                                        </button>
+                                                       
+                                                          <form name="unlinkform" method="post" action="/unlink_following">
+                                                                <input type="hidden" name="unlink_following"  value="<%= Following_result.data001[i].following_id._id %>">
+                                                                <input type="hidden" name="user_id"  value="<%= user._id %>">
+                                                                <button class="btn waves-effect waves-light blue light-blue lighten-1 btn-following" type="submit" name="action">following
+                                                                </button>
+                                                            </form>
                                                         <% } else { %>
-                                                        <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
-                                                        </button>
+                                                        <form name="setfollowings" method="post" action="/setfollowing">
+                                                                <input type="hidden" name="following_id" value="<%= Following_result.data001[i].following_id._id %>">
+                                                                <input type="hidden" name="user_id"  value="<%= user._id %>">
+                                                                <button class="btn waves-effect waves-light blue light-blue lighten-1 " type="submit" name="action">follow
+                                                                </button>
+                                                            </form>
                                                         
                                                         <% } %>
                                                     </div>
@@ -165,7 +174,7 @@
                                         <!-- end following tab -->
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                     <!-- center div post  -->
@@ -180,8 +189,8 @@
             <div id="modal1" class="modal">
                 <div class="modal-content">
                     <div class="row">
-                        <form method="post" action="/secure/setnewpost" name="compose_post">
-                            <input type="hidden" name="username" value="">
+                        <form method="post" action="/setnewpost" name="compose_post">
+                            <input type="hidden" name="username" value="<%= user.username %>">
                             <h5 class="center-align">Compose a new Post</h5>
                             <div class="input-field col s12 mb-10">
                                 <!-- <input type="text" name="post_title" value=""> -->

@@ -3,16 +3,15 @@
 // Packages
 var express  			= require('express');							// Framwork
 var app      			= express();
-var port     			= process.env.PORT || 4000;						// Port
 var passport 			= require('passport');							// Used For Authentication
 var flash    			= require('connect-flash');						// For Flash Messages
 var expressValidator 	= require('express-validator');					// For validation
 var bodyParser          = require('body-parser');						// To Accept Post Request
-var path                = require('path');
+var path                = require('path');								// Path Module
 var morgan       		= require('morgan');							// Request To The Console
-var bformat = require('bunyan-format');
+var bformat 			= require('bunyan-format');						// Bunyan Format
 var cookieParser 		= require('cookie-parser');						// Read cookies (needed for auth)
-var session      		= require('express-session');
+var session      		= require('express-session');					// Express Session
 
 var log = require('./config/logging')()
 
@@ -21,9 +20,8 @@ require('./app/models/db') //initialize db collections and its data
 
 // Pages
 var server              = require('http').Server(app);
-var notificationschema  = require('./model/notification_model.js');
-var notification        = require('./api/notification.js');  
-var mailer              = require('./api/mail.js');                     // Mail Functionality
+var port     			= process.env.NODE_SERVER_PORT || 4000;						// Port
+var routeDirectMsgApi = require('./app/routes/api_direct_msg')
 
 // Middleware
 app.use(morgan('dev')); // log every request to the console
@@ -50,7 +48,9 @@ require('./config/passport.js')(passport); // pass passport for configuration
 // routes ======================================================================
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
+//============ direct messaging router====================
+app.use('/api/direct_messages', routeDirectMsgApi)
 
 // launch ======================================================================
-app.listen(port);
-console.log('Connected To server at port ' + port);
+server.listen(port);
+log.info('Connected To server at port ' + port);

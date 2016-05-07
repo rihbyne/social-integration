@@ -26,6 +26,7 @@
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "express-validator": "^2.20.3",
+    "lodash": "^4.11.1",
     "mailgun-js": "^0.7.7",
     "materialize-css": "^0.97.5",
     "method-override": "^2.3.5",

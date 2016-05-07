@@ -214,7 +214,7 @@ var getDMById = function(user_id, id, pollState, ts, cb) {
     $and: [{one_to_one_msg_session_fk_key: id},
            {flag_msg_as: null},
            {user_id_fk_key: { $ne: user_id}},
-           {msg_time: { $gte: new Date(ts).toISOString()}}
+           {msg_time: { $gt: new Date(ts).toISOString()}}
     ]
   }
 

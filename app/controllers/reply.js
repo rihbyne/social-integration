@@ -1,7 +1,7 @@
 var post_model = require('../models/postSchema.js');
 var async 	   = require('async');
 var master     = require('./master.js');
-
+var notificationModel = require('../models/notificationSchema.js');
 
 //update reply to post
 var setreply =  function(req, res){
@@ -13,6 +13,7 @@ var setreply =  function(req, res){
 
     var mentionusers = new Array();
     var hashtags = new Array();
+	var replyOn = "";
 
     var regexat = /@([^\s]+)/g;
     var regexhash = /#([^\s]+)/g;
@@ -48,6 +49,8 @@ var setreply =  function(req, res){
     //blank validation
     if (post_type == 1) {//post
 
+		replyOn = "Post";
+	
         var post_reply = new post_model.reply({
             post_id : post_id,
             reply_user_id : reply_user_id,
@@ -57,6 +60,8 @@ var setreply =  function(req, res){
     }
     else if(post_type == 2){//retweet
 
+		replyOn = "Retweet";
+	
         var post_reply = new post_model.reply({
             retweet_quote_id : post_id,
             reply_user_id : reply_user_id,
@@ -66,6 +71,8 @@ var setreply =  function(req, res){
     }
     else if(post_type == 3){//reply
 
+		replyOn = "Reply";
+		
         var post_reply = new post_model.reply({
             reply_id : post_id,
             reply_user_id : reply_user_id,
@@ -92,7 +99,44 @@ var setreply =  function(req, res){
             console.log('post created.');
 
         });
+		
+		
+		master.getusername(reply_user_id, function(err, result){
+		
+			console.log(result);
+			
+			if (err) {
+                res.send(err)
+            };
+			
+			if(result !== 'No user found')
+			{
+				if(mentionusers != "")
+				{
+					var i = -1;
+					var notification_message = result+' Has Replied on your '+replyOn;
+					var notification = new notificationModel.notification({
 
+						notification_message: notification_message,
+						notification_user: mentionusers,
+						reply_id: post_reply._id,
+						username: result[0]
+						
+					});
+					
+					notification.save(function(err) {
+				
+						if (err)
+							res.send(err);
+							
+						console.log('Notification Saved');
+						
+					})
+				}
+			}
+		
+		})
+		
         // res.json({
         //     message: 'Reply Inserted'
         // });

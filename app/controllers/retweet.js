@@ -37,6 +37,7 @@ var setretweet = function(req, res){
         message = 'User retweeted on Post';
 
     }
+	
     else if(post_type == 2){ //if retweet
 
         // if (retweet_type == 1){ //simple retweet
@@ -70,7 +71,6 @@ var setretweet = function(req, res){
 
         if (retweetResult.length !== 0) {
 
-
                 if(post_type == 1){ //if post
 
                     var retweetUser = retweetResult[0].posted_by;
@@ -89,6 +89,7 @@ var setretweet = function(req, res){
                         var retweetUser = retweetResult[0].ret_user_id;
                     }
                     else if(retweet_type == 2){
+					
                         var retweetUser = retweetResult[0].ret_user_id;
 
                         var retweet = new post_model.retweet_quote({
@@ -116,7 +117,7 @@ var setretweet = function(req, res){
 
                 }
 
-           if (retweetUser !== ret_user_id){
+			if (retweetUser !== ret_user_id){
 
                 if (retweet_type == 1){ //simple retweet
 
@@ -255,6 +256,8 @@ var setretweet = function(req, res){
 
                                 });                           
                                 
+								
+							
                             
                         });
 
@@ -288,15 +291,42 @@ var setretweet = function(req, res){
 
 }
 
-//Get Retweet
-var getretweet = function(req, res) { //get new like
+//Get Retweets of single post
+var getretweet = function(req, res) { 
 
     var post_id = req.params.post_id;
+    var post_type = req.params.post_type;
+    var query;
 
-    post_model
-    .post_retweet
-    .find({post_id: post_id})
+    if(post_type == 1){
+        var query = {post_id: post_id}
+    }
+    else if(post_type == 2){
+        var query = {retweet_quote_id: post_id}
+    }
+    else if(post_type == 3){
+        var query = {reply_id: post_id}
+    }
+    else{
+        console.info('wrong post type');
+        res.json({
+            Result : 'No post_type found'
+        })
+        return;
+    }
+
+    post_model.retweet
+    .find(query)
+    .select('ret_user_id')
+    .populate('ret_user_id')
+    .lean()
     .exec(function(err, getRetweetResult){
+
+        if (err) {
+            res.send(err);
+            return
+        };
+
         console.info(getRetweetResult.length);
         console.info(getRetweetResult);
 

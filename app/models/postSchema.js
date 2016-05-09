@@ -5,10 +5,10 @@ var User 			= require('../models/userSchema.js');							// For Referring User Co
 var post = mongoose.Schema({
     
     posted_by:                       {type: String, ref:'User'},       				// Posted By (User Id From user Colloction) 
-    username:                        {type: String, ref:'User'},					// Username From user Collection
     post_description:                {type: String},        						// Post Description 
     retweet_count:                   {type: Number, default: 0, min: 0},			// Retweet Count
     like_count:                      {type: Number, default: 0, min: 0},			// Post Like Count
+    post_type :                      {type: Number, default: 1},
     created_at:                      {type: Date, default: Date.now},          		// created date
     
 }, { versionKey: false });
@@ -27,7 +27,8 @@ var retweet_schema = mongoose.Schema({
     post_id:                         {type: String, ref:'post'},                 	// Post Id
 	retweet_quote_id:				 {type: String, ref:'retweet_quote'},			// Retweet Quote Id (Mongoose Id of Retweet Quote Document on which retweet is made[Retweet on Retweet Quote])
 	reply_id:						 {type: String, ref:'reply'},					// Reply Id (Mongoose Id of Reply document on which retweet is Made)
-    ret_user_id:                     {type: String},                             	// User Id Who Retweeted (User Id From user Colloction) 						
+    ret_user_id:                     {type: String, ref:'User'},                             	// User Id Who Retweeted (User Id From user Colloction) 						
+    retweet_type :                   {type: Number, default: 1},                  
     created_at :                     {type: Date, default: Date.now}				// Time of Retweet Made
 	
 }, { versionKey: false });
@@ -38,10 +39,12 @@ var retweet_quote_schema = mongoose.Schema({
     post_id:                         {type: String, ref:'post'},                 	// Post Id
 	retweet_quote_id:				 {type: String, ref:'retweet_quote'},			// Retweet Quote Id (Mongoose Id of Retweet Quote Document on which retweet quote is made[Retweet Quote on Retweet Quote])
 	reply_id:						 {type: String, ref:'reply'},					// Reply Id (Mongoose Id of Reply document on which retweet is Made)
-    ret_user_id:                     {type: String, ref:'User'},                             	// User Id Who Retweeted (User Id From user Colloction) 
+    ret_user_id:                     {type: String, ref:'User'},                    // User Id Who Retweeted (User Id From user Colloction) 
     retweet_count:                   {type: Number, default: 0, min: 0},			// Number of Retweets Made on this 
     like_count:                      {type: Number, default: 0, min: 0},			// Number of Likes on this
-    retweet_quote:                   {type: String},								// String of Message							
+    retweet_quote:                   {type: String},								// String of Message		
+    post_type :                      {type: Number, default: 2},					
+    retweet_type :                   {type: Number, default: 2},                 
     created_at :                     {type: Date, default: Date.now}				// Time of Retweet Made
 
 }, { versionKey: false });
@@ -50,7 +53,7 @@ var retweet_quote_schema = mongoose.Schema({
 var post_like_schema = mongoose.Schema({
     
     post_id:                         {type: String, ref:'post'},        			// Post Id
-    like_user_id:                    {type: String}	        						// User Id From user Colloction)
+    like_user_id:                    {type: String, ref:'User'}	        						// User Id From user Colloction)
 
 }, { versionKey: false });
 
@@ -58,7 +61,7 @@ var post_like_schema = mongoose.Schema({
 var retweet_like_schema = mongoose.Schema({
     
     retweet_quote_id:                {type: String, ref:'retweet_quote'},        			// Retweet Quote Id
-    like_user_id:                    {type: String}	        						// User Id From user Colloction)
+    like_user_id:                    {type: String, ref:'User'}	        						// User Id From user Colloction)
 
 }, { versionKey: false });
 
@@ -66,7 +69,7 @@ var retweet_like_schema = mongoose.Schema({
 var reply_like_schema = mongoose.Schema({
     
     reply_id:                        {type: String, ref:'reply'},        			// Reply Id
-    like_user_id:                    {type: String}	        						// User Id From user Colloction)
+    like_user_id:                    {type: String, ref:'User'}	        						// User Id From user Colloction)
 
 }, { versionKey: false });
 
@@ -90,10 +93,16 @@ var reply_schema = mongoose.Schema({
     reply_msg :                      {type: String},  								// String of Reply Message
     retweet_count:                   {type: Number, default: 0, min: 0},			// Number of Retweets Made on this 	
     like_count:                      {type: Number, default: 0, min: 0},			// Number of Likes on this
+    post_type :                      {type: Number, default: 3},  
     created_at :                     {type: Date, default: Date.now}          		// Time of Reply
 	
 }, { versionKey: false });
 
+// var post_type_schema = mongoose.Schema({
+//     post :  {type: Number},
+//     retweet : {type: Number},
+//     post : {type: Number}
+// }
 
 // Models
 module.exports.post 				= mongoose.model('post', post);

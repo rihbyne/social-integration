@@ -5,7 +5,7 @@ var master = require('./master.js');
 var async = require('async');
 var request = require('request');
 
-// to get details @logged in user home page using same API 
+// to get details @logged in user home page using same API for ejs
 var loggednin_home_userdetails = function(req, res) {
    
     console.log('Show all posts for single user on home page');
@@ -165,6 +165,7 @@ var getuserhomeposts = function(req, res) { // get a post
             //     ProfilePosts: profilePosts ,
             //     pro_user: user_details_all , 
             //     user : req.user
+
             // });
 
         });
@@ -260,10 +261,8 @@ function getPostByUserId(callback){
     
     //use userid to find all post of users
     post_model.post
-    .find({
+    .find({ 
         posted_by: userid
-    }, {
-        _id: 0
     })
     .populate('posted_by')
     .sort({

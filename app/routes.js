@@ -14,6 +14,7 @@ var userhome 		= require('./controllers/userhome.js');
 var reply 			= require('./controllers/reply.js');
 var blockuser 		= require('./controllers/blockuser.js');
 var suggest			= require('./controllers/suggestion.js');
+var notification	= require('./controllers/notification.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -148,15 +149,15 @@ module.exports = function(app, passport) {
     // app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
 
     // HashTags
-    //app.post('/hashtags', hashtag.gethashtag);         // Get all hashtag keyword
-    app.get('/hashtags/:hashtag', hashtag.gethashposts);      // Get post from hashtag
-    //app.get('/hashtag/count', hashtag.allhashtagcount);      // Get the count of all hashtag
+    app.get('/hashtag/:hashtag', hashtag.gethashposts);      // Get post from hashtag
     app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);     // Get the count of specifiedhashtag
+    //app.post('/hashtags', hashtag.gethashtag);         // Get all hashtag keyword    
+    //app.get('/hashtag/count', hashtag.allhashtagcount);      // Get the count of all hashtag
     //app.post('/gethashtaglistcount', hashtag.gethashtaglist);     // Get all hashtag keyword
 
     // Retweet
     app.post('/setretweet', retweet.setretweet);        // Set new user
-    app.get('/getretweet/:post_id', retweet.getretweet);      // Get Retweet by post
+    app.get('/retweet/:post_type/:post_id', retweet.getretweet);      // Get Retweet by post
     app.post('/deleteRetweet', retweet.deleteRetweet);       // delete retweet
 
     //Post
@@ -170,7 +171,7 @@ module.exports = function(app, passport) {
     
     //Following - Follower   
     app.post('/setfollowing', follow.setfollowing);                         // Set follower// dk
-    app.get('/:user_name/following',  follow.getfollowing);                 // Set followings
+    app.get('/:user_name/following', isLoggedIn , follow.getfollowing);                 // Set followings
     app.get('/:user_name/followers', isLoggedIn , follow.getfollowers);  // Set follower
     app.post('/unlink_following', follow.unlink_following);     // Set follower
     app.get('/follower/count/:user_id', follow.getCountFollower);    // count follower
@@ -192,14 +193,20 @@ module.exports = function(app, passport) {
     app.get('/suggestion/:user_id', suggest.getSuggestion);     // Get Suggestions
     app.get('/randomSuggestion', suggest.randomSuggestion);     // Get Random Suggestions
     app.get('/allSuggestion/:user_id', suggest.allSuggestion);    // Get All Suggestions
-                                                                                                                                                                           
+
     //Like
     app.post('/setLike', like.setLike);          // Set Like
-    app.get('/like/post/:post_id', like.getLikeByPost);      // Get like by post
-    app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   // Get like by retweet
-    app.get('/like/reply/:reply_id', like.getLikeByReply);      // Get like by reply
+    app.get('/like/:post_type/:post_id', like.getlike);      // Get like by reply
+    // app.get('/like/post/:post_id', like.getLikeByPost);      // Get like by post
+    // app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   // Get like by retweet
+    // app.get('/like/reply/:reply_id', like.getLikeByReply);      // Get like by reply
     app.get('/like/user/:user_id', like.getLikeByUser);      // Get like by User
     
+	
+	// Notification
+	app.get('/notification/:username', notification.getNotification);
+	
+	
 /*===========================================================================================================================*/
 
 };

@@ -3,7 +3,6 @@
 // Packages
 var express  			= require('express');							// Framwork
 var app      			= express();
-var port     			= process.env.PORT || 4000;						// Port
 var passport 			= require('passport');							// Used For Authentication
 var flash    			= require('connect-flash');						// For Flash Messages
 var expressValidator 	= require('express-validator');					// For validation
@@ -21,6 +20,7 @@ require('./app/models/db') //initialize db collections and its data
 
 // Pages
 var server              = require('http').Server(app);
+var port     			= process.env.NODE_SERVER_PORT || 4000;						// Port
 var routeDirectMsgApi = require('./app/routes/api_direct_msg')
 
 // Middleware

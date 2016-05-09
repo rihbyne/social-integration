@@ -1,3 +1,8 @@
+<!-- views/pages/index.ejs -->
+
+<!-- data coming from loggednin_home_userdetails API  -->
+
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -45,7 +50,7 @@
                 <!-- END left div -->
                 <div class="col s12 m12 l6">
                     <div class="row">
-                        <form class="col s12">
+                        <div class="col s12">
                             <div class="row">
                                 <% include ../partials/tweet_type_tab.ejs %>
                                 <div id="test1" class="col s12">
@@ -68,8 +73,20 @@
                                                 </a>
                                                 <form method="post" action="/setlike" class="frm-inline"  name='likeform'>
                                                     <input type="hidden" name="like_user_id" value="<%= user._id %>">
+                                                    <input type="hidden" name="type" value="<%= ProfilePosts.post_type %>">
+                                                    <% if (ProfilePosts.post_type = 1) { %>
+
                                                     <input type="hidden" name="post_id" value="<%= ProfilePosts._id %>">
-                                                    <input type="hidden" name="like_user_name" value="<%= ProfilePosts.username %>">
+
+                                                    <% } else if (ProfilePosts.post_type = 2){ %>
+
+                                                    <input type="hidden" name="retweet_quote_id" value="<%= ProfilePosts._id %>">
+
+                                                    <% } else{ %>
+
+                                                    <input type="hidden" name="reply_id" value="<%= ProfilePosts._id %>">
+                                                        
+                                                    <% } %>
                                                     <button href="#" class="btn-like  tooltipped" data-position="top" data-delay="50" data-tooltip="like"  ><i class="fa fa-heart"></i>
                                                     <span class="rt-count"> <%= ProfilePosts.like_count %></span>
                                                     </button>
@@ -92,7 +109,7 @@
                                 </div>
                                 
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
                 <!-- END center div post  -->

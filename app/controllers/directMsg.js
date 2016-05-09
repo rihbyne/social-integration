@@ -23,18 +23,40 @@ var getDMs = function(req, res) {
     })
 }
 
+var getDMUnreadCount = function(req, res) {
+  dmCommon.getDMUnreadCount(req.params.user_id, function(err, result) {
+    if (err) {
+      var status = err.status? err.status: 500
+      helpers.sendJsonResponse(res, status, err)
+      return
+    } else {
+      log.info(util.inspect(result))
+      helpers.sendJsonResponse(res, result.status, result.content)
+      return
+    }
+  })
+}
+
 var getDMById = function(req, res) {
-    dmCommon.getDMById(req.params.user_id, req.params.id, function(err, result) {
-      if (err) {
-        var status = err.status? err.status: 500
-        helpers.sendJsonResponse(res, status, err)
-        return
-      } else {
-        log.info(util.inspect(result))
-        helpers.sendJsonResponse(res, result.status, result.content)
-        return
-      }
-    })
+  var pollState = /^(true|false)$/.test(req.query.poll)? req.query.poll: false
+  var ts = req.query.timestamp? req.query.timestamp: ""
+
+  dmCommon.getDMById(req.params.user_id, req.params.id, pollState, ts, function(err, result) {
+    if (err) {
+      var status = err.status? err.status: 500
+      helpers.sendJsonResponse(res, status, err)
+      return
+    } else {
+      log.info(util.inspect(result))
+      helpers.sendJsonResponse(res, result.status, result.content)
+      return
+    }
+  })
+}
+
+//get msgs for last 5 sec only
+var pollNewDMs = function(req, res) {
+  
 }
 
 var startDM = function(req, res) {
@@ -185,7 +207,9 @@ var flagMsgId = function(req, res) {
 
 module.exports = {
   getDMs: getDMs,
+  getDMUnreadCount: getDMUnreadCount,
   getDMById: getDMById,
+  pollNewDMs: pollNewDMs,
   startDM: startDM,
   removeSessionById: removeSessionById,
   flagSessionById: flagSessionById,
@@ -194,3 +218,4 @@ module.exports = {
   getFlagOptions: getFlagOptions,
   flagMsgId: flagMsgId
 }
+

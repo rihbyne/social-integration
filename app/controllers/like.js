@@ -1,7 +1,9 @@
 var postModel 	= require('../models/postSchema.js');		// Including postModel File
 var async		= require('async');
+
 var master     = require('./master.js');
 var notificationModel = require('../models/notificationSchema.js');
+var log = require('../../config/logging')()
 
 //Set Post Like
 var setLike = function(req, res) {
@@ -36,7 +38,8 @@ var setLike = function(req, res) {
 					};
 
 					console.log('Post Unliked', result);
-					res.send('Post Unliked Successfully');
+					log.info('Post Unliked Successfully');
+					res.redirect('/')
 				})
 	  
 			} 
@@ -54,8 +57,8 @@ var setLike = function(req, res) {
 						res.send(err);
 
 					console.log('Post Like');
-					res.send('Post Liked Successfully');					
-
+					log.info('Post Liked Successfully');					
+             		res.redirect('/')
 				});
 				
 				master.getusername(like_user_id, function(err, result){

@@ -4,6 +4,7 @@ var router = express.Router()
 var ctrlDirectMsg = require('../controllers/directMsg')
 
 router.get('/:user_id/msgtexts', ctrlDirectMsg.getDMs)
+router.get('/:user_id/msgtexts/unreadcount', ctrlDirectMsg.getDMUnreadCount)
 router.get('/:user_id/msgtexts/:id', ctrlDirectMsg.getDMById)
 router.post('/:user_id/msgtexts', ctrlDirectMsg.startDM)
 router.delete('/:user_id/msgtexts/:id', ctrlDirectMsg.removeSessionById)

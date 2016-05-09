@@ -37,6 +37,7 @@ var setretweet = function(req, res){
         message = 'User retweeted on Post';
 
     }
+	
     else if(post_type == 2){ //if retweet
 
         // if (retweet_type == 1){ //simple retweet
@@ -70,7 +71,6 @@ var setretweet = function(req, res){
 
         if (retweetResult.length !== 0) {
 
-
                 if(post_type == 1){ //if post
 
                     var retweetUser = retweetResult[0].posted_by;
@@ -89,6 +89,7 @@ var setretweet = function(req, res){
                         var retweetUser = retweetResult[0].ret_user_id;
                     }
                     else if(retweet_type == 2){
+					
                         var retweetUser = retweetResult[0].ret_user_id;
 
                         var retweet = new post_model.retweet_quote({
@@ -116,7 +117,7 @@ var setretweet = function(req, res){
 
                 }
 
-           if (retweetUser !== ret_user_id){
+			if (retweetUser !== ret_user_id){
 
                 if (retweet_type == 1){ //simple retweet
 
@@ -255,6 +256,8 @@ var setretweet = function(req, res){
 
                                 });                           
                                 
+								
+							
                             
                         });
 

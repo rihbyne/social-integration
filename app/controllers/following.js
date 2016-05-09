@@ -3,9 +3,11 @@ var util = require('util');
 var async = require('async');
 var request = require('request');
 // Pages
-var follower = require('../models/followersSchema.js');
-var users = require('../models/userSchema.js');
-var postSchema = require('../models/postSchema.js');
+var follower 	= require('../models/followersSchema.js');
+var users 		= require('../models/userSchema.js');
+var master     	= require('./master.js');
+var postSchema 	= require('../models/postSchema.js');
+var notificationModel = require('../models/notificationSchema.js');
 //Set following
 var setfollowing = function(req, res) {
     var user_id = req.body.user_id; // User Id
@@ -31,9 +33,7 @@ var setfollowing = function(req, res) {
     // validation for the profile if already followed
     follower
         .find({
-            $and: [{
-                user_id: user_id
-            }, {
+            $and: [{ user_id: user_id }, {
                 following_id: following_id
             }, {
                 follow_status: true
@@ -94,6 +94,48 @@ var setfollowing = function(req, res) {
                                     if (err)
                                         res.send(err);
                                     console.info('following/followers set saved');
+									
+									master.getusername(following_id, function(err, followingResult){
+										
+										if (err) {
+											res.send(err)
+										};
+									
+										if(followingResult !== 'No user found')
+										{
+											master.getusername(user_id, function(err, userResult){
+										
+												if (err) {
+													res.send(err)
+												};
+													
+												if(followingResult !== 'No user found')
+												{
+													var notification_message = followingResult+" is now following you";
+											
+													var notification = new notificationModel.notification({
+
+														notification_message: notification_message,
+														notification_user: userResult,
+														username: followingResult
+														
+													});
+													
+													notification.save(function(err) {
+												
+														if (err)
+															res.send(err);
+															
+														console.log('Notification Saved');
+														
+													})
+												}
+											})
+											
+										}
+										
+									})
+									
                                 });
                             } else {
                                 follower

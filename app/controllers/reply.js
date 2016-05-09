@@ -120,7 +120,7 @@ var setreply =  function(req, res){
 						notification_message: notification_message,
 						notification_user: mentionusers,
 						reply_id: post_reply._id,
-						usrname: result[0]
+						username: result[0]
 						
 					});
 					

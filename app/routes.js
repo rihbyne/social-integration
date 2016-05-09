@@ -171,16 +171,16 @@ module.exports = function(app, passport) {
     
     //Following - Follower   
     app.post('/setfollowing', follow.setfollowing);                         // Set follower// dk
-    app.get('/:user_name/following', isLoggedIn , follow.getfollowing);                 // Set followings
-    app.get('/:user_name/followers', isLoggedIn , follow.getfollowers);  // Set follower
-    app.post('/unlink_following', follow.unlink_following);     // Set follower
+    app.get('/following/:user_name', follow.getfollowing);                 // get followings
+    app.get('/followers/:user_name', follow.getfollowers);  // get follower
+    app.post('/unlink_following', follow.unlink_following);     // unlink following
     app.get('/follower/count/:user_id', follow.getCountFollower);    // count follower
     app.get('/following/count/:following_id', follow.getCountFollowing);  // count follower
     app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);
 // app.get('/followLatestPost/:user_id', follow.followLatestPost);
    
     //Reply
-    app.get('/getReply/:type/:id',reply.getReply);       // Get Reply
+    app.get('/reply/:type/:id',reply.getReply);       // Get Reply
     app.post('/setreply', reply.setreply);          // Set reply
     app.delete('/deletereply', reply.deletereply);        // delete Reply
 

@@ -146,19 +146,20 @@ var isFollowing = function(user_id, following_id, callback) {
     }
     //Get following
 var getfollowing = function(req, res) {
-        var user_name = req.params.user_name;
-        //validation for blank variables
-        req.checkParams('user_name', 'User name is mandatory').notEmpty();
-        var errors = req.validationErrors();
-        if (errors) {
-            // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-            res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-            return;
-        }
-        users
-            .find({
-                username: user_name
-            })
+
+    var user_name = req.params.user_name;
+    //validation for blank variables
+    req.checkParams('user_name', 'User name is mandatory').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+    users
+        .find({
+            username: user_name
+        })
         .select('_id')
         .exec(function(err, result) {
             // console.info(result[0]._id);
@@ -174,64 +175,18 @@ var getfollowing = function(req, res) {
                     .populate('user_id following_id')
                     .exec(function(err, result) {
                         console.info(result);
-                        var f_list = result;
-                        // res.json({
-                        //     FollowingList: f_list
-                        // })
-                        res.render('pages/following', {
-                            // FollowingList : ['result'],
-                            FollowingList: f_list,
-                            user: req.user
-                        });
+
+                        res.json({
+                            FollowingList: result
+                        })
+
                     })
             };
         })
-        // .exec(function(err, result) {
-        //     // console.info(result[0]._id);
-        //     if (result[0]._id) {
-        //         follower
-        //             .find({
-        //                 $and: [{
-        //                     user_id: result[0]._id
-        //                 }, {
-        //                     follow_status: true
-        //                 }]
-        //             })
-        //             .populate('user_id following_id')
-        //             .exec(function(err, followerResult) {
-        //                 console.info(followerResult);
-        //                 request.get({
-        //                     url: 'http://localhost:4000/Trendsdk',
-        //                     headers: {
-        //                         "content-type": "application/json"
-        //                     }
-        //                 }, function optionalCallback(err, body) {
-        //                      var L_user = req.user
-        //                     res.render('pages/following', {
-        //                         Following_result: {
-        //                             data001: followerResult,
-        //                             // data002: JSON.parse(body.body)
-        //                             data002: body
-        //                         },
-        //                         pro_user: result,
-        //                         user: L_user
-        //                     });
-                           
-        //                     // res.send('pages/following', {
-        //                     //     Following_result: {
-        //                     //         data001: followerResult,
-        //                     //         // data002: JSON.parse(body.body)
-        //                     //         data002: body
-        //                     //     },
-        //                     //     pro_user: result,
-        //                     //     user: L_user
-        //                     // });
-        //                 })
-        //             })
-        //     };
-        // })
-    }
-    //get follower
+
+}
+
+//get follower
 var getfollowers = function(req, res) {
         var user_name = req.params.user_name;
         //validation for blank variables
@@ -250,6 +205,7 @@ var getfollowers = function(req, res) {
         .exec(function(err, result) {
             // console.info(result[0]._id);
             if (result[0]._id) {
+
                 follower
                     .find({
                         $and: [{
@@ -260,52 +216,14 @@ var getfollowers = function(req, res) {
                     })
                     .populate('following_id user_id')
                     .exec(function(err, followerResult) {
-                        // console.info(result);
-                        // var f_list = result;
-                        // // res.json({
-                        // //     FollowersList: result
-                        // // })
-                        // res.render('pages/follower', {
-                        //     // FollowingList : ['result'],
-                        //     Followers_List: f_list,
-                        //     user: req.user
-                        // });
-                        request.get({
-                            url: 'http://localhost:4000/Trendsdk',
-                            headers: {
-                                "content-type": "application/json"
-                            }
-                        }, function optionalCallback(err, body) {
-                            // res.render('pages/follower', {
-                            //     Following_result: {
-                            //         data001: followerResult,
-                            //         data002: body
-                            //     },
-                            //     // Following_result: { data001: result , data002: JSON.parse(body.body) } ,
-                            //     user: req.user
-                            // });
-                            var L_user = req.user
-                            // res.send({
-                            //     // Following_result: { data00201: result , data002: JSON.parse(body.body) }
-                            //     Following_result: {
-                            //         data001: followerResult,
-                            //         data002: body
-                            //     },
-                            //     pro_user: result,
-                            //     user: L_user
-                            //     // Following_result: [dk_f_list]
-                            // })
-                             res.render( 'pages/follower' , {
-                                // Following_result: { data00201: result , data002: JSON.parse(body.body) }
-                                Following_result: {
-                                    data001: followerResult,
-                                    data002: body
-                                },
-                                pro_user: result,
-                                user: L_user
-                                // Following_result: [dk_f_list]
-                            })
+                        if (err) {
+                            res.send(err);
+                        };
+
+                        res.json({
+                            FollowersList: followerResult
                         })
+
                     })
             };
         })
@@ -364,37 +282,37 @@ var unlink_following = function(req, res) {
     }
     //Get Count of Follwer
 var getCountFollower = function(req, res) {
-        var user_id = req.params.user_id;
-        //validation for blank variables
-        req.checkParams('user_id', 'User name is mandatory').notEmpty();
-        var errors = req.validationErrors();
-        if (errors) {
-            // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-            res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-            return;
-        }
-        users
-            .count({
-                _id: user_id
-            }, function(err, usercount) {
-                if (usercount > 0) {
-                    follower
-                        .count({
-                            user_id: user_id
-                        }, function(err, followercount) {
-                            if (err)
-                                res.send(err);
-                            console.log('Count is ' + followercount);
-                            res.json({
-                                FollowerCount: followercount
-                            });
+    var user_id = req.params.user_id;
+    //validation for blank variables
+    req.checkParams('user_id', 'User name is mandatory').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+    users
+        .count({
+            _id: user_id
+        }, function(err, usercount) {
+            if (usercount > 0) {
+                follower
+                    .count({
+                        user_id: user_id, follow_status: true
+                    }, function(err, followercount) {
+                        if (err)
+                            res.send(err);
+                        console.log('Count is ' + followercount);
+                        res.json({
+                            FollowerCount: followercount
                         });
-                } else {
-                    res.json({
-                        Result: 'No user with this id'
                     });
-                }
-            });
+            } else {
+                res.json({
+                    Result: 'No user with this id'
+                });
+            }
+        });
     }
     //Get Count of Follwing
 var getCountFollowing = function(req, res) {

@@ -9,7 +9,7 @@ var setretweet = function(req, res){
     var ret_user_id = req.body.ret_user_id;
     var retweet_type = req.body.retweet_type;
     var retweet_quote = req.body.retweet_quote;
-    var collectionName, message, userIdFrom;
+    var collectionName, message, userIdFrom, query;
 
     console.log('Retweet Api hitted');
 
@@ -35,6 +35,7 @@ var setretweet = function(req, res){
         collectionName = post_model.post;
         userIdFrom = 'posted_by';              
         message = 'User retweeted on Post';
+        query = {post_id: post_id, ret_user_id: ret_user_id};
 
     }
     else if(post_type == 2){ //if retweet
@@ -45,6 +46,7 @@ var setretweet = function(req, res){
         // else if(retweet_type == 2){
             collectionName = post_model.retweet_quote;
             message = 'User retweeted On Retweet'; 
+            query = {retweet_quote_id: post_id, ret_user_id: ret_user_id};
         // }
 
         var userIdFrom = 'ret_user_id'; 
@@ -54,6 +56,7 @@ var setretweet = function(req, res){
         collectionName = post_model.reply;
         userIdFrom = 'reply_user_id';
         message = 'User retweeted On Reply';
+        query = {reply_id: post_id, ret_user_id: ret_user_id};
     }
 
     collectionName
@@ -98,7 +101,7 @@ var setretweet = function(req, res){
                 if (retweet_type == 1){ //simple retweet
 
                     post_model.retweet
-                    .find({post_id: post_id, ret_user_id: ret_user_id})
+                    .find(query)
                     .lean()
                     .exec(function(err, simpleRetweet){
 
@@ -138,7 +141,7 @@ var setretweet = function(req, res){
                                 if (err)
                                     res.send(err);
                                 
-                                setretweetcount(post_id, collectionName, function(){
+                                setretweetcount(post_id, post_type, collectionName, function(){
 
                                     console.info(message);
                                     
@@ -154,14 +157,15 @@ var setretweet = function(req, res){
                         else{//remove old simple retweet
 
                             post_model.retweet
-                            .remove({post_id: post_id, ret_user_id: ret_user_id})
+                            .remove(query)
                             .exec(function(err, result){
+                                
                                 if (err) {
                                     res.send(err)
                                     return;
                                 }
 
-                                setretweetcount(post_id, collectionName, function(){
+                                setretweetcount(post_id, post_type, collectionName, function(){
 
                                     console.log('Retweet document removed');
 
@@ -350,32 +354,45 @@ var getretweet = function(req, res) {
 }
 
 //update count of retweet in post
-var setretweetcount = function(post_id, collectionName, res){
+var setretweetcount = function(post_id, post_type, collectionName, res){
+
+    var query;
+
+    if (post_type == 1) {
+        query = {post_id : post_id}
+    }
+    else if(post_type == 2){
+        query = {retweet_quote_id : post_id}
+    }
+    else if(post_type == 3){
+        query = {reply_id : post_id}
+    }
+    else{
+        console.info('collectionName is blank');
+        return;
+    }
 
     if (collectionName !== '') {
       
-            post_model.retweet
-            .count({post_id: post_id})
-            .lean()
-            .exec(function(err, retweetCount){
+        post_model.retweet
+        .count(query)
+        .lean()
+        .exec(function(err, retweetCount){
 
-                collectionName
-                .findOneAndUpdate({_id: post_id}, {retweet_count: retweetCount})
-                .exec(function(err, postUpdateResult) {
+            collectionName
+            .findOneAndUpdate({_id: post_id}, {retweet_count: retweetCount})
+            .exec(function(err, postUpdateResult) {
 
-                    if (err)
-                        res.send(err);
+                if (err)
+                    res.send(err);
 
-                    console.log(postUpdateResult); 
+                console.log(postUpdateResult); 
 
-                    res(null, postUpdateResult)
+                res(null, postUpdateResult)
 
-                });     
+            });     
 
-            });
-    }
-    else{
-        console.info('collectionName is blank')
+        });
     }
     
 }

@@ -141,11 +141,18 @@ var gethashposts = function(req, res) { // get a post
 
     function getPostByHashtagkd(callback){
 
+        var filterOptions = [{
+                path: 'post_id'
+            },{
+              path: 'post_id',
+              populate: {path: 'posted_by'}
+            }];
+
         // find by mention collection from post_mention and check for errors
         hashtag_model.post_hashtag
         .find({hashtag: hashtag})
         .select('post_id')
-        .populate('post_id')
+        .populate(filterOptions)
         .lean()
         .exec(function(err, hashtagpost) {
 

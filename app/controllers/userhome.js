@@ -138,10 +138,7 @@ var getuserhomeposts = function(req, res) { // get a post
                     console.info('Retweet posts are zero');
                     var profilePosts = result[0]
                 }
-                // res.json({
-                //     message: result
-                // });
-                // return;
+
             }
             else{
 
@@ -156,17 +153,9 @@ var getuserhomeposts = function(req, res) { // get a post
 
             // console.info(result[0]+''+result[1]);
 
-            res.render('pages/user_profile_home.ejs', {
-                ProfilePosts: profilePosts ,
-                pro_user: user_details_all , 
-                user : req.user
+            res.json({
+                ProfilePosts: profilePosts 
             });
-            // res.json({
-            //     ProfilePosts: profilePosts ,
-            //     pro_user: user_details_all , 
-            //     user : req.user
-
-            // });
 
         });
 
@@ -225,10 +214,6 @@ var getpostsrtreply = function(req, res) { // get a post
                     console.info('Retweet posts are zero');
                     var profilePosts = result[0]
                 }
-                // res.json({
-                //     message: result
-                // });
-                // return;
 
             }
             else{
@@ -313,26 +298,36 @@ function getRetweetByUserId(callback){//simple retweet
 
                     if (singleretweet.post_id !== undefined) {
 
-                        var options = {
-                            path: 'post_id',
-                            model: 'post'
-                        };
+                        var options = [
+                        {
+                            path: 'post_id'
+                        },
+                        {
+                          path: 'post_id',
+                          populate: {path: 'posted_by'}
+                        }];
 
                     }
                     else if (singleretweet.retweet_quote_id !== undefined) {
 
-                        var options = {
-                            path: 'retweet_quote_id',
-                            model: 'retweet_quote'
-                        };
+                        var options = [{
+                            path: 'retweet_quote_id'
+                        },
+                        {
+                          path: 'post_id',
+                          populate: {path: 'posted_by'}
+                        }];
                         
                     }
                     else if (singleretweet.reply_id !== undefined) {
 
-                        var options = {
-                            path: 'reply_id',
-                            model: 'reply'
-                        };
+                        var options = [{
+                            path: 'reply_id'
+                        },
+                        {
+                          path: 'reply_id',
+                          populate: {path: 'posted_by'}
+                        }];
                         
                     };
 
@@ -377,40 +372,42 @@ function getReplyByUserId(callback){
 
                 if (singleReplyResult.post_id !== undefined) {
                     
-                    var options = {
-                        path: 'post_id',
-                        model: 'post'
-                    };
+                    var options = [{
+                            path: 'post_id'
+                        },
+                        {
+                          path: 'post_id',
+                          populate: {path: 'posted_by'}
+                        }];
 
                 }
                 else if (singleReplyResult.retweet_quote_id !== undefined) {
 
-                    var options = {
-                        path: 'retweet_quote_id',
-                        model: 'retweet_quote'
-                    };
+                    var options = [{
+                        path: 'retweet_quote_id'
+                    },{
+                      path: 'retweet_quote_id',
+                      populate: {path: 'ret_user_id'}
+                    }];
+
                 }
                 else if (singleReplyResult.reply_id !== undefined) {
 
-                    var options = {
-                        path: 'reply_id',
-                        model: 'reply'
-                    };
+                    var options = [{
+                        path: 'reply_id'
+                    },{
+                      path: 'reply_id',
+                      populate: {path: 'reply_user_id'}
+                    }];
                     
                 };
-                console.info(singleReplyResult);
+
                 post_model.reply
                 .populate(singleReplyResult, options, function (err, reply) {
 
                     callback();
 
                 });
-                // if (singlepostReplyResult.post_id == null) {
-
-                //     console.info('this post is not available');
-                //     singlepostReplyResult.post_id = 'This post is not available';
-
-                // };
 
         }, function(err){
             
@@ -448,26 +445,32 @@ function getQuoteRetweetByUserId(callback){//simple retweet
 
                     if (singleretweet.post_id !== undefined) {
 
-                        var options = {
-                            path: 'post_id',
-                            model: 'post'
-                        };
+                        var options = [{
+                            path: 'post_id'
+                        },{
+                            path: 'post_id', 
+                            populate:{path: 'posted_by'}}
+                        ];
 
                     }
                     else if (singleretweet.retweet_quote_id !== undefined) {
 
-                        var options = {
-                            path: 'retweet_quote_id',
-                            model: 'retweet_quote'
-                        };
+                        var options = [{
+                            path: 'retweet_quote_id'
+                        }, {
+                            path: 'retweet_quote_id', 
+                            populate:{path: 'ret_user_id'}}
+                        ];
                         
                     }
-                    else if (singleretweet.post_id !== undefined) {
+                    else if (singleretweet.reply_id !== undefined) {
 
-                        var options = {
-                            path: 'reply_id',
-                            model: 'reply'
-                        };
+                        var options = [{
+                            path: 'reply_id'
+                        },{
+                            path: 'reply_id', 
+                            populate:{path: 'reply_user_id'}}
+                        ];
                         
                     };
 

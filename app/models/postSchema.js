@@ -28,6 +28,7 @@ var retweet_schema = mongoose.Schema({
 	retweet_quote_id:				 {type: String, ref:'retweet_quote'},			// Retweet Quote Id (Mongoose Id of Retweet Quote Document on which retweet is made[Retweet on Retweet Quote])
 	reply_id:						 {type: String, ref:'reply'},					// Reply Id (Mongoose Id of Reply document on which retweet is Made)
     ret_user_id:                     {type: String, ref:'User'},                             	// User Id Who Retweeted (User Id From user Colloction) 						
+    post_type :                      {type: Number, default: 2},                    
     retweet_type :                   {type: Number, default: 1},                  
     created_at :                     {type: Date, default: Date.now}				// Time of Retweet Made
 	

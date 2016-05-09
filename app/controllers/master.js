@@ -18,9 +18,8 @@ var getUserId = function(username, res){
         else if (userdata.length !== 0) {
 
             userid = userdata[0]._id;
-            user_details_all = userdata[0];
 
-            return res(null, userid , user_details_all);
+            return res(null, userid);
         }
         else{
 
@@ -44,7 +43,6 @@ var getusername = function(id, res){
         else if (userdata.length !== 0) {
 
             username = userdata[0].username;
-            //user_details_all = userdata[0];
 
             return res(null, username);
         }

@@ -133,16 +133,16 @@ module.exports = function(app, passport) {
 
 	app.get('/about', post.getuserdetails); 					// about page
 
-   // user home tile line bind to profile EJS , changed in route/path  also
-    app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
+    // user home tile line bind to profile EJS , changed in route/path  also
+    // app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API
 
 
 /*===========================================================================================================================*/
 
 
     // UserHome
-    app.get('/gethomepost/:username', userhome.getuserhomeposts);    // user home timeline post API
-    app.get('/getpostsrtreply/:username', userhome.getpostsrtreply);   // tweet,retweet & reply post
+    app.get('/user_timeline/:username/1', userhome.getuserhomeposts);    // user home timeline post API
+    app.get('/user_timeline/:username/2', userhome.getpostsrtreply);   // tweet,retweet & reply post
  
     // Mention
     app.get('/mention/:mention_user', mention.getmentionuser);     // Get post of user by mention user
@@ -158,13 +158,13 @@ module.exports = function(app, passport) {
     // Retweet
     app.post('/setretweet', retweet.setretweet);        // Set new user
     app.get('/retweet/:post_type/:post_id', retweet.getretweet);      // Get Retweet by post
-    app.post('/deleteRetweet', retweet.deleteRetweet);       // delete retweet
+    app.delete('/deleteretweet', retweet.deleteRetweet);       // delete retweet
 
     //Post
     app.get('/getpost/:user', post.getuserposts);        // Get post by username
     app.get('/getpost/:user/:post_id', post.getuserpost);      // Get single post of user
     app.get('/getpost/count/:user', post.getuserpostcount);     // Get post count by username
-    app.post('/deletepost', post.deletepost);         // delete post
+    app.delete('/deletepost', post.deletepost);         // delete post
     app.post('/setuser', post.setuser);          // Set new user
     app.post('/setpost', post.setpost);          // Set new post
     app.get('/Trendsdk', post.Trendsdk);                                 // trend keyword
@@ -182,7 +182,7 @@ module.exports = function(app, passport) {
     //Reply
     app.get('/getReply/:type/:id',reply.getReply);       // Get Reply
     app.post('/setreply', reply.setreply);          // Set reply
-    app.post('/deletereply', reply.deletereply);        // delete Reply
+    app.delete('/deletereply', reply.deletereply);        // delete Reply
 
     //Block
     app.post('/setblockuser', blockuser.setblockuser);       // Set block user
@@ -200,7 +200,7 @@ module.exports = function(app, passport) {
     // app.get('/like/post/:post_id', like.getLikeByPost);      // Get like by post
     // app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   // Get like by retweet
     // app.get('/like/reply/:reply_id', like.getLikeByReply);      // Get like by reply
-    app.get('/like/user/:user_id', like.getLikeByUser);      // Get like by User
+    app.get('/like/:username', like.getLikeByUser);      // Get like by User
     
 	
 	// Notification

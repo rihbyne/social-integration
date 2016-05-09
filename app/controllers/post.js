@@ -12,36 +12,6 @@ var User = require('../models/userSchema.js');
 var notificationModel = require('../models/notificationSchema.js');
 var user_followers = require('../models/followersSchema.js');
 
-// //Get all post and other details
-// var home_userdetails = function(req, res) {
-//         request.get({
-
-//             url: 'http://localhost:4000/req.user._id/getuserdetails',
-//             headers: {
-//                 "content-type": "application/json"
-//             }
-
-//         }, function optionalCallback(err, body) {
-
-//             // res.render('pages/about', {
-//             //     userdetails: userdetails,
-//             //     user: req.user
-//             // });
-//             // res.render('pages/about', {
-//             //     userdetails:body,
-//             //     user: req.user
-//             // })
-//              res.json({
-//                 userdetails:JSON.parse(body.body),
-//                 user: req.user
-//             })
-//             // res.json({
-//             //     Following_result: { data001: result , data002: JSON.parse(body.body) } 
-//             //     // Following_result: [dk_f_list]
-//             // })
-
-//         })
-//     } // Get Detailsvar getuserdetails = function(req, res) { 
 var getuserdetails = function(req, res) { 
 
     var userdetails = new Array();
@@ -352,7 +322,6 @@ var getuserposts = function(req, res) { // get a post
                             // if (result[0].tweet_count !== 0) {      //check tweet count if not zero then proceed
 
                             // console.info('Retweet count', result[0].tweet_count);
-
                             post_model.post_retweet
                                 .find({
                                     ret_user_id: userid
@@ -453,12 +422,12 @@ var setpost = function(req, res) { // create a post
     var regexhash = /#([^\s]+)/g;
 
     req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
+    req.checkBody('userid', 'userid is empty').notEmpty();
 
     var errors = req.validationErrors();
 
     if (errors) {
-        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        res.status('400').send('There have been validation errors: \n' + util.inspect(errors));
         return;
     }
 
@@ -490,7 +459,7 @@ var setpost = function(req, res) { // create a post
         if (err)
             res.send(err);
 
-        master.getusername(result.posted_by, function(username){
+        master.getusername(result.posted_by, function(err, username){
 
 			// user_final_followers_schema
 			// .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
@@ -579,11 +548,9 @@ var setpost = function(req, res) { // create a post
                     res.send(err)
                 };
 
-                // res.json({
-                //     message: result
-                // });
-
-                res.redirect('/')
+                res.json({
+                    message: result
+                });
 
                 console.log('post created.');
 
@@ -606,12 +573,15 @@ var setuser = function(req, res) { //Create new user
     var username = req.body.username;
 
     req.checkBody('first_name', 'Empty parameters').notEmpty();
+    req.checkBody('last_name', 'Empty parameters').notEmpty();
+    req.checkBody('email', 'Empty parameters').notEmpty();
+    req.checkBody('username', 'Empty parameters').notEmpty();
 
     var errors = req.validationErrors();
 
     if (errors) {
         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-        res.status('400').send('There have been validation errors: ' + util.inspect(errors));
+        res.status('400').send('There have been validation errors: \n' + util.inspect(errors));
         return;
     }
 
@@ -623,8 +593,9 @@ var setuser = function(req, res) { //Create new user
     });
 
     setuser.save(function(err) {
-        // if (err)
-        //     res.send(err);
+        if (err)
+            res.send(err);
+
         res.json({
             message: 'Users Inserted'
         });

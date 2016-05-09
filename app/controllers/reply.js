@@ -50,7 +50,9 @@ var setreply =  function(req, res){
     if (post_type == 1) {//post
 
 		replyOn = "Post";
-	
+
+		collectionName = post_model.post;
+
         var post_reply = new post_model.reply({
             post_id : post_id,
             reply_user_id : reply_user_id,
@@ -61,7 +63,9 @@ var setreply =  function(req, res){
     else if(post_type == 2){//retweet
 
 		replyOn = "Retweet";
-	
+
+		collectionName = post_model.retweet_quote;
+
         var post_reply = new post_model.reply({
             retweet_quote_id : post_id,
             reply_user_id : reply_user_id,
@@ -72,7 +76,9 @@ var setreply =  function(req, res){
     else if(post_type == 3){//reply
 
 		replyOn = "Reply";
-		
+
+		collectionName = post_model.reply;
+
         var post_reply = new post_model.reply({
             reply_id : post_id,
             reply_user_id : reply_user_id,
@@ -81,67 +87,86 @@ var setreply =  function(req, res){
         
     }
 
-    post_reply
-    .save(function(err) {
-        if (err)
+    collectionName
+    .find({
+        _id: post_id
+    })
+    .lean()
+    .exec(function(err, replyResult){
+
+        if (err) {
             res.send(err);
+            return;
+        }
 
-        master.hashtagMention(3, post_reply, mentionusers, hashtags, function(err, result){
+        if (replyResult.length !== 0) {
 
-            if (err) {
-                res.send(err)
-            };
+	       	post_reply
+	    	.save(function(err) {
 
-            res.json({
-                message: result
-            });
+		        if (err)
+		            res.send(err);
 
-            console.log('post created.');
+		        master.hashtagMention(3, post_reply, mentionusers, hashtags, function(err, result){
 
-        });
-		
-		
-		master.getusername(reply_user_id, function(err, result){
-		
-			console.log(result);
+		            if (err) {
+		                res.send(err)
+		            };
+
+			        res.json({
+			            message: 'Reply Inserted'
+			        });
+
+		            console.log('post created.');
+
+		        });
 			
-			if (err) {
-                res.send(err)
-            };
+				master.getusername(reply_user_id, function(err, result){
 			
-			if(result !== 'No user found')
-			{
-				if(mentionusers != "")
-				{
-					var i = -1;
-					var notification_message = result+' Has Replied on your '+replyOn;
-					var notification = new notificationModel.notification({
-
-						notification_message: notification_message,
-						notification_user: mentionusers,
-						reply_id: post_reply._id,
-						usrname: result[0]
-						
-					});
+					console.log(result);
 					
-					notification.save(function(err) {
-				
-						if (err)
-							res.send(err);
+					if (err) {
+		                res.send(err)
+		            };
+					
+					if(result !== 'No user found')
+					{
+						if(mentionusers != "")
+						{
+							var i = -1;
+							var notification_message = result+' Has Replied on your '+replyOn;
+							var notification = new notificationModel.notification({
+
+								notification_message: notification_message,
+								notification_user: mentionusers,
+								reply_id: post_reply._id,
+								usrname: result[0]
+								
+							});
 							
-						console.log('Notification Saved');
+							notification.save(function(err) {
 						
-					})
-				}
-			}
-		
-		})
-		
-        // res.json({
-        //     message: 'Reply Inserted'
-        // });
+								if (err)
+									res.send(err);
+									
+								console.log('Notification Saved');
+								
+							})
+						}
+					}
+			
+				})
+			
+
+	    	});
+        }
+        else{
+        	res.send('No post found')
+        }
 
     });
+
+
 
 };
 
@@ -309,6 +334,16 @@ var deletereply = function(req, res){
 
     var reply_id = req.body.reply_id;  
 
+    req.checkBody('reply_id', 'reply_id').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+    
     post_model.reply
     .findOneAndRemove({
         _id: reply_id

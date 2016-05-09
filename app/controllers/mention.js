@@ -30,15 +30,15 @@ var getmentionuser = function(req, res) { // get a post
             }
             else{
 
-                console.info(result);
-
                 var mentionUserPosts = result[0].concat(result[1]).concat(result[2]);//Got two result , concent two results
+                    
                     function custom_sort(a, b) {
                         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                     }
 
                 mentionUserPosts.sort(custom_sort); 
-
+                
+                console.info(mentionUserPosts);
             }
 
             res.json({
@@ -50,11 +50,15 @@ var getmentionuser = function(req, res) { // get a post
 
 function getPostByMentionUser(callback){
 
+    var optionFilter = [
+        {path:'post_id', 
+        populate:{path:'posted_by'}}
+    ]
     // find by mention collection from post_mention and check for errors
     mention_model.post_mention
     .find({mention_users: mention_user})
     .select('post_id')
-    .populate('post_id')
+    .populate(optionFilter)
     .lean()
     .exec(function(err, mentionspost) {
 
@@ -66,15 +70,10 @@ function getPostByMentionUser(callback){
             // console.log(mentionspost);
 
             callback(null, mentionspost)
-            // res.json({
-            //     posts: mentionspost
-            // });
 
         } else {
 
             callback(null, [])
-
-            // res.json('No Post Found')
         }
 
     });
@@ -105,15 +104,10 @@ function getRetweetByMentionUser(callback){
 
                 callback(null, mentionspostdata);
 
-            // res.json({
-            //     posts: mentionspost
-            // });
-
         } else {
 
             callback(null, [])
 
-            // res.json('No Post Found')
         }
 
     });
@@ -144,15 +138,11 @@ function getReplyByMentionUser(callback){
         if (mentionspost.length !== '') {
 
             callback(null, mentionspost)
-            // res.json({
-            //     posts: mentionspost
-            // });
 
         } else {
 
             callback(null, [])
 
-            // res.json('No Post Found')
         }
 
     });

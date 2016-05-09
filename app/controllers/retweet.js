@@ -13,9 +13,9 @@ var setretweet = function(req, res){
 
     console.log('Retweet Api hitted');
 
-    console.log('Post Id', req.body.post_id);
-    console.log('Retweet User Id', req.body.ret_user_id);
-    console.log('Retweet Type', req.body.retweet_type);
+    console.log('Post Id', post_id);
+    console.log('Retweet User Id', ret_user_id);
+    console.log('Retweet Type', retweet_type);
 
     req.checkBody('post_type', 'post type').notEmpty();
     req.checkBody('ret_user_id', 'ret_user_id').notEmpty();
@@ -71,52 +71,29 @@ var setretweet = function(req, res){
         if (retweetResult.length !== 0) {
 
 
-                if(post_type == 1){ //if post
+            if(post_type == 1){ //if post
 
-                    var retweetUser = retweetResult[0].posted_by;
+                var retweetUser = retweetResult[0].posted_by;
 
-                    var retweet = new post_model.retweet_quote({
+            }
+            else if(post_type == 2){ //if retweet
 
-                        post_id: post_id,
-                        ret_user_id: ret_user_id,
-                        retweet_quote: retweet_quote
-
-                    });
+                if (retweet_type == 1){ //simple retweet
+                    var retweetUser = retweetResult[0].ret_user_id;
                 }
-                else if(post_type == 2){ //if retweet
-
-                    if (retweet_type == 1){ //simple retweet
-                        var retweetUser = retweetResult[0].ret_user_id;
-                    }
-                    else if(retweet_type == 2){
-                        var retweetUser = retweetResult[0].ret_user_id;
-
-                        var retweet = new post_model.retweet_quote({
-
-                            retweet_quote_id: post_id,
-                            ret_user_id: ret_user_id,
-                            retweet_quote: retweet_quote
-                            
-                        });
-
-                    }
-
-                }
-                else if(post_type == 3){ //if reply        
-
-                    var retweetUser = retweetResult[0].reply_user_id;
-
-                    var retweet = new post_model.retweet_quote({
-
-                        reply_id: post_id,
-                        ret_user_id: ret_user_id,
-                        retweet_quote: retweet_quote
-                        
-                    });
+                else if(retweet_type == 2){
+                    var retweetUser = retweetResult[0].ret_user_id;
 
                 }
 
-           if (retweetUser !== ret_user_id){
+            }
+            else if(post_type == 3){ //if reply        
+
+                var retweetUser = retweetResult[0].reply_user_id;
+
+            }
+
+            if (retweetUser !== ret_user_id){
 
                 if (retweet_type == 1){ //simple retweet
 
@@ -234,6 +211,44 @@ var setretweet = function(req, res){
                     console.log('Mention Users : ', mentionusers);
                     console.log('Hash Tags : ', hashtags);
 
+                        if(post_type == 1){ //if post
+
+                            var retweet = new post_model.retweet_quote({
+
+                                post_id: post_id,
+                                ret_user_id: ret_user_id,
+                                retweet_quote: retweet_quote
+
+                            });
+                        
+                        }
+                        else if(post_type == 2){ //if retweet
+
+                            if(retweet_type == 2){
+
+                                var retweet = new post_model.retweet_quote({
+
+                                    retweet_quote_id: post_id,
+                                    ret_user_id: ret_user_id,
+                                    retweet_quote: retweet_quote
+                                    
+                                });
+
+                            }
+
+                        }
+                        else if(post_type == 3){ //if reply        
+
+                            var retweet = new post_model.retweet_quote({
+
+                                reply_id: post_id,
+                                ret_user_id: ret_user_id,
+                                retweet_quote: retweet_quote
+                                
+                            });
+
+                        }
+
                         retweet.save(function(err) {
 
                             if (err)
@@ -269,8 +284,6 @@ var setretweet = function(req, res){
                     message: 'You can not RE-tweet on your own post'
                 });
 
-                // res.redirect('about');
-
             } 
 
         }
@@ -281,7 +294,7 @@ var setretweet = function(req, res){
             res.json({
                 Result : 'No Post Found'
             })
-            // res.redirect('about');
+
         }
 
     })
@@ -372,6 +385,7 @@ var deleteRetweet = function(req, res){
 
 	var retweet_quote_id = req.body.retweet_quote_id;
 	
+    
 	post_model.retweet_quote
 	.findOneAndRemove({_id: retweet_quote_id})
 	.lean()

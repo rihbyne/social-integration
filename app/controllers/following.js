@@ -14,12 +14,14 @@ var setfollowing = function(req, res) {
     //validation for blank variables
     req.checkBody('user_id', 'User id is mandatory').notEmpty();
     req.checkBody('following_id', 'following_id is mandatory').notEmpty();
+
     var errors = req.validationErrors();
     if (errors) {
         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
+
     // validation for the same profile followes
     if (user_id === following_id) {
         console.log('You can not follow your own profile');
@@ -157,33 +159,7 @@ var getfollowing = function(req, res) {
             .find({
                 username: user_name
             })
-        // .select('_id')
-        // .exec(function(err, result) {
-        //     // console.info(result[0]._id);
-        //     if (result[0]._id) {
-        //         follower
-        //             .find({
-        //                 $and: [{
-        //                     user_id: result[0]._id
-        //                 }, {
-        //                     follow_status: true
-        //                 }]
-        //             })
-        //             .populate('user_id following_id')
-        //             .exec(function(err, result) {
-        //                 console.info(result);
-        //                 var f_list = result;
-        //                 // res.json({
-        //                 //     FollowingList: f_list
-        //                 // })
-        //                 res.render('pages/following', {
-        //                     // FollowingList : ['result'],
-        //                     FollowingList: f_list,
-        //                     user: req.user
-        //                 });
-        //             })
-        //     };
-        // })
+        .select('_id')
         .exec(function(err, result) {
             // console.info(result[0]._id);
             if (result[0]._id) {
@@ -196,38 +172,64 @@ var getfollowing = function(req, res) {
                         }]
                     })
                     .populate('user_id following_id')
-                    .exec(function(err, followerResult) {
-                        console.info(followerResult);
-                        request.get({
-                            url: 'http://localhost:4000/Trendsdk',
-                            headers: {
-                                "content-type": "application/json"
-                            }
-                        }, function optionalCallback(err, body) {
-                             var L_user = req.user
-                            res.render('pages/following', {
-                                Following_result: {
-                                    data001: followerResult,
-                                    // data002: JSON.parse(body.body)
-                                    data002: body
-                                },
-                                pro_user: result,
-                                user: L_user
-                            });
-                           
-                            // res.send('pages/following', {
-                            //     Following_result: {
-                            //         data001: followerResult,
-                            //         // data002: JSON.parse(body.body)
-                            //         data002: body
-                            //     },
-                            //     pro_user: result,
-                            //     user: L_user
-                            // });
-                        })
+                    .exec(function(err, result) {
+                        console.info(result);
+                        var f_list = result;
+                        // res.json({
+                        //     FollowingList: f_list
+                        // })
+                        res.render('pages/following', {
+                            // FollowingList : ['result'],
+                            FollowingList: f_list,
+                            user: req.user
+                        });
                     })
             };
         })
+        // .exec(function(err, result) {
+        //     // console.info(result[0]._id);
+        //     if (result[0]._id) {
+        //         follower
+        //             .find({
+        //                 $and: [{
+        //                     user_id: result[0]._id
+        //                 }, {
+        //                     follow_status: true
+        //                 }]
+        //             })
+        //             .populate('user_id following_id')
+        //             .exec(function(err, followerResult) {
+        //                 console.info(followerResult);
+        //                 request.get({
+        //                     url: 'http://localhost:4000/Trendsdk',
+        //                     headers: {
+        //                         "content-type": "application/json"
+        //                     }
+        //                 }, function optionalCallback(err, body) {
+        //                      var L_user = req.user
+        //                     res.render('pages/following', {
+        //                         Following_result: {
+        //                             data001: followerResult,
+        //                             // data002: JSON.parse(body.body)
+        //                             data002: body
+        //                         },
+        //                         pro_user: result,
+        //                         user: L_user
+        //                     });
+                           
+        //                     // res.send('pages/following', {
+        //                     //     Following_result: {
+        //                     //         data001: followerResult,
+        //                     //         // data002: JSON.parse(body.body)
+        //                     //         data002: body
+        //                     //     },
+        //                     //     pro_user: result,
+        //                     //     user: L_user
+        //                     // });
+        //                 })
+        //             })
+        //     };
+        // })
     }
     //get follower
 var getfollowers = function(req, res) {
@@ -351,12 +353,10 @@ var unlink_following = function(req, res) {
                             if (err) {
                                 console.log("found err" + err);
                             } else {
-                                // res.json({
-                                //     message: 'Removed following'
-                                // })
+                                res.json({
+                                    message: 'Removed following'
+                                })
                                 console.log('Removed following')
-                                var u_name = req.user.username
-                                res.redirect('/' + u_name + '/followers');
                             }
                         })
                 }

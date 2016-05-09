@@ -209,16 +209,15 @@ var getDMById = function(user_id, id, pollState, ts, cb) {
   var nonTSquery = {
     $and: [{one_to_one_msg_session_fk_key: id}, {flag_msg_as: null}]
   }
-
   var withTSquery = {
     $and: [{one_to_one_msg_session_fk_key: id},
            {flag_msg_as: null},
            {user_id_fk_key: { $ne: user_id}},
-           {msg_time: { $gt: new Date(ts).toISOString()}}
+           {msg_time: { $gt: new Date(ts).toISOString() || null}}
     ]
   }
 
-  var toggleMsgQuery = pollState? withTSquery: nonTSquery
+  var toggleMsgQuery = pollState === 'true'? withTSquery: nonTSquery
 
   isSessionFlaggedByUser(user_id, id, function(err, flag) {
     if (err) {

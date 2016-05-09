@@ -38,20 +38,25 @@ var getDMUnreadCount = function(req, res) {
 }
 
 var getDMById = function(req, res) {
+  var ts = helpers.isoDateValidate(req.query.timestamp)? req.query.timestamp: null
   var pollState = /^(true|false)$/.test(req.query.poll)? req.query.poll: false
-  var ts = req.query.timestamp? req.query.timestamp: ""
 
-  dmCommon.getDMById(req.params.user_id, req.params.id, pollState, ts, function(err, result) {
-    if (err) {
-      var status = err.status? err.status: 500
-      helpers.sendJsonResponse(res, status, err)
-      return
-    } else {
-      log.info(util.inspect(result))
-      helpers.sendJsonResponse(res, result.status, result.content)
-      return
-    }
-  })
+  if (ts === null) {
+    helpers.sendJsonResponse(res, 400, {failed: "invalid timestamp"})
+    return
+  } else {
+    dmCommon.getDMById(req.params.user_id, req.params.id, pollState, ts, function(err, result) {
+      if (err) {
+        var status = err.status? err.status: 500
+        helpers.sendJsonResponse(res, status, err)
+        return
+      } else {
+        log.info(util.inspect(result))
+        helpers.sendJsonResponse(res, result.status, result.content)
+        return
+      }
+    })
+  }
 }
 
 //get msgs for last 5 sec only

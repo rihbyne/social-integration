@@ -1,5 +1,8 @@
 var postModel 	= require('../models/postSchema.js');		// Including postModel File
 var async		= require('async');
+
+var master     = require('./master.js');
+var notificationModel = require('../models/notificationSchema.js');
 var log = require('../../config/logging')()
 
 //Set Post Like
@@ -57,6 +60,56 @@ var setLike = function(req, res) {
 					log.info('Post Liked Successfully');					
              		res.redirect('/')
 				});
+				
+				master.getusername(like_user_id, function(err, result){
+					
+					if(err)
+					{
+						res.send(err);
+					}
+				
+					if(result !== 'No user found')
+					{
+						postModel.post
+						.find({_id:post_id})
+						.populate('posted_by')
+						.exec(function(err, postResult){
+						
+							if(err)
+							{
+								res.send(err);
+								return;
+							}
+							
+							// console.log(like_user_id);
+							// console.log(postResult[0].posted_by.username);
+							
+							if(like_user_id != postResult[0].posted_by._id)
+							{
+								var notification_message = result+' Likes your Post';
+								var notification = new notificationModel.notification({
+
+									notification_message: notification_message,
+									notification_user: postResult[0].posted_by.username,
+									post_id: post_id,
+									username: result[0]
+									
+								});
+								
+								notification.save(function(err) {
+							
+									if (err)
+										res.send(err);
+										
+									console.log('Notification Saved');
+									
+								})
+							}
+
+						})
+					}
+				
+				})
 
 			}
 			
@@ -167,6 +220,56 @@ var setLike = function(req, res) {
 					res.send('Reply Like Successfully');					
 
 				});
+				
+				master.getusername(like_user_id, function(err, result){
+					
+					if(err)
+					{
+						res.send(err);
+					}
+				
+					if(result !== 'No user found')
+					{
+						postModel.reply
+						.find({_id:reply_id})
+						.populate('reply_user_id')
+						.exec(function(err, replyResult){
+						
+							if(err)
+							{
+								res.send(err);
+								return;
+							}
+							
+							// console.log(like_user_id);
+							// console.log(postResult[0].posted_by.username);
+							
+							if(like_user_id != replyResult[0].reply_user_id._id)
+							{
+								var notification_message = result+' Replied on your Post';
+								var notification = new notificationModel.notification({
+
+									notification_message: notification_message,
+									notification_user: replyResult[0].reply_user_id.username,
+									reply_id: reply_id,
+									username: result
+									
+								});
+								
+								notification.save(function(err) {
+							
+									if (err)
+										res.send(err);
+										
+									console.log('Notification Saved');
+									
+								})
+							}
+
+						})
+					}
+				
+				})
 
 			}
 			

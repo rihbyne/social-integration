@@ -2,26 +2,28 @@ var user = require('../models/userSchema.js');
 var post_model = require('../models/postSchema.js');
 var mention_model = require('../models/mentionSchema.js');
 var hashtag_model = require('../models/hashtagSchema.js');
-
+var log = require('../../config/logging')()
 
 //find id of user from username
-var getUserId = function(username, res){
+var getUserId = function(username, res) {
 
     user
-    .find({ username: username })
+        .find({
+            username: username
+        })
     // .select('_id')
     .exec(function(err, userdata) {
 
-        if (err)
+        if (err) {
+            log.error(err);
             res.send(err);
 
-        else if (userdata.length !== 0) {
+        } else if (userdata.length !== 0) {
 
             userid = userdata[0]._id;
 
             return res(null, userid);
-        }
-        else{
+        } else {
 
             return res(true, 'No user found');
         }
@@ -30,32 +32,33 @@ var getUserId = function(username, res){
 
 }
 
-var getusername = function(id, res){
+var getusername = function(id, res) {
 
     user
-    .find({ _id: id })
-    .select('username')
-    .exec(function(err, userdata) {
+        .find({
+            _id: id
+        })
+        .select('username')
+        .exec(function(err, userdata) {
 
-        if (err)
-            res.send(err);
+            if (err) {
+                log.error(err);
+                res.send(err);
+            } else if (userdata.length !== 0) {
 
-        else if (userdata.length !== 0) {
+                username = userdata[0].username;
 
-            username = userdata[0].username;
+                return res(null, username);
+            } else {
 
-            return res(null, username);
-        }
-        else{
+                return res(true, 'No user found');
+            }
 
-            return res(true, 'No user found');
-        }
-
-    });
+        });
 
 }
 
-var hashtagMention = function(type, post, mentionusers, hashtags, res){
+var hashtagMention = function(type, post, mentionusers, hashtags, res) {
 
     console.info(post._id);
 
@@ -76,27 +79,27 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
                 mention_users: mention_users
             });
 
-        }
-        else if(type == 2){
+        } else if (type == 2) {
 
             var mention = new mention_model.retweet_quote_mention({
                 retweet_quote_id: post._id,
                 mention_users: mention_users
             });
 
-        }
-        else if(type == 3){
+        } else if (type == 3) {
 
             var mention = new mention_model.reply_mention({
                 reply_id: post._id,
                 mention_users: mention_users
             });
 
-        }        
+        }
 
         mention.save(function(err) {
-            if (err)
+            if (err) {
+                log.error(err);
                 res.send(err);
+            }
         });
 
     };
@@ -124,30 +127,29 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
                 }, function(err, result) {
 
                     if (err) {
+                        log.error(err);
                         res.send(err);
-                    };
+                    }
                     console.log('Trends updated');
                 })
 
         }
 
-         if (type == 1) {
+        if (type == 1) {
 
             var hashtag = new hashtag_model.post_hashtag({
                 post_id: post._id,
                 hashtag: hashtagkd
             });
 
-        }
-        else if(type == 2){
+        } else if (type == 2) {
 
             var hashtag = new hashtag_model.retweet_quote_hashtag({
                 retweet_quote_id: post._id,
                 hashtag: hashtagkd
             });
 
-        }
-        else if(type == 3){
+        } else if (type == 3) {
 
             var hashtag = new hashtag_model.reply_hashtag({
                 reply_id: post._id,
@@ -158,8 +160,10 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
 
         //find keyword if it is present update count, other wise create new trend
         hashtag.save(function(err) {
-            if (err)
+            if (err) {
+                log.error(err);
                 res.send(err);
+            }
         });
 
     };
@@ -182,7 +186,8 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
 }
 
 module.exports = ({
-    getUserId : getUserId,
-    hashtagMention : hashtagMention,
-	getusername : getusername
+    getUserId: getUserId,
+    hashtagMention: hashtagMention,
+    getusername: getusername
+
 })

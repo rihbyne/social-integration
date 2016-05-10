@@ -4,13 +4,14 @@ var user_followers = require('../models/followersSchema.js');
 var master = require('./master.js');
 var async = require('async');
 var request = require('request');
+var log = require('../../config/logging')()
 
 // to get details @logged in user home page using same API for ejs
 var loggednin_home_userdetails = function(req, res) {
    
-    console.log('Show all posts for single user on home page');
+    log.info('Show all posts for single user on home page');
     var username_param = req.user.username 
-    console.log('user name default is ' +username_param)
+    log.info('user name default is ' +username_param)
     var username = username_param; // find posts of user and check for errors
 
     var result1, result2;
@@ -91,11 +92,11 @@ var loggednin_home_userdetails = function(req, res) {
 //Get all post and retweet of user
 var getuserhomeposts = function(req, res) { // get a post 
 
-    console.log('Show all posts for single user on home page');
+    log.info('Show all posts for single user on home page');
 
     var username = req.params.username; // find posts of user and check for errors
 
-    console.log('user ', req.params.username);
+    log.info('user ', req.params.username);
 
     var result1, result2;
 
@@ -103,17 +104,15 @@ var getuserhomeposts = function(req, res) { // get a post
     master.getUserId(username, function(err, userid , user_details_all){
 
         if (err) {
-            
-            console.info(userid);
-
-            res.json({
+            log.error(err);
+            res.send({
                 Error: userid
                 // PostRTReply : result
             });
 
             return;
         };
-        console.info(userid);
+        log.info(userid);
 
         //using async series function get all post 
         async.parallel([
@@ -123,19 +122,19 @@ var getuserhomeposts = function(req, res) { // get a post
         ],
         function (err, result) {
                 
-            console.info(result);
+            log.info(result);
 
             var profilePosts;
 
             if (err) {
 
                 if (result[0] === 0) {
-                    console.info('Own posts are zero');
+                    log.info('Own posts are zero');
                     var profilePosts = result[1]
                 }
 
                 if (result[1] === 0) {
-                    console.info('Retweet posts are zero');
+                    log.info('Retweet posts are zero');
                     var profilePosts = result[0]
                 }
 
@@ -151,7 +150,7 @@ var getuserhomeposts = function(req, res) { // get a post
                 
             };
 
-            // console.info(result[0]+''+result[1]);
+            // log.info(result[0]+''+result[1]);
 
             res.json({
                 ProfilePosts: profilePosts 
@@ -166,11 +165,11 @@ var getuserhomeposts = function(req, res) { // get a post
 //Get all post, retweet and reply of user
 var getpostsrtreply = function(req, res) { // get a post 
 
-    console.log('Show all posts, retweet & reply for single user');
+    log.info('Show all posts, retweet & reply for single user');
 
     var username = req.params.username; // find posts of user and check for errors
 
-    console.log('user ', req.params.username);
+    log.info('user ', req.params.username);
 
     var result1, result2;
 
@@ -179,7 +178,7 @@ var getpostsrtreply = function(req, res) { // get a post
 
         if (err) {
             
-            console.info(userid);
+            log.info(userid);
 
             res.json({
                 Result: userid
@@ -188,7 +187,8 @@ var getpostsrtreply = function(req, res) { // get a post
 
             return;
         };
-        console.info(userid);
+        
+        log.info(userid);
 
         //using async series function get all post 
         async.parallel([
@@ -199,19 +199,19 @@ var getpostsrtreply = function(req, res) { // get a post
         ],
         function (err, result) {
                 
-            //console.info(result);
+            //log.info(result);
 
             var profilePosts;
 
             if (err) {
 
                 if (result[0] === 0) {
-                    console.info('Own posts are zero');
+                    log.info('Own posts are zero');
                     var profilePosts = result[1]
                 }
 
                 if (result[1] === 0) {
-                    console.info('Retweet posts are zero');
+                    log.info('Retweet posts are zero');
                     var profilePosts = result[0]
                 }
 
@@ -228,7 +228,7 @@ var getpostsrtreply = function(req, res) { // get a post
                 
             };
 
-            // console.info(result[0]+''+result[1]);
+            // log.info(result[0]+''+result[1]);
 
             res.json({
                 PostRTReply: profilePosts
@@ -256,8 +256,11 @@ function getPostByUserId(callback){
     .limit(10)
     .exec(function(err, result) {
 
-        if (err)
+        if (err) {
+            log.error(err);
             res.send(err);
+            return
+        }
 
         else if (result.length == 0) {
 
@@ -282,8 +285,11 @@ function getRetweetByUserId(callback){//simple retweet
     .lean()
     .exec(function(err, retweets){
 
-        if (err)
+        if (err) {
+            log.error(err);
             res.send(err);
+            return
+        }
 
         else if (retweets.length == 0) {
 
@@ -341,7 +347,7 @@ function getRetweetByUserId(callback){//simple retweet
 
                 }, function(err){
                 
-                // console.info(retweets);
+                // log.info(retweets);
 
                 return callback(null, retweets);
 
@@ -361,10 +367,13 @@ function getReplyByUserId(callback){
     .limit(5)
     .lean()
     .exec(function(err, postReplyResult){
+        
         if (err) {
-            res.send(err)
-        };
-        // console.info('Reply By user: \n',postReplyResult);
+            log.error(err);
+            res.send(err);
+            return
+        }
+        // log.info('Reply By user: \n',postReplyResult);
 
         async.each(postReplyResult, 
 
@@ -429,8 +438,11 @@ function getQuoteRetweetByUserId(callback){//simple retweet
     .lean()
     .exec(function(err, retweets){
 
-        if (err)
+        if (err) {
+            log.error(err);
             res.send(err);
+            return
+        }
 
         else if (retweets.length == 0) {
 
@@ -484,7 +496,7 @@ function getQuoteRetweetByUserId(callback){//simple retweet
 
                 }, function(err){
                 
-                // console.info(retweets);
+                // log.info(retweets);
 
                 return callback(null, retweets);
 

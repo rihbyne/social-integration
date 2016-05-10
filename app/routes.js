@@ -167,7 +167,7 @@ module.exports = function(app, passport) {
     app.delete('/deletepost', post.deletepost);         // delete post
     app.post('/setuser', post.setuser);          // Set new user
     app.post('/setpost', post.setpost);          // Set new post
-    app.get('/Trendsdk', post.Trendsdk);                                 // trend keyword
+    app.get('/trend', post.trend);                                 // trend keyword
     
     //Following - Follower   
     app.post('/setfollowing', follow.setfollowing);                         // Set follower// dk

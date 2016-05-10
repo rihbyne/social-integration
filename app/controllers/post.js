@@ -3,6 +3,7 @@ var util = require('util');
 var async = require('async');
 var express = require('express');
 var router = express.Router(); // get an instance of the express Router
+var log = require('../../config/logging')()
 
 // Pages
 var master = require('./master.js');
@@ -12,76 +13,84 @@ var User = require('../models/userSchema.js');
 var notificationModel = require('../models/notificationSchema.js');
 var user_followers = require('../models/followersSchema.js');
 
-var getuserdetails = function(req, res) { 
+var getuserdetails = function(req, res) {
 
     var userdetails = new Array();
-    var user_id         = req.user._id;
-    
+    var user_id = req.user._id;
+
     async.parallel([
         allpost,
         tweetcount,
         trends,
         following,
         followers
-    ], function (err, results){
+    ], function(err, results) {
 
-        console.info(userdetails);
+        log.info(userdetails);
         res.render('pages/about', {
-            userdetails : userdetails,
+            userdetails: userdetails,
             user: req.user
         });
+        
 
     });
-    
+
     function allpost(callback) {
-    
+
         post_model.post
-        .find({posted_by: user_id})
-        .sort({created_at: -1})
-        .lean()
-        .exec(function(err, allpost) {
+            .find({
+                posted_by: user_id
+            })
+            .sort({
+                created_at: -1
+            })
+            .lean()
+            .exec(function(err, allpost) {
 
-            if (err)
-                res.send(err);
-            
-            // console.info(allpost);
-
-            async.each(allpost,
-                                   
-                function(singlepost, callback) {
-
-                    post_model.post_like
-                    .count({post_id: singlepost._id})
-                    .lean()
-                    .exec(function(err, countPostLikes){
-                        if (err) {
-                            res.send(err)
-                        };
-                        // console.info(countPostLikes);
-                        if (countPostLikes !== 0) {
-                            singlepost.postLikeCount = countPostLikes;
-                            // console.info(singlepost);
-                        }   
-                        else{
-                            singlepost.postLikeCount = 0;
-                        }   
-                        // console.info(singlepost);
-                        callback();
-                    })
-                    
-                },
-                // 3rd param is the function to call when everything's done
-                function(err) {
-                    // All tasks are done now
-                    console.info(allpost);
-                    userdetails.allpost = allpost
-                    callback(null, userdetails);
-                  
+                if (err) {
+                    log.error(err);
+                    res.send(err);
                 }
 
-            );
-                        
-        }); 
+                // log.info(allpost);
+
+                async.each(allpost,
+
+                    function(singlepost, callback) {
+
+                        post_model.post_like
+                            .count({
+                                post_id: singlepost._id
+                            })
+                            .lean()
+                            .exec(function(err, countPostLikes) {
+                                if (err) {
+                                    res.send(err)
+                                };
+                                // log.info(countPostLikes);
+                                if (countPostLikes !== 0) {
+                                    singlepost.postLikeCount = countPostLikes;
+                                    // log.info(singlepost);
+                                } else {
+                                    singlepost.postLikeCount = 0;
+                                }
+                                // log.info(singlepost);
+                                callback();
+                            })
+
+                    },
+                    // 3rd param is the function to call when everything's done
+                    function(err) {
+                        // All tasks are done now
+                        log.info(allpost);
+                        userdetails.allpost = allpost
+                        callback(null, userdetails);
+
+                    }
+
+                );
+
+            });
 
     }
 
@@ -89,82 +98,96 @@ var getuserdetails = function(req, res) {
 
         async.parallel([
 
-			function(callback){
-				// show count of post and check for errors
-				post_model.post
-				.count({posted_by: user_id})
-				.exec(function(err, postcount) {
+                function(callback) {
+                    // show count of post and check for errors
+                    post_model.post
+                        .count({
+                            posted_by: user_id
+                        })
+                        .exec(function(err, postcount) {
 
 
-					if (err)
-						res.send(err);
+                            if (err)
+                                res.send(err);
 
-					callback(null, postcount);
+                            callback(null, postcount);
 
-				});                
+                        });
 
-			},
-			function(callback){
+                },
+                function(callback) {
 
-				// show count of post and check for errors
-				post_model.retweet_quote
-				.count({ret_user_id: user_id})
-				.exec(function(err, retweetcount) {
+                    // show count of post and check for errors
+                    post_model.retweet_quote
+                        .count({
+                            ret_user_id: user_id
+                        })
+                        .exec(function(err, retweetcount) {
 
-					if (err)
-						res.send(err);
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
 
-						callback(null, retweetcount);
+                            callback(null, retweetcount);
 
-				});
+                        });
 
-			},
-			function(callback){
+                },
+                function(callback) {
 
-				// show count of post and check for errors
-				post_model.reply
-				.count({reply_user_id: user_id})
-				.exec(function(err, replycount) {
+                    // show count of post and check for errors
+                    post_model.reply
+                        .count({
+                            reply_user_id: user_id
+                        })
+                        .exec(function(err, replycount) {
 
-					if (err)
-						res.send(err);
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
 
-						callback(null, replycount);
+                            callback(null, replycount);
 
-				});
+                        });
 
-			}],
-			function(err, result){
+                }
+            ],
+            function(err, result) {
 
-				var sumArray = function() {
-					// Use one adding function rather than create a new one each
-					// time sumArray is called
-					function add(a, b) {
-						return a + b;
-					}
+                var sumArray = function() {
+                    // Use one adding function rather than create a new one each
+                    // time sumArray is called
+                    function add(a, b) {
+                        return a + b;
+                    }
 
-					return function(arr) {
-						return arr.reduce(add);
-					};
-				}();
+                    return function(arr) {
+                        return arr.reduce(add);
+                    };
+                }();
 
-				var allCount = sumArray(result);
+                var allCount = sumArray(result);
 
-				userdetails.tweetcount = allCount   
-				callback(null, userdetails);
-				// res.json({count : allCount});
+                userdetails.tweetcount = allCount
+                callback(null, userdetails);
+                // res.json({count : allCount});
 
-			}
+            }
 
-        ) 
-        
+        )
+
     }
 
     function trends(callback) {
 
-        post_model.trends.find().sort({count: -1}).limit(5).exec(function(err, results){
+        post_model.trends.find().sort({
+            count: -1
+        }).limit(5).exec(function(err, results) {
 
             if (err) {
+                log.error(err);
                 res.send(err);
             };
 
@@ -172,45 +195,61 @@ var getuserdetails = function(req, res) {
             callback(null, userdetails);
 
         });
-    
+
     }
-    
+
     function following(callback) {
-    
-        user_followers
-        .count({$and:[{following_id : user_id},{follow_status:true}]})
-        .exec(function(err, followingcount){
-               
-            if (err)
-                res.send(err);
-               
-            userdetails.followingcount = followingcount
-            callback(null, userdetails);        
 
-        });
+        user_followers
+            .count({
+                $and: [{
+                    following_id: user_id
+                }, {
+                    follow_status: true
+                }]
+            })
+            .exec(function(err, followingcount) {
+
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
+
+                userdetails.followingcount = followingcount
+                callback(null, userdetails);
+
+            });
 
     }
-    
-    function followers(callback) {
-    
-        user_followers
-        .count({$and:[{user_id : user_id},{follow_status:true}]})
-        .exec(function(err, followercount){
-               
-            if (err)
-                res.send(err);
-               
-            userdetails.followerCount = followercount
-            callback(null, userdetails);        
 
-        });
+    function followers(callback) {
+
+        user_followers
+            .count({
+                $and: [{
+                    user_id: user_id
+                }, {
+                    follow_status: true
+                }]
+            })
+            .exec(function(err, followercount) {
+
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
+
+                userdetails.followerCount = followercount
+                callback(null, userdetails);
+
+            });
 
     }
 
 };
 
 
-var Trendsdk = function(req, res) {
+var trend = function(req, res) {
 
     post_model.trends
         .find()
@@ -221,8 +260,10 @@ var Trendsdk = function(req, res) {
         .exec(function(err, results) {
 
             if (err) {
+                log.error(err);
                 res.send(err);
-            };
+            }
+
             var TD = results
             res.json({
                 trends_data: results
@@ -238,6 +279,7 @@ var Trendsdk = function(req, res) {
 //  .find()
 //  .exec(function(err, allpost) {
 //         if (err)
+// log.error(err);
 //             res.send(err);
 
 //         res.json({
@@ -249,21 +291,25 @@ var Trendsdk = function(req, res) {
 
 //Get single post of user
 var getsinglepost = function(req, res) { // get a post 
-    console.log('Show single post');
+    log.info('Show single post');
     var post_title = req.params.post_title;
-    console.log(post_title);
+    log.info(post_title);
     // get the post and check for errors
 
     post_model.post.findOne({
         post_title: post_title
     }).exec(function(err, singlepost) {
-        if (err)
+        if (err) {
+            log.error(err);
             res.send(err);
+        }
+
         if (singlepost) {
             res.json({
                 posts: singlepost
             });
         } else {
+
             res.json('No Post Found')
         }
 
@@ -275,11 +321,11 @@ var getsinglepost = function(req, res) { // get a post
 var getuserposts = function(req, res) { // get a post 
     var finalObj = new Array;
     var finalObj1;
-    console.log('Show all posts for single user');
+    log.info('Show all posts for single user');
 
     var username = req.params.username; // find posts of user and check for errors
 
-    console.log('user ', req.params.user);
+    log.info('user ', req.params.user);
 
     //find id of user from user collection
     User
@@ -288,12 +334,12 @@ var getuserposts = function(req, res) { // get a post
         })
         .exec(function(err, userdata) {
 
-            if (err)
+            if (err) {
+                log.error(err);
                 res.send(err);
-
-            else if (userdata.length !== 0) {
+            } else if (userdata.length !== 0) {
                 userid = userdata[0]._id;
-                // console.log(userid);
+                // log.info(userid);
 
                 //use userid to find all post of users
                 post_model.post
@@ -309,10 +355,10 @@ var getuserposts = function(req, res) { // get a post
                     .limit(10)
                     .exec(function(err, result) {
 
-                        if (err)
+                        if (err) {
+                            log.error(err);
                             res.send(err);
-
-                        else if (result.length == 0) {
+                        } else if (result.length == 0) {
                             res.json({
                                 message: 'No post found'
                             });
@@ -321,7 +367,7 @@ var getuserposts = function(req, res) { // get a post
                             //show recent 10 retweeted post
                             // if (result[0].tweet_count !== 0) {      //check tweet count if not zero then proceed
 
-                            // console.info('Retweet count', result[0].tweet_count);
+                            // log.info('Retweet count', result[0].tweet_count);
                             post_model.post_retweet
                                 .find({
                                     ret_user_id: userid
@@ -351,12 +397,12 @@ var getuserposts = function(req, res) { // get a post
 
                                     var finalObj1 = result.concat(finalObj);
 
-                                    console.info('\n\n', finalObj1);
+                                    log.info('\n\n', finalObj1);
                                     // sortOut(finalObj1, function(){
 
                                     // var finalObjResult = JSON.stringify(finalObjResult);
 
-                                    // console.info('\n\n', finalObjResult);
+                                    // log.info('\n\n', finalObjResult);
 
                                     // })
 
@@ -385,20 +431,24 @@ var getuserposts = function(req, res) { // get a post
 //Get single post of user
 var getuserpost = function(req, res) { // get a post 
 
-    console.log('Show single posts for single user');
+    log.info('Show single posts for single user');
 
     var post_id = req.params.post_id;
     var user = req.params.username; // find posts of user and check for errors
 
-    console.log('post_id', post_id);
-    console.log('post_user', user);
+    log.info('post_id', post_id);
+    log.info('post_user', user);
 
     // find posts of user and check for errors
     post_model.post
-    .find({_id: post_id})
-    .exec(function(err, userposts) {
-        if (err)
-            res.send(err);
+        .find({
+            _id: post_id
+        })
+        .exec(function(err, userposts) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
             res.json({
                 posts: userposts
             });
@@ -409,7 +459,7 @@ var getuserpost = function(req, res) { // get a post
 //Set new post
 var setpost = function(req, res) { // create a post 
 
-    console.log('Add post');
+    log.info('Add post api hitted');
 
     var userid = req.body.userid; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
@@ -427,6 +477,7 @@ var setpost = function(req, res) { // create a post
     var errors = req.validationErrors();
 
     if (errors) {
+        log.warn('There have been validation errors: \n' + util.inspect(errors));
         res.status('400').send('There have been validation errors: \n' + util.inspect(errors));
         return;
     }
@@ -443,122 +494,127 @@ var setpost = function(req, res) { // create a post
     //     urls.push(match_url[1]);
     // }
 
-    console.log('Mention Users : ', mentionusers);
-    console.log('Hash Tags : ', hashtags);
+    log.info('Mention Users : ', mentionusers);
+    log.info('Hash Tags : ', hashtags);
 
     var post = new post_model.post({
 
-        posted_by : userid,
+        posted_by: userid,
         post_description: post_description
-        
+
     }); // create a new instance of the post model
 
-        // save the post and check for errors
+    // save the post and check for errors
     post.save(function(err, result) {
 
-        if (err)
+        if (err) {
+            log.error(err);
             res.send(err);
+        }
 
-        master.getusername(result.posted_by, function(err, username){
+        master.getusername(result.posted_by, function(err, username) {
 
-			// user_final_followers_schema
-			// .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
-			// .lean()
-			// .exec(function(err, resValue){
-			
-				// if (err)
-					// res.send(err);
-					
-			// })
-			
-			console.log('Test :'+mentionusers);
-			
-			if(mentionusers != "")
-			{
-				// console.log('Users : ',mentionusers);
-				//var notification_user = [];
-				var i = -1;
-				
-				var notification_message = username+' Has Mentioned you in post';
-				
-				var notification = new notificationModel.notification({
+            // user_final_followers_schema
+            // .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
+            // .lean()
+            // .exec(function(err, resValue){
 
-					notification_message: notification_message,
-					notification_user: mentionusers,
-					post_id:post._id,
-					usrname: username
-					
-				});
-				
-				// console.log(notification_user);
-				notification.save(function(err) {
-				
-					if (err)
-						res.send(err);
-						
-					console.log('Notification Saved');
-					
-				})
-				
-				// async.each(mentionusers, function(mentionuser, callback){
-					
-					// master.getUserId(mentionuser, function(err, getId) {
-					
-						// if (err)
-							// res.send(err);
-						
-						// if(getId != 'No user found')
-						// {
-							// i++;
-							// var result = {username:mentionuser, userId:getId};
-							// notification_user[i] = result
-						// }
-						
-						// callback();
-						
-					// })
-					
-				// }, function(err){
-				
-					// var notification = new notificationModel.notification({
+            // if (err)
+            // res.send(err);
 
-						// notification_message: notification_message,
-						// notification_user: notification_user,
-						// post_id:post._id,
-						// usrname: username
-						
-					// });
-				
-					// console.log(notification_user);
-					// notification.save(function(err) {
-					
-						// if (err)
-							// res.send(err);
-							
-						// console.log('Notification Saved');
-					
-					// })
-				
-				// })
-			}
-			
-            master.hashtagMention(1, post, mentionusers, hashtags, function(err, result){
+            // })
+
+            log.info('Mention Users :' + mentionusers);
+
+            if (mentionusers != "") {
+                // log.info('Users : ',mentionusers);
+                //var notification_user = [];
+                var i = -1;
+
+                var notification_message = username + ' Has Mentioned you in post';
+
+                var notification = new notificationModel.notification({
+
+                    notification_message: notification_message,
+                    notification_user: mentionusers,
+                    post_id: post._id,
+                    usrname: username
+
+                });
+
+                // log.info(notification_user);
+                notification.save(function(err) {
+
+                    if (err) {
+                        log.error(err);
+                        res.send(err);
+                    }
+
+                    log.info('Notification Saved');
+
+                })
+
+                // async.each(mentionusers, function(mentionuser, callback){
+
+                // master.getUserId(mentionuser, function(err, getId) {
+
+                // if (err)
+                // res.send(err);
+
+                // if(getId != 'No user found')
+                // {
+                // i++;
+                // var result = {username:mentionuser, userId:getId};
+                // notification_user[i] = result
+                // }
+
+                // callback();
+
+                // })
+
+                // }, function(err){
+
+                // var notification = new notificationModel.notification({
+
+                // notification_message: notification_message,
+                // notification_user: notification_user,
+                // post_id:post._id,
+                // usrname: username
+
+                // });
+
+                // log.info(notification_user);
+                // notification.save(function(err) {
+
+                // if (err)
+                // res.send(err);
+
+                // log.info('Notification Saved');
+
+                // })
+
+                // })
+            }
+
+            master.hashtagMention(1, post, mentionusers, hashtags, function(err, result) {
 
                 if (err) {
-                    res.send(err)
-                };
+                    log.error(err);
+                    res.send(err);
+
+                }
 
                 res.json({
                     message: result
                 });
 
-                console.log('post created.');
+                log.info('Post Created.');
 
             });
 
         })
-        
-    });        
+
+    });
 
     // res.redirect('/about');
 
@@ -593,8 +649,10 @@ var setuser = function(req, res) { //Create new user
     });
 
     setuser.save(function(err) {
-        if (err)
+        if (err) {
+            log.error(err);
             res.send(err);
+        }
 
         res.json({
             message: 'Users Inserted'
@@ -607,15 +665,15 @@ var setuser = function(req, res) { //Create new user
 //Get Count of post of specified user
 var getuserpostcount = function(req, res) { // get a post 
 
-    console.log('Show count of HashTag');
+    log.info('Show count of HashTag');
 
     var username = req.params.username;
 
-    master.getUserId(username, function(err, userid){
+    master.getUserId(username, function(err, userid) {
 
         if (err) {
-            
-            console.info(userid);
+
+            log.info(userid);
 
             res.json({
                 Result: userid
@@ -624,55 +682,68 @@ var getuserpostcount = function(req, res) { // get a post
 
             return;
         };
-        console.info(userid);
+        log.info(userid);
 
         async.parallel([
 
-            function(callback){
-                // show count of post and check for errors
-                post_model.post
-                .count({posted_by: userid})
-                .exec(function(err, postcount) {
+                function(callback) {
+                    // show count of post and check for errors
+                    post_model.post
+                        .count({
+                            posted_by: userid
+                        })
+                        .exec(function(err, postcount) {
 
-                    if (err)
-                        res.send(err);
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
 
-                    callback(null, postcount);
+                            callback(null, postcount);
 
-                });                
+                        });
 
-            },
-            function(callback){
+                },
+                function(callback) {
 
-                // show count of post and check for errors
-                post_model.retweet_quote
-                .count({ret_user_id: userid})
-                .exec(function(err, retweetcount) {
+                    // show count of post and check for errors
+                    post_model.retweet_quote
+                        .count({
+                            ret_user_id: userid
+                        })
+                        .exec(function(err, retweetcount) {
 
-                    if (err)
-                        res.send(err);
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
 
-                        callback(null, retweetcount);
+                            callback(null, retweetcount);
 
-                });
+                        });
 
-            },
-            function(callback){
+                },
+                function(callback) {
 
-                // show count of post and check for errors
-                post_model.reply
-                .count({reply_user_id: userid})
-                .exec(function(err, replycount) {
+                    // show count of post and check for errors
+                    post_model.reply
+                        .count({
+                            reply_user_id: userid
+                        })
+                        .exec(function(err, replycount) {
 
-                    if (err)
-                        res.send(err);
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
 
-                        callback(null, replycount);
+                            callback(null, replycount);
 
-                });
+                        });
 
-            }],
-            function(err, result){
+                }
+            ],
+            function(err, result) {
 
                 var sumArray = function() {
                     // Use one adding function rather than create a new one each
@@ -688,12 +759,14 @@ var getuserpostcount = function(req, res) { // get a post
 
                 var allCount = sumArray(result);
 
-                res.json({count : allCount});
+                res.json({
+                    count: allCount
+                });
 
             }
 
         )
-        
+
     });
 
 }
@@ -703,23 +776,38 @@ var deletepost = function(req, res) {
     var post_id = req.body.post_id;
     var posted_by = req.body.posted_by;
 
+    req.checkBody('post_id', 'post_id').notEmpty();
+    req.checkBody('posted_by', 'posted_by').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        log.warn('There have been validation errors: \n' + util.inspect(errors));
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+    
     post_model.post
-        .findOneAndRemove({_id: post_id, posted_by:posted_by})
+        .findOneAndRemove({
+            _id: post_id,
+            posted_by: posted_by
+        })
         .exec(function(err, result) {
             if (err) {
+                log.error(err);
                 res.send(err);
             };
 
             if (result !== null) {
 
-                console.info('Post Deleted');
+                log.info('Post Deleted');
 
                 res.json({
                     message: 'Post Deleted'
                 });
             } else {
 
-                console.info('No Post Found');
+                log.info('No Post Found');
 
                 res.json({
                     message: 'No Post Found'
@@ -738,7 +826,7 @@ module.exports = ({
     setpost: setpost,
     setuser: setuser,
     getuserpostcount: getuserpostcount,
-    Trendsdk: Trendsdk,
+    trend: trend,
     deletepost: deletepost
     // getpost : getpost,
     // home_userdetails :home_userdetails

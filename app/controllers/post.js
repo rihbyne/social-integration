@@ -701,11 +701,10 @@ var getuserpostcount = function(req, res) { // get a post
 var deletepost = function(req, res) {
 
     var post_id = req.body.post_id;
+    var posted_by = req.body.posted_by;
 
     post_model.post
-        .findOneAndRemove({
-            _id: post_id
-        })
+        .findOneAndRemove({_id: post_id, posted_by:posted_by})
         .exec(function(err, result) {
             if (err) {
                 res.send(err);

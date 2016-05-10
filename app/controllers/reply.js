@@ -333,6 +333,7 @@ var getReply = function(req, res){
 var deletereply = function(req, res){
 
     var reply_id = req.body.reply_id;  
+    var reply_user_id = req.body.reply_user_id;  
 
     req.checkBody('reply_id', 'reply_id').notEmpty();
 
@@ -346,7 +347,7 @@ var deletereply = function(req, res){
     
     post_model.reply
     .findOneAndRemove({
-        _id: reply_id
+        _id: reply_id, reply_user_id:reply_user_id
     })
     .exec(function(err, result) {
         if (err) {

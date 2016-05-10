@@ -401,10 +401,10 @@ var setretweetcount = function(post_id, post_type, collectionName, res){
 var deleteRetweet = function(req, res){
 
 	var retweet_quote_id = req.body.retweet_quote_id;
-	
+	var ret_user_id = req.body.ret_user_id;
     
 	post_model.retweet_quote
-	.findOneAndRemove({_id: retweet_quote_id})
+	.findOneAndRemove({_id: retweet_quote_id, ret_user_id:ret_user_id})
 	.lean()
 	.exec(function(err, result){
 		

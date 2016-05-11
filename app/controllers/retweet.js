@@ -11,6 +11,7 @@ var setretweet = function (req, res) {
     var retweet_type = req.body.retweet_type;
     var retweet_quote = req.body.retweet_quote;
     var collectionName, message, userIdFrom, query;
+	var privacy_setting = req.body.privacy_setting; 
 
     log.info('Retweet Api hitted');
 
@@ -115,7 +116,8 @@ var setretweet = function (req, res) {
                                         var retweet = new post_model.retweet({
 
                                             post_id: post_id,
-                                            ret_user_id: ret_user_id
+                                            ret_user_id: ret_user_id,
+											privacy_setting: privacy_setting
                                         });
 
                                     } else if (post_type == 2) {
@@ -123,7 +125,8 @@ var setretweet = function (req, res) {
                                         var retweet = new post_model.retweet({
 
                                             retweet_quote_id: post_id,
-                                            ret_user_id: ret_user_id
+                                            ret_user_id: ret_user_id,
+											privacy_setting: privacy_setting
                                         });
 
                                     } else if (post_type == 3) {
@@ -131,7 +134,8 @@ var setretweet = function (req, res) {
                                         var retweet = new post_model.retweet({
 
                                             reply_id: post_id,
-                                            ret_user_id: ret_user_id
+                                            ret_user_id: ret_user_id,
+											privacy_setting: privacy_setting
                                         });
 
                                     }
@@ -225,7 +229,8 @@ var setretweet = function (req, res) {
 
                                 post_id: post_id,
                                 ret_user_id: ret_user_id,
-                                retweet_quote: retweet_quote
+                                retweet_quote: retweet_quote,
+								privacy_setting: privacy_setting
 
                             });
 
@@ -237,7 +242,8 @@ var setretweet = function (req, res) {
 
                                     retweet_quote_id: post_id,
                                     ret_user_id: ret_user_id,
-                                    retweet_quote: retweet_quote
+                                    retweet_quote: retweet_quote,
+									privacy_setting: privacy_setting
 
                                 });
 
@@ -249,7 +255,8 @@ var setretweet = function (req, res) {
 
                                 reply_id: post_id,
                                 ret_user_id: ret_user_id,
-                                retweet_quote: retweet_quote
+                                retweet_quote: retweet_quote,
+								privacy_setting: privacy_setting
 
                             });
 
@@ -268,7 +275,7 @@ var setretweet = function (req, res) {
 
                             master.hashtagMention(2, retweet, mentionusers, hashtags, function(err, result) {
 
-                                if (err) {
+                                if (err){
 
                                     log.error(err)
                                     res.send(err);

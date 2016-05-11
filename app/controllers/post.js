@@ -32,66 +32,56 @@ var getuserdetails = function(req, res) {
             user: req.user
         });
         
-
     });
 
     function allpost(callback) {
 
         post_model.post
-            .find({
-                posted_by: user_id
-            })
-            .sort({
-                created_at: -1
-            })
-            .lean()
-            .exec(function(err, allpost) {
+        .find({posted_by: user_id})
+		.sort({created_at: -1})
+		.lean()
+        .exec(function(err, allpost) {
 
-                if (err) {
-                    log.error(err);
-                    res.send(err);
-                }
+			if (err) {
+				log.error(err);
+				res.send(err);
+			}
 
-                // log.info(allpost);
+			// log.info(allpost);
 
-                async.each(allpost,
+			async.each(allpost, function(singlepost, callback) {
 
-                    function(singlepost, callback) {
+				post_model.post_like
+				.count({ post_id: singlepost._id })
+				.lean()
+				.exec(function(err, countPostLikes) {
+                                
+					if (err) {
+						log.error(err);
+						res.send(err);
+					}
+					// log.info(countPostLikes);
+					if (countPostLikes !== 0) {
+						singlepost.postLikeCount = countPostLikes;
+						// log.info(singlepost);
+					} else {
+						singlepost.postLikeCount = 0;
+					}
+					// log.info(singlepost);
+					callback();
+				})
 
-                        post_model.post_like
-                            .count({
-                                post_id: singlepost._id
-                            })
-                            .lean()
-                            .exec(function(err, countPostLikes) {
-                                if (err) {
-                    log.error(err);
-                    res.send(err);
-                }
-                                // log.info(countPostLikes);
-                                if (countPostLikes !== 0) {
-                                    singlepost.postLikeCount = countPostLikes;
-                                    // log.info(singlepost);
-                                } else {
-                                    singlepost.postLikeCount = 0;
-                                }
-                                // log.info(singlepost);
-                                callback();
-                            })
+			},
+				// 3rd param is the function to call when everything's done
+				function(err) {
+					// All tasks are done now
+					log.info(allpost);
+					userdetails.allpost = allpost
+					callback(null, userdetails);
 
-                    },
-                    // 3rd param is the function to call when everything's done
-                    function(err) {
-                        // All tasks are done now
-                        log.info(allpost);
-                        userdetails.allpost = allpost
-                        callback(null, userdetails);
+			});
 
-                    }
-
-                );
-
-            });
+		});
 
     }
 
@@ -468,6 +458,7 @@ var setpost = function(req, res) { // create a post
 
     var userid = req.body.userid; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
+	var privacy_setting = req.body.privacy_setting; 
     //var post_links = req.body.post_links;
 
     var mentionusers = new Array();
@@ -505,7 +496,8 @@ var setpost = function(req, res) { // create a post
     var post = new post_model.post({
 
         posted_by: userid,
-        post_description: post_description
+        post_description: post_description,
+		privacy_setting: privacy_setting
 
     }); // create a new instance of the post model
 

@@ -266,7 +266,7 @@ var getReply = function(req, res) {
     if (type == 2 || type == '2') {
         var retweet_quote_id = id;
 
-        console.log(retweet_quote_id);
+        log.info(retweet_quote_id);
 
         post_model.reply
             .find({
@@ -276,7 +276,7 @@ var getReply = function(req, res) {
             .lean()
             .exec(function(err, retweetReplys) {
 
-                console.log(retweetReplys);
+                log.info(retweetReplys);
 
                 if (err) {
 

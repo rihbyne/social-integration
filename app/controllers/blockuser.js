@@ -7,62 +7,77 @@ var setblockuser = function(req, res) {
 
     //Validation remaining
 
-    follow
-    .find({
-        $and: [{
-            user_id: userId
-        }, {
-            following_id: followingId
-        }]
-    })
-    .select('block')
-    .exec(function(err, blcokresult) {
-        if (err)
-            res.send(err)
-        	
-        	console.info(blcokresult);
+        follow
+        .find({
+            $and: [{
+                user_id: userId
+            }, {
+                following_id: followingId
+            }]
+        })
+        .select('block')
+        .exec(function(err, blcokresult) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-        	var blockStatus = (blcokresult[0].block == false) ? true : false;
+            log.info(blcokresult);
 
-        	follow
-        	.update({_id : blcokresult[0]._id}, {block: blockStatus})
-        	.exec(function(err, result){
+            var blockStatus = (blcokresult[0].block == false) ? true : false;
 
-        		 if (err)
-	                res.send(err)
-	            	
-	            	console.info(result);
+            follow
+                .update({
+                    _id: blcokresult[0]._id
+                }, {
+                    block: blockStatus
+                })
+                .exec(function(err, result) {
 
-        	})
+                    if (err) {
+                        log.error(err);
+                        res.send(err);
+                    }
 
-    });
+                    log.info(result);
+
+                })
+
+        });
 
 }
 
-var getblockuser = function(req, res){
+var getblockuser = function(req, res) {
 
-	var userId = req.params.userId;
+    var userId = req.params.userId;
     var blockStatus = req.params.blockStatus;
 
     //validation Remaining
 
     follow
-    .find({$and: [{user_id: userId}, {block: 'true'}]})
-    .select('following_id')
-    .exec(function(err, result){
-    	if (err) {
-    		res.send(err)
-    	};
-    	console.info(result);
-    	res.json({
-    		countOfBlockUsers: result.length,
-    		listOfBlockUsers: result
-    	})
-    })
+        .find({
+            $and: [{
+                user_id: userId
+            }, {
+                block: 'true'
+            }]
+        })
+        .select('following_id')
+        .exec(function(err, result) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+            log.info(result);
+            res.json({
+                countOfBlockUsers: result.length,
+                listOfBlockUsers: result
+            })
+        })
 
 }
 
 module.exports = ({
-	setblockuser : setblockuser,
-	getblockuser : getblockuser
+    setblockuser: setblockuser,
+    getblockuser: getblockuser
 });

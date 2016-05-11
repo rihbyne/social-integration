@@ -265,7 +265,7 @@ var getLikeByPost = function(req, res) {
         })
         .exec(function(err, postLikeResult) {
 
-            console.info(postLikeResult.length + '\n' + postLikeResult);
+            log.info(postLikeResult.length + '\n' + postLikeResult);
 
             res.json({
                 count: postLikeResult.length,
@@ -286,8 +286,11 @@ var getLikeByRetweet = function(req, res) {
             retweet_quote_id: retweet_quote_id
         })
         .exec(function(err, retweetLikeResult) {
-
-            console.info(retweetLikeResult.length + '\n' + retweetLikeResult);
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+            log.info(retweetLikeResult.length + '\n' + retweetLikeResult);
 
             res.json({
                 count: retweetLikeResult.length,
@@ -309,7 +312,7 @@ var getLikeByReply = function(req, res) {
         })
         .exec(function(err, replyLikeResult) {
 
-            console.info(replyLikeResult.length + '\n' + replyLikeResult);
+            log.info(replyLikeResult.length + '\n' + replyLikeResult);
 
             res.json({
                 count: replyLikeResult.length,
@@ -340,7 +343,7 @@ var getLikeByUser = function(req, res) { //get new like
 
             var length = results.length;
             var count = 0;
-            
+
             for (var i = 0; i < length; i++) {
                 count = count + ++results[i].length;
             }
@@ -361,10 +364,10 @@ var getLikeByUser = function(req, res) { //get new like
                 .populate('post_id')
                 .exec(function(err, userPostLikeResult) {
 
-                    if (err) {
-                        res.send(err);
-                        return;
-                    };
+                   if (err) {
+                log.error(err);
+                res.send(err);
+            }
                     //log.info(userPostLikeResult);
                     callback(null, userPostLikeResult);
 
@@ -545,7 +548,7 @@ var getlike = function(req, res) {
             reply_id: post_id
         }
     } else {
-        console.info('wrong post type');
+        log.info('wrong post type');
         res.json({
             Result: 'No post_type found'
         })
@@ -564,8 +567,8 @@ var getlike = function(req, res) {
                 res.send(err);
             }
 
-            console.info(getRetweetResult.length);
-            console.info(getRetweetResult);
+            log.info(getRetweetResult.length);
+            log.info(getRetweetResult);
 
             res.json({
                 count: getRetweetResult.length,

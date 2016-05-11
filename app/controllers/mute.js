@@ -17,10 +17,12 @@ var setmuteuser = function(req, res) {
         })
         .select('mute')
         .exec(function(err, muteresult) {
-            if (err)
-                res.send(err)
+            if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
             	
-            	console.info(muteresult);
+            	log.info(muteresult);
 
             	var blockStatus = (muteresult[0].block == false) ? true : false;
 
@@ -31,7 +33,7 @@ var setmuteuser = function(req, res) {
             		 if (err)
 		                res.send(err)
 		            	
-		            	console.info(result);
+		            	log.info(result);
 
             	})
 
@@ -52,9 +54,10 @@ var getmuteuser = function(req, res){
     .select('following_id')
     .exec(function(err, result){
     	if (err) {
-    		res.send(err)
-    	};
-    	console.info(result);
+                            log.error(err);
+                            res.send(err);
+                        }
+    	log.info(result);
     	res.json({
     		countOfBlockUsers: result.length,
     		listOfBlockUsers: result

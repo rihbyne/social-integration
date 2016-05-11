@@ -111,7 +111,7 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
         for (var k = 0; k < hashtags.length; k++) {
 
             hashtagkd[k] = hashtags[k];
-            console.log('hashtagkeyword', hashtagkd[k]);
+            log.info('hashtagkeyword', hashtagkd[k]);
 
             post_model.trends
                 .findOneAndUpdate({
@@ -130,7 +130,7 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
                         log.error(err);
                         res.send(err);
                     }
-                    console.log('Trends updated');
+                    log.info('Trends updated');
                 })
 
         }

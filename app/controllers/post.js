@@ -65,8 +65,9 @@ var getuserdetails = function(req, res) {
                             .lean()
                             .exec(function(err, countPostLikes) {
                                 if (err) {
-                                    res.send(err)
-                                };
+                    log.error(err);
+                    res.send(err);
+                }
                                 // log.info(countPostLikes);
                                 if (countPostLikes !== 0) {
                                     singlepost.postLikeCount = countPostLikes;
@@ -107,8 +108,10 @@ var getuserdetails = function(req, res) {
                         .exec(function(err, postcount) {
 
 
-                            if (err)
-                                res.send(err);
+                            if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
 
                             callback(null, postcount);
 
@@ -309,7 +312,7 @@ var getsinglepost = function(req, res) { // get a post
                 posts: singlepost
             });
         } else {
-
+            log.info('No post found')
             res.json('No Post Found')
         }
 
@@ -319,8 +322,10 @@ var getsinglepost = function(req, res) { // get a post
 
 //Get all post of user
 var getuserposts = function(req, res) { // get a post 
+
     var finalObj = new Array;
     var finalObj1;
+
     log.info('Show all posts for single user');
 
     var username = req.params.username; // find posts of user and check for errors
@@ -649,6 +654,7 @@ var setuser = function(req, res) { //Create new user
     });
 
     setuser.save(function(err) {
+        
         if (err) {
             log.error(err);
             res.send(err);

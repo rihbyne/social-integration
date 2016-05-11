@@ -146,6 +146,10 @@ var isFollowing = function(user_id, following_id, callback) {
             })
             .lean()
             .exec(function(err, result) {
+                if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
                 log.info(result);
                 if (result.length == 0) {
                     return callback(true);
@@ -226,9 +230,11 @@ var getfollowers = function(req, res) {
                     })
                     .populate('following_id user_id')
                     .exec(function(err, followerResult) {
+                        
                         if (err) {
+                            log.error(err);
                             res.send(err);
-                        };
+                        }
 
                         res.json({
                             FollowersList: followerResult
@@ -311,8 +317,10 @@ var getCountFollower = function(req, res) {
                             user_id: user_id,
                             follow_status: true
                         }, function(err, followercount) {
-                            if (err)
-                                res.send(err);
+                            if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
                             log.info('Count is ' + followercount);
                             res.json({
                                 FollowerCount: followercount
@@ -345,8 +353,10 @@ var getCountFollowing = function(req, res) {
                     .count({
                         following_id: following_id
                     }, function(err, followingcount) {
-                        if (err)
+                        if (err) {
+                            log.error(err);
                             res.send(err);
+                        }
                         log.info('Count is ' + followingcount);
                         res.json({
                             Followingcount: followingcount
@@ -404,8 +414,10 @@ var getMutualFollowerYouKnow = function(req, res) {
                     .select('user_id')
                     .lean()
                     .exec(function(err, followerIds) {
-                        // log.info(typeof(followerIds));
-                        // log.info(followerIds);
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
                         var item, items;
                         var i = 0;
                         var users = [];

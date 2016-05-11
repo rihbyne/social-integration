@@ -21,7 +21,7 @@ var loggednin_home_userdetails = function(req, res) {
 
         if (err) {
             
-            console.info(userid);
+            log.info(userid);
 
             res.json({
                 Result: userid
@@ -30,7 +30,7 @@ var loggednin_home_userdetails = function(req, res) {
 
             return;
         };
-        console.info(userid);
+        log.info(userid);
 
         //using async series function get all post 
         async.parallel([
@@ -40,19 +40,19 @@ var loggednin_home_userdetails = function(req, res) {
         ],
         function (err, result) {
                 
-            console.info(result);
+            log.info(result);
 
             var profilePosts;
 
             if (err) {
 
                 if (result[0] === 0) {
-                    console.info('Own posts are zero');
+                    log.info('Own posts are zero');
                     var profilePosts = result[1]
                 }
 
                 if (result[1] === 0) {
-                    console.info('Retweet posts are zero');
+                    log.info('Retweet posts are zero');
                     var profilePosts = result[0]
                 }
                 // res.json({

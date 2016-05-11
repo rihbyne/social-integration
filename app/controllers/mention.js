@@ -5,7 +5,7 @@ var log = require('../../config/logging')()
 //Get mentionuser's post
 var getmentionuser = function(req, res) { // get a post 
 
-    console.log('Show mention user\'s post');
+    log.info('Show mention user\'s post');
 
     var mention_user = req.params.mention_user;
 
@@ -72,7 +72,7 @@ var getmentionuser = function(req, res) { // get a post
                 
                 if (mentionspost.length !== '') {
 
-                    // console.log(mentionspost);
+                    // log.info(mentionspost);
 
                     callback(null, mentionspost)
 

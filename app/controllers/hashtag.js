@@ -4,7 +4,7 @@ var log = require('../../config/logging')()
 
 //Get all post
 var gethashtag = function(req, res) { // get a post 
-    console.log('Show all HashTag');
+    log.info('Show all HashTag');
 
     // find the hashtag and check for errors
     post_model.post_hashtag
@@ -26,7 +26,7 @@ var gethashtag = function(req, res) { // get a post
 //Get Count of all hashtag
 var allhashtagcount = function(req, res) { // get a post 
 
-    console.log('Show count of all HashTag');
+    log.info('Show count of all HashTag');
 
     // show count of post and check for errors
     post_model.post_hashtag.aggregate({
@@ -54,7 +54,7 @@ var allhashtagcount = function(req, res) { // get a post
 //Get Count of specified hashtag
 var hashtagcount = function(req, res) { // get a post 
 
-    console.log('Show count of HashTag');
+    log.info('Show count of HashTag');
 
     var hashtagkeywd = req.params.hashtag;
     // show count of post and check for errors
@@ -85,14 +85,14 @@ var hashtagcount = function(req, res) { // get a post
 
 //Get all post
 var gethashtaglist = function(req, res) { // get a post 
-    console.log('Show all HashTag');
+    log.info('Show all HashTag');
 
     // find the hashtag and check for errors
     post_model.trends.find().sort({
         count: -1
     }).limit(5).exec(function(err, result) {
 
-        console.log(result);
+        log.info(result);
 
         if (err) {
             log.error(err);
@@ -110,9 +110,9 @@ var gethashtaglist = function(req, res) { // get a post
 //Get posts of hashtag
 var gethashposts = function(req, res) { // get a post 
 
-    console.log('Show posts of hashtag');
+    log.info('Show posts of hashtag');
 
-    console.log('Hashtag : ', hashtag);
+    log.info('Hashtag : ', hashtag);
 
     var hashtag = req.params.hashtag;
 
@@ -181,7 +181,7 @@ var gethashposts = function(req, res) { // get a post
 
                 if (hashtagpost.length !== '') {
 
-                    // console.log(mentionspost);
+                    // log.info(mentionspost);
 
                     callback(null, hashtagpost)
                     // res.json({

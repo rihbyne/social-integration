@@ -185,9 +185,32 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
 
 }
 
+var isFollowing = function(user_id, following_id, callback) {
+    
+    follower
+        .find({
+            user_id: user_id,
+            following_id: following_id,
+            follow_status: 'false'
+        })
+        .lean()
+        .exec(function(err, result) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+            log.info(result);
+            if (result.length == 0) {
+                return callback(true);
+            } else {
+                return callback(false);
+            }
+        })
+}
+
 module.exports = ({
     getUserId: getUserId,
     hashtagMention: hashtagMention,
-    getusername: getusername
-
+    getusername: getusername,
+    isFollowing:isFollowing
 })

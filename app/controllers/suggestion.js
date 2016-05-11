@@ -1,7 +1,7 @@
 var follower 	= require('../models/followersSchema.js'),
     users 		= require('../models/userSchema.js')
 	util 		= require('util'),
-	async		= require('async')
+	async		= require('async'),
 	request     = require('request');                               // Request Module
 
 var	ip			= 'http://192.168.2.16:4000/';

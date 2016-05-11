@@ -44,6 +44,7 @@ var setfollowing = function(req, res) {
             }]
         })
         .exec(function(err, result) {
+
             if (result.length !== 0) {
                 log.info('User already following');
                 // res.json({
@@ -52,7 +53,7 @@ var setfollowing = function(req, res) {
                 return;
             } else { //add new follower
                 log.info('update follower status');
-                /*update user follower status true*/
+                
                 follower
                     .find({
                         $and: [{
@@ -63,6 +64,7 @@ var setfollowing = function(req, res) {
                     })
                     .select('follow_back')
                     .exec(function(err, result) {
+
                         if (err) {
                             log.error(err);
                             res.send(err);
@@ -70,6 +72,7 @@ var setfollowing = function(req, res) {
 
                         if (result.length == 1) {
                             log.info(result);
+                            /*update user follower status true*/
                             follower
                                 .update({
                                     _id: result[0]._id
@@ -77,17 +80,23 @@ var setfollowing = function(req, res) {
                                     follow_back: 'true'
                                 })
                                 .exec(function(err, statusResult) {
+
                                     if (err) {
+                                        log.error(err);
                                         res.send(err);
-                                    };
+                                    }
+
                                     log.info(statusResult);
                                 })
+
                             follow_back = 'true';
 
                         } else {
                             follow_back = 'false';
                         };
-                        isFollowing(user_id, following_id, function(result) {
+                        
+                        master.isFollowing(user_id, following_id, function(result) {
+
                             log.info(result);
                             if (result) {
 
@@ -96,7 +105,9 @@ var setfollowing = function(req, res) {
                                     following_id: following_id,
                                     follow_back: follow_back
                                 });
+
                                 followingModel.save(function(err) {
+
                                     if (err) {
                                         log.error(err);
                                         res.send(err);
@@ -104,7 +115,9 @@ var setfollowing = function(req, res) {
 
                                     log.info('following/followers set saved');
                                 });
+
                             } else {
+
                                 follower
                                     .update({
                                         user_id: user_id,
@@ -114,6 +127,7 @@ var setfollowing = function(req, res) {
                                         follow_status: true
                                     })
                                     .exec(function(err, result) {
+                                        
                                         if (err) {
                                             log.error(err);
                                             res.send(err);
@@ -121,10 +135,13 @@ var setfollowing = function(req, res) {
 
                                         log.info('following/followers update');
                                     });
+
                                 log.info('update following');
                             }
+
                         });
-                    });
+
+                    })
 
                 res.json({
                     message: 'following/followers set'
@@ -137,27 +154,7 @@ var setfollowing = function(req, res) {
             }
         })
 }
-var isFollowing = function(user_id, following_id, callback) {
-        follower
-            .find({
-                user_id: user_id,
-                following_id: following_id,
-                follow_status: 'false'
-            })
-            .lean()
-            .exec(function(err, result) {
-                if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
-                log.info(result);
-                if (result.length == 0) {
-                    return callback(true);
-                } else {
-                    return callback(false);
-                }
-            })
-    }
+
     //Get following
 var getfollowing = function(req, res) {
 

@@ -19,26 +19,6 @@ var notification	= require('./controllers/notification.js');
 // app/routes.js
 module.exports = function(app, passport) {
 
-    // app.get('/', isLoggedIn, function(req, res) {
-    //     // save the bear and check for errors
-    //     var drinks = [{
-				// 		name: 'Bloody Mary',
-				// 		drunkness: 3
-				// 	},{
-				// 		name: 'Martini',
-				// 		drunkness: 5
-				// 	},{
-				// 		name: 'Scotch',
-				// 		drunkness: 10
-				// 	}];
-					
-    //     var tagline = "Any code of your own that you haven't looked at for six or more months might as well have been written by someone else.";
-
-    //     res.render('pages/index', {
-          
-    //     });
-
-    // });
     app.get('/' ,  isLoggedIn , userhome.loggednin_home_userdetails);
 
     // =====================================
@@ -139,9 +119,8 @@ module.exports = function(app, passport) {
 
 /*===========================================================================================================================*/
 
-
     // UserHome
-    app.get('/user_timeline/:username/1', userhome.getuserhomeposts);    // user home timeline post API
+    app.get('/user_timeline/:username/:loggeduser/1', userhome.getuserhomeposts);    // user home timeline post API
     app.get('/user_timeline/:username/2', userhome.getpostsrtreply);   // tweet,retweet & reply post
  
     // Mention

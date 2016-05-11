@@ -11,6 +11,7 @@ var setreply = function(req, res) {
     var reply_user_id = req.body.reply_user_id;
     var reply_msg = req.body.reply_msg;
     var post_id = req.body.post_id;
+	var privacy_setting = req.body.privacy_setting; 
 
     var mentionusers = new Array();
     var hashtags = new Array();
@@ -57,7 +58,8 @@ var setreply = function(req, res) {
         var post_reply = new post_model.reply({
             post_id: post_id,
             reply_user_id: reply_user_id,
-            reply_msg: reply_msg
+            reply_msg: reply_msg,
+			privacy_setting:privacy_setting
         });
 
     } else if (post_type == 2) { //retweet
@@ -69,7 +71,8 @@ var setreply = function(req, res) {
         var post_reply = new post_model.reply({
             retweet_quote_id: post_id,
             reply_user_id: reply_user_id,
-            reply_msg: reply_msg
+            reply_msg: reply_msg,
+			privacy_setting:privacy_setting
         });
 
     } else if (post_type == 3) { //reply
@@ -81,7 +84,8 @@ var setreply = function(req, res) {
         var post_reply = new post_model.reply({
             reply_id: post_id,
             reply_user_id: reply_user_id,
-            reply_msg: reply_msg
+            reply_msg: reply_msg,
+			privacy_setting:privacy_setting
         });
 
     }

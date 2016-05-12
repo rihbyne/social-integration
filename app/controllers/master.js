@@ -2,6 +2,7 @@ var user = require('../models/userSchema.js');
 var post_model = require('../models/postSchema.js');
 var mention_model = require('../models/mentionSchema.js');
 var hashtag_model = require('../models/hashtagSchema.js');
+var follower = require('../models/followersSchema.js');
 var log = require('../../config/logging')()
 
 //find id of user from username
@@ -11,24 +12,25 @@ var getUserId = function(username, res) {
         .find({
             username: username
         })
-    // .select('_id')
-    .exec(function(err, userdata) {
+        .select('_id')
+        .lean()
+        .exec(function(err, userdata) {
 
-        if (err) {
-            log.error(err);
-            res.send(err);
+            if (err) {
+                log.error(err);
+                res.send(err);
 
-        } else if (userdata.length !== 0) {
+            } else if (userdata.length !== 0) {
 
-            userid = userdata[0]._id;
+                userid = (userdata[0]._id).toString();
+                return res(null, userid);
 
-            return res(null, userid);
-        } else {
+            } else {
 
-            return res(true, 'No user found');
-        }
+                return res(true, 'No user found');
+            }
 
-    });
+        });
 
 }
 
@@ -186,12 +188,12 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
 }
 
 var isFollowing = function(user_id, following_id, callback) {
-    
+
     follower
         .find({
             user_id: user_id,
             following_id: following_id,
-            follow_status: 'false'
+            follow_status: 'true'
         })
         .lean()
         .exec(function(err, result) {
@@ -199,18 +201,49 @@ var isFollowing = function(user_id, following_id, callback) {
                 log.error(err);
                 res.send(err);
             }
-            log.info(result);
-            if (result.length == 0) {
-                return callback(true);
+            log.info('isFollowing Result',result);
+            if (result.length !== 0) {
+                return callback(true); //following
             } else {
                 return callback(false);
             }
         })
 }
 
+var getPrivacyStatus = function(userid, loggedid, callback) {
+    //check userid and loggeduser same or not
+    if (loggedid == userid) {
+
+        privacyStatus = 1;
+
+        callback(null, privacyStatus);
+
+    } else {
+
+        isFollowing(userid, loggedid, function(followResult) {
+
+            if (followResult) {
+
+                privacyStatus = 2;
+
+            } else {
+
+                privacyStatus = 3;
+
+            }
+
+            callback(null, privacyStatus);
+            console.info('master', privacyStatus);
+        });
+
+    }
+
+}
+
 module.exports = ({
     getUserId: getUserId,
     hashtagMention: hashtagMention,
     getusername: getusername,
-    isFollowing:isFollowing
+    isFollowing: isFollowing,
+    getPrivacyStatus : getPrivacyStatus
 })

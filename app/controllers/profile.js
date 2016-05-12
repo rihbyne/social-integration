@@ -95,101 +95,61 @@ var getuserhomeposts = function(req, res) { // get a post
 
     log.info('Show all posts for single user on home page');
 
-    var username = req.params.username; // find posts of user
-    // var loggedUser = req.params.loggeduser;
-    var loggedUser = req.params.loggeduser;;
-      var loggedid = '572d8d2c710b14dc0da65030';
+    var userid = req.body.user_id; // find posts of user
+    var loggedid = req.body.logged_id;
 
-    var privacyStatus;
+    log.info('userid, loggedid', userid + '   ' + loggedid);
 
-    log.info('user ', req.params.username);
-
-    var result1, result2;
-
-    //Get My Post
-    master.getUserId(username, function(err, userid) {
+    master.getPrivacyStatus(userid, loggedid, function(err, privacyStatus) {
 
         if (err) {
-
             log.error(err);
-
-            res.send({
-                Result: userid
-            });
-
-            return;
+            res.send(err);
         };
 
-        log.info(userid);
+        //using async series function get all post 
+        async.parallel([
+                callback => getPostByUserId(userid, privacyStatus, callback),
+                callback => getRetweetByUserId(userid, privacyStatus, callback),
+                callback => getQuoteRetweetByUserId(userid, privacyStatus, callback)
+            ],
+            function(err, result) {
 
-        //check userid and loggeduser same or not
-        if (loggedid === userid) {
+                log.info(result);
 
-            privacyStatus = 1;
+                var profilePosts;
 
-        }
-        else{
-            
-            master.isFollowing(userid, loggedid, function(followResult) {
+                if (err) {
 
-                if (followResult) {
+                    if (result[0] === 0) {
+                        log.info('Own posts are zero');
+                        var profilePosts = result[1]
+                    }
 
-                    privacyStatus = 2;
-                
+                    if (result[1] === 0) {
+                        log.info('Retweet posts are zero');
+                        var profilePosts = result[0]
+                    }
+
                 } else {
-                
-                    privacyStatus = 3;
-                
-                }
 
-                //using async series function get all post 
-                async.parallel([
-                        getPostByUserId,
-                        getRetweetByUserId,
-                        getQuoteRetweetByUserId
-                    ],
-                    function(err, result) {
+                    var profilePosts = result[0].concat(result[1]).concat(result[2]); //Got two result , concent two results
+                    function custom_sort(a, b) {
+                        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                    }
 
-                        log.info(result);
+                    profilePosts.sort(custom_sort);
 
-                        var profilePosts;
+                };
 
-                        if (err) {
-
-                            if (result[0] === 0) {
-                                log.info('Own posts are zero');
-                                var profilePosts = result[1]
-                            }
-
-                            if (result[1] === 0) {
-                                log.info('Retweet posts are zero');
-                                var profilePosts = result[0]
-                            }
-
-                        } else {
-
-                            var profilePosts = result[0].concat(result[1]); //Got two result , concent two results
-                            function custom_sort(a, b) {
-                                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-                            }
-
-                            profilePosts.sort(custom_sort);
-
-                        };
-
-                        // log.info(result[0]+''+result[1]);
-
-                        res.json({
-                            ProfilePosts: profilePosts
-                        });
-
-                    });
+                res.json({
+                    ProfilePosts: profilePosts
+                });
 
             });
 
-        }
+    })
 
-    });
 
 }
 
@@ -198,35 +158,26 @@ var getpostsrtreply = function(req, res) { // get a post
 
     log.info('Show all posts, retweet & reply for single user');
 
-    var username = req.params.username; // find posts of user and check for errors
-
-    log.info('user ', req.params.username);
+    var userid = req.body.user_id; // find posts of user
+    var loggedid = req.body.logged_id;
 
     var result1, result2;
 
-    //Get My Post
-    master.getUserId(username, function(err, userid) {
+    log.info('userid, loggedid', userid + '   ' + loggedid);
+
+    master.getPrivacyStatus(userid, loggedid, function(err, privacyStatus) {
 
         if (err) {
-
-            log.info(userid);
-
-            res.json({
-                Result: userid
-                // PostRTReply : result
-            });
-
-            return;
+            log.error(err);
+            res.send(err);
         };
-
-        log.info(userid);
 
         //using async series function get all post 
         async.parallel([
-                getPostByUserId,
-                getRetweetByUserId,
-                getQuoteRetweetByUserId,
-                getReplyByUserId
+                callback => getPostByUserId(userid, privacyStatus, callback),
+                callback => getRetweetByUserId(userid, privacyStatus, callback),
+                callback => getQuoteRetweetByUserId(userid, privacyStatus, callback),
+                callback => getReplyByUserId(userid, privacyStatus, callback)
             ],
             function(err, result) {
 
@@ -272,19 +223,33 @@ var getpostsrtreply = function(req, res) { // get a post
 }
 
 //find post from userid
-function getPostByUserId(callback) {
+function getPostByUserId(userid, privacyStatus, callback) {
 
-    switch(privacyStatus) {
+    var query, privacyStatus;
+
+    switch (privacyStatus) {
         case 1:
-            query = {posted_by: userid}
+            query = {
+                posted_by: userid
+            }
             break;
         case 2:
-            query = {$and:[{posted_by: userid},{privacy_setting:{$ne: 2}}]}
+            query = {
+                $and: [{
+                    posted_by: userid
+                }, {
+                    privacy_setting: {
+                        $ne: 2
+                    }
+                }]
+            }
             break;
         default:
-            query = {$and:[{posted_by: userid},{privacy_setting:1}]};
-            // query = {posted_by: userid, privacy_setting:1}           
-    } 
+            query = {
+                posted_by: userid,
+                privacy_setting: 1
+            }
+    }
 
     //use userid to find all post of users
     post_model.post
@@ -307,7 +272,7 @@ function getPostByUserId(callback) {
                 callback(null, []); //No post found
 
             } else {
-
+                console.info(result);
                 callback(null, result);
             }
 
@@ -316,12 +281,36 @@ function getPostByUserId(callback) {
 }
 
 //find retweet from userid
-function getRetweetByUserId(callback) { //simple retweet
+function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
+
+    var query, privacyStatus;
+
+    switch (privacyStatus) {
+        case 1:
+            query = {
+                ret_user_id: userid
+            }
+            break;
+        case 2:
+            query = {
+                $and: [{
+                    ret_user_id: userid
+                }, {
+                    privacy_setting: {
+                        $ne: 2
+                    }
+                }]
+            }
+            break;
+        default:
+            query = {
+                ret_user_id: userid,
+                privacy_setting: 1
+            }
+    }
 
     post_model.retweet
-        .find({
-            ret_user_id: userid
-        })
+        .find(query)
         .sort({
             retweet_at: -1
         })
@@ -399,90 +388,37 @@ function getRetweetByUserId(callback) { //simple retweet
         });
 }
 
-//find reply from userid
-function getReplyByUserId(callback) {
-
-    post_model.reply
-        .find({
-            reply_user_id: userid
-        })
-        .sort({
-            created_at: -1
-        })
-        .limit(10)
-        .lean()
-        .exec(function(err, postReplyResult) {
-
-            if (err) {
-                log.error(err);
-                res.send(err);
-                return
-            }
-            // log.info('Reply By user: \n',postReplyResult);
-
-            async.each(postReplyResult,
-
-                function(singleReplyResult, callback) {
-
-                    if (singleReplyResult.post_id !== undefined) {
-
-                        var options = [{
-                            path: 'post_id'
-                        }, {
-                            path: 'post_id',
-                            populate: {
-                                path: 'posted_by'
-                            }
-                        }];
-
-                    } else if (singleReplyResult.retweet_quote_id !== undefined) {
-
-                        var options = [{
-                            path: 'retweet_quote_id'
-                        }, {
-                            path: 'retweet_quote_id',
-                            populate: {
-                                path: 'ret_user_id'
-                            }
-                        }];
-
-                    } else if (singleReplyResult.reply_id !== undefined) {
-
-                        var options = [{
-                            path: 'reply_id'
-                        }, {
-                            path: 'reply_id',
-                            populate: {
-                                path: 'reply_user_id'
-                            }
-                        }];
-
-                    };
-
-                    post_model.reply
-                        .populate(singleReplyResult, options, function(err, reply) {
-
-                            callback();
-
-                        });
-
-                }, function(err) {
-
-                    callback(null, postReplyResult);
-
-                });
-
-        })
-
-};
-
 //find quote retweet from userid
-function getQuoteRetweetByUserId(callback) { //simple retweet
+function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
+
+    var query, privacyStatus;
+
+    switch (privacyStatus) {
+        case 1:
+            query = {
+                ret_user_id: userid
+            }
+            break;
+        case 2:
+            query = {
+                $and: [{
+                    ret_user_id: userid
+                }, {
+                    privacy_setting: {
+                        $ne: 2
+                    }
+                }]
+            }
+            break;
+        default:
+            query = {
+                ret_user_id: userid,
+                privacy_setting: 1
+            }
+    }
 
     post_model.retweet_quote
-        .find({
-            ret_user_id: userid
-        })
+        .find(query)
         .sort({
             retweet_at: -1
         })
@@ -559,6 +495,107 @@ function getQuoteRetweetByUserId(callback) { //simple retweet
 
         });
 }
+
+//find reply from userid
+function getReplyByUserId(userid, privacyStatus, callback) {
+
+    var query, privacyStatus;
+
+    switch (privacyStatus) {
+        case 1:
+            query = {
+                reply_user_id: userid
+            }
+            break;
+        case 2:
+            query = {
+                $and: [{
+                    reply_user_id: userid
+                }, {
+                    privacy_setting: {
+                        $ne: 2
+                    }
+                }]
+            }
+            break;
+        default:
+            query = {
+                reply_user_id: userid,
+                privacy_setting: 1
+            }
+    }
+
+    post_model.reply
+        .find(query)
+        .sort({
+            created_at: -1
+        })
+        .limit(10)
+        .lean()
+        .exec(function(err, postReplyResult) {
+
+            if (err) {
+                log.error(err);
+                res.send(err);
+                return
+            }
+            // log.info('Reply By user: \n',postReplyResult);
+
+            async.each(postReplyResult,
+
+                function(singleReplyResult, callback) {
+
+                    if (singleReplyResult.post_id !== undefined) {
+
+                        var options = [{
+                            path: 'post_id'
+                        }, {
+                            path: 'post_id',
+                            populate: {
+                                path: 'posted_by'
+                            }
+                        }];
+
+                    } else if (singleReplyResult.retweet_quote_id !== undefined) {
+
+                        var options = [{
+                            path: 'retweet_quote_id'
+                        }, {
+                            path: 'retweet_quote_id',
+                            populate: {
+                                path: 'ret_user_id'
+                            }
+                        }];
+
+                    } else if (singleReplyResult.reply_id !== undefined) {
+
+                        var options = [{
+                            path: 'reply_id'
+                        }, {
+                            path: 'reply_id',
+                            populate: {
+                                path: 'reply_user_id'
+                            }
+                        }];
+
+                    };
+
+                    post_model.reply
+                        .populate(singleReplyResult, options, function(err, reply) {
+
+                            callback();
+
+                        });
+
+                }, function(err) {
+
+                    callback(null, postReplyResult);
+
+                });
+
+        })
+
+};
 
 module.exports = ({
     getuserhomeposts: getuserhomeposts,

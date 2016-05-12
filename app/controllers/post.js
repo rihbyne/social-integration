@@ -265,23 +265,6 @@ var trend = function(req, res) {
         });
 };
 
-//Get all post 
-// var getpost = function(req, res) {
-
-//     post_model.post
-//  .find()
-//  .exec(function(err, allpost) {
-//         if (err)
-// log.error(err);
-//             res.send(err);
-
-//         res.json({
-//             posts: allpost
-//         });
-//     });
-
-// };
-
 //Get single post of user
 var getsinglepost = function(req, res) { // get a post 
     log.info('Show single post');
@@ -815,6 +798,24 @@ var deletepost = function(req, res) {
         });
 
 };
+
+
+//Get all post 
+// var getpost = function(req, res) {
+
+//     post_model.post
+//  .find()
+//  .exec(function(err, allpost) {
+//         if (err)
+// log.error(err);
+//             res.send(err);
+
+//         res.json({
+//             posts: allpost
+//         });
+//     });
+
+// };
 
 module.exports = ({
     getuserdetails: getuserdetails,

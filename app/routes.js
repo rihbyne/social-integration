@@ -10,7 +10,7 @@ var follow 			= require('./controllers/following.js');
 var hashtag 		= require('./controllers/hashtag.js');
 var like 			= require('./controllers/like.js');
 var retweet 		= require('./controllers/retweet.js');
-var userhome 		= require('./controllers/userhome.js');
+var profile 		= require('./controllers/profile.js');
 var reply 			= require('./controllers/reply.js');
 var blockuser 		= require('./controllers/blockuser.js');
 var suggest			= require('./controllers/suggestion.js');
@@ -19,7 +19,7 @@ var notification	= require('./controllers/notification.js');
 // app/routes.js
 module.exports = function(app, passport) {
 
-    app.get('/' ,  isLoggedIn , userhome.loggednin_home_userdetails);
+    app.get('/' ,  isLoggedIn , profile.loggednin_home_userdetails);
 
     // =====================================
     // LOGIN ===============================
@@ -120,8 +120,8 @@ module.exports = function(app, passport) {
 /*===========================================================================================================================*/
 
     // UserHome
-    app.get('/user_timeline/:username/:loggeduser/1', userhome.getuserhomeposts);    // user home timeline post API
-    app.get('/user_timeline/:username/2', userhome.getpostsrtreply);   // tweet,retweet & reply post
+    app.post('/user_timeline/1', profile.getuserhomeposts);    // user home timeline post API
+    app.post('/user_timeline/2', profile.getpostsrtreply);   // tweet,retweet & reply post
  
     // Mention
     app.get('/mention/:mention_user', mention.getmentionuser);     // Get post of user by mention user

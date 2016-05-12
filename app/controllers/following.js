@@ -6,7 +6,8 @@ var request = require('request');
 var follower = require('../models/followersSchema.js');
 var users = require('../models/userSchema.js');
 var postSchema = require('../models/postSchema.js');
-var log = require('../../config/logging')()
+var log = require('../../config/logging')();
+var master = require('./master.js');
 
 //Set following
 var setfollowing = function(req, res) {
@@ -98,7 +99,7 @@ var setfollowing = function(req, res) {
                         master.isFollowing(user_id, following_id, function(result) {
 
                             log.info(result);
-                            if (result) {
+                            if (!result) {
 
                                 var followingModel = new follower({
                                     user_id: user_id,

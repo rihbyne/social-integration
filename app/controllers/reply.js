@@ -24,6 +24,7 @@ var setreply = function(req, res) {
     req.checkBody('reply_user_id', 'reply user id').notEmpty();
     req.checkBody('reply_msg', 'reply msg').notEmpty();
     req.checkBody('post_id', 'post id').notEmpty();
+    req.checkBody('privacy_setting', 'Privacy Setting').notEmpty();
 
     var errors = req.validationErrors();
 

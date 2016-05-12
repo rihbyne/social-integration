@@ -23,6 +23,7 @@ var setretweet = function (req, res) {
     req.checkBody('ret_user_id', 'ret_user_id').notEmpty();
     req.checkBody('retweet_type', 'retweet_type').notEmpty();
     req.checkBody('post_id', 'post id').notEmpty();
+    req.checkBody('privacy_setting', 'privacy setting').notEmpty();
 
     var errors = req.validationErrors();
 

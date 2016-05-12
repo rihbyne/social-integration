@@ -31,57 +31,63 @@ var getuserdetails = function(req, res) {
             userdetails: userdetails,
             user: req.user
         });
-        
+
     });
 
     function allpost(callback) {
 
         post_model.post
-        .find({posted_by: user_id})
-		.sort({created_at: -1})
-		.lean()
-        .exec(function(err, allpost) {
+            .find({
+                posted_by: user_id
+            })
+            .sort({
+                created_at: -1
+            })
+            .lean()
+            .exec(function(err, allpost) {
 
-			if (err) {
-				log.error(err);
-				res.send(err);
-			}
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
 
-			// log.info(allpost);
+                // log.info(allpost);
 
-			async.each(allpost, function(singlepost, callback) {
+                async.each(allpost, function(singlepost, callback) {
 
-				post_model.post_like
-				.count({ post_id: singlepost._id })
-				.lean()
-				.exec(function(err, countPostLikes) {
-                                
-					if (err) {
-						log.error(err);
-						res.send(err);
-					}
-					// log.info(countPostLikes);
-					if (countPostLikes !== 0) {
-						singlepost.postLikeCount = countPostLikes;
-						// log.info(singlepost);
-					} else {
-						singlepost.postLikeCount = 0;
-					}
-					// log.info(singlepost);
-					callback();
-				})
+                        post_model.post_like
+                            .count({
+                                post_id: singlepost._id
+                            })
+                            .lean()
+                            .exec(function(err, countPostLikes) {
 
-			},
-				// 3rd param is the function to call when everything's done
-				function(err) {
-					// All tasks are done now
-					log.info(allpost);
-					userdetails.allpost = allpost
-					callback(null, userdetails);
+                                if (err) {
+                                    log.error(err);
+                                    res.send(err);
+                                }
+                                // log.info(countPostLikes);
+                                if (countPostLikes !== 0) {
+                                    singlepost.postLikeCount = countPostLikes;
+                                    // log.info(singlepost);
+                                } else {
+                                    singlepost.postLikeCount = 0;
+                                }
+                                // log.info(singlepost);
+                                callback();
+                            })
 
-			});
+                    },
+                    // 3rd param is the function to call when everything's done
+                    function(err) {
+                        // All tasks are done now
+                        log.info(allpost);
+                        userdetails.allpost = allpost
+                        callback(null, userdetails);
 
-		});
+                    });
+
+            });
 
     }
 
@@ -99,9 +105,9 @@ var getuserdetails = function(req, res) {
 
 
                             if (err) {
-                    log.error(err);
-                    res.send(err);
-                }
+                                log.error(err);
+                                res.send(err);
+                            }
 
                             callback(null, postcount);
 
@@ -441,7 +447,7 @@ var setpost = function(req, res) { // create a post
 
     var userid = req.body.userid; // get the post name (comes from the request)
     var post_description = req.body.post_description; // get the post name (comes from the request)
-	var privacy_setting = req.body.privacy_setting; 
+    var privacy_setting = req.body.privacy_setting;
     //var post_links = req.body.post_links;
 
     var mentionusers = new Array();
@@ -450,8 +456,9 @@ var setpost = function(req, res) { // create a post
     var regexat = /@([^\s]+)/g;
     var regexhash = /#([^\s]+)/g;
 
-    req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
     req.checkBody('userid', 'userid is empty').notEmpty();
+    req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
+    req.checkBody('privacy_setting', 'privacy setting is empty').notEmpty();
 
     var errors = req.validationErrors();
 
@@ -480,7 +487,7 @@ var setpost = function(req, res) { // create a post
 
         posted_by: userid,
         post_description: post_description,
-		privacy_setting: privacy_setting
+        privacy_setting: privacy_setting
 
     }); // create a new instance of the post model
 
@@ -629,7 +636,7 @@ var setuser = function(req, res) { //Create new user
     });
 
     setuser.save(function(err) {
-        
+
         if (err) {
             log.error(err);
             res.send(err);
@@ -767,7 +774,7 @@ var deletepost = function(req, res) {
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
-    
+
     post_model.post
         .findOneAndRemove({
             _id: post_id,

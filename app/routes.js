@@ -15,6 +15,7 @@ var reply 			= require('./controllers/reply.js');
 var blockuser 		= require('./controllers/blockuser.js');
 var suggest			= require('./controllers/suggestion.js');
 var notification	= require('./controllers/notification.js');
+var privacy         = require('./controllers/privacy.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -181,7 +182,9 @@ module.exports = function(app, passport) {
     // app.get('/like/reply/:reply_id', like.getLikeByReply);      // Get like by reply
     app.get('/like/:username', like.getLikeByUser);      // Get like by User
     
-	
+	//Privacy Setting
+    app.put('/privacy/update', privacy.updatePrivacy)
+
 	// Notification
 	app.get('/notification/:username', notification.getNotification);
 	

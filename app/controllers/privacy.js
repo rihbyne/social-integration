@@ -113,7 +113,3 @@ function isValidUser(collectionName, query, callback) {
 module.exports = ({
     updatePrivacy: updatePrivacy
 });
-
-//chk userid and post id are correct from post type 
-
-//update privacy

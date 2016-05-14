@@ -512,8 +512,6 @@ var setpost = function(req, res) { // create a post
 
                 if (mentionusers != "") {
 
-                    var i = -1;
-
                     var notification_message = username + ' Has Mentioned you in post';
 
                     var notification = new notificationModel.notification({

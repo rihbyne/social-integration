@@ -5,7 +5,7 @@ var log = require('../../config/logging')();
 
 var homeTimeline = function(req, res) {
 
-    console.log('home timeline api hitted');
+    log.info('home timeline api hitted');
     //FInd 10 active follwing
     var userid = req.body.userid;
 
@@ -25,100 +25,156 @@ var homeTimeline = function(req, res) {
             follow_status: true
         })
         .select('following_id')
-        // .populate({
-        //     path: 'following_id',
-        //     select: ('_id update_at'),
-        //     options: {
-        //         sort: 'following_id.update_at'
-        //     }
+        .populate({
+            path: 'following_id',
+            select: ('_id update_at')
 
-        // })
+        })
+        .sort({
+            '_id': -1
+        })
+        .limit(10)
+        .lean()
+        .exec(function(err, followingResult) {
 
-.populate('following_id', '_id count update_at', null, {sort: { 'count': -1 } })
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-//{ sort: { 'created_at': -1 } }
-    // .sort({
-    //     'following_id.update_at': -1
-    // })
-    .exec(function(err, followingResult) {
+            if (followingResult.length == 0) {
 
-        if (err) {
-            log.error(err);
-            res.send(err);
-        }
+                log.info('No Following Found');
+                res.send('No Result Found');
 
-        if (followingResult.length == 0) {
+            } else {
 
-            log.info('No Following Found');
-            res.send('No Result Found');
+                // log.info(followingResult[2]);
 
-        } else {
+                var options = {
+                    path: 'user_id'
+                }
 
-            log.info(followingResult);
-            return;
+                user
+                    .find({
+                        _id: userid
+                    })
+                    .select('update_at')
+                    .exec(function(err, userResult) {
 
-            followingIds = followingResult.map(function(singleFollowing) {
-                return singleFollowing.following_id._id;
-            });
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        };
 
-            // log.info(followingIds);
+                        
+                        var showPostLoggedUser = 'false';
 
-            async.parallel([
-                    getPostByUserId,
-                    getRetweetByUserId,
-                    getQuoteRetweetByUserId,
-                    getReplyByUserId
-                ],
-                function(err, result) {
+                        if (userResult[0].update_at <= followingResult[0].following_id.update_at) {
 
-                    if (err) {
+                            followingResult[followingResult.length++] = userResult[0];
 
-                        if (result[0] === 0) {
-                            log.info('Own posts are zero');
-                            var homePosts = result[1]
+                            // console.info(followingResult);
+
+                            var showPostLoggedUser = 'true';
                         }
 
-                        if (result[1] === 0) {
-                            log.info('Retweet posts are zero');
-                            var homePosts = result[0]
+                        followingIds = followingResult.map(function(singleFollowing) {
+
+                            return singleFollowing.following_id._id;
+
+                        });
+                        
+                        log.info(userResult[0].update_at+''+followingResult[2].following_id.update_at);
+                        log.info('show post logged user: ',showPostLoggedUser);
+
+                        if (showPostLoggedUser) {
+
+                            followingIds.push(userResult[0]._id);
+
                         }
 
-                    } else {
+                        async.parallel([
+                                callback => getPostByUserId(showPostLoggedUser, userid, callback),
+                                callback => getRetweetByUserId(showPostLoggedUser, userid, callback),
+                                callback => getQuoteRetweetByUserId(showPostLoggedUser, userid, callback),
+                                callback => getReplyByUserId(showPostLoggedUser, userid, callback)
+                            ],
+                            function(err, result) {
 
-                        var homePosts = result[0].concat(result[1]).concat(result[2]).concat(result[3]); //Got two result , concent two results
+                                if (err) {
 
-                        function custom_sort(a, b) {
-                            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-                        }
+                                    if (result[0] === 0) {
+                                        log.info('Own posts are zero');
+                                        var homePosts = result[1]
+                                    }
 
-                        homePosts.sort(custom_sort);
+                                    if (result[1] === 0) {
+                                        log.info('Retweet posts are zero');
+                                        var homePosts = result[0]
+                                    }
 
-                        log.info(homePosts);
-                        res.json(homePosts);
+                                } else {
 
-                    }
+                                    var homePosts = result[0].concat(result[1]).concat(result[2]).concat(result[3]); //Got two result , concent two results
 
-                })
+                                    function custom_sort(a, b) {
+                                        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                                    }
 
+                                    homePosts.sort(custom_sort);
 
-        }
+                                    // log.info(homePosts);
+                                    res.json(homePosts);
 
-    })
+                                }
+
+                            })
+
+                    });
+
+            }
+
+        })
 
     //Find post, retweet, reply of follwing user
 
 }
 
 //find post from userid
-function getPostByUserId(callback) {
+function getPostByUserId(showPostLoggedUser, userid, callback) {
 
-    var query = {
-        posted_by: {
-            $in: followingIds
-        },
-        privacy_setting: {
-            $ne: 2
+    // log.info(showPostLoggedUser);
+
+    if (showPostLoggedUser) {
+
+        var query = {
+
+            $or: [{
+                posted_by: {
+                    $in: followingIds
+                },
+                privacy_setting: {
+                    $ne: 2
+                }
+            }, {
+                posted_by: userid
+            }]
+
         }
+
+    } else {
+
+        var query = {
+            posted_by: {
+                $in: followingIds
+            },
+            privacy_setting: {
+                $ne: 2
+            }
+
+        }
+
     }
 
     //use userid to find all post of users
@@ -151,15 +207,40 @@ function getPostByUserId(callback) {
 }
 
 //find retweet from userid
-function getRetweetByUserId(callback) { //simple retweet
+function getRetweetByUserId(showPostLoggedUser, userid, callback) { //simple retweet
 
-    var query = {
-        ret_user_id: {
-            $in: followingIds
-        },
-        privacy_setting: {
-            $ne: 2
+    if (showPostLoggedUser) {
+
+        var query = {
+
+            $or: [{
+
+                ret_user_id: {
+                    $in: followingIds
+                },
+                privacy_setting: {
+                    $ne: 2
+                }
+
+            }, {
+                ret_user_id: userid
+            }]
+
         }
+
+    } else {
+
+        var query = {
+
+            ret_user_id: {
+                $in: followingIds
+            },
+            privacy_setting: {
+                $ne: 2
+            }
+
+        }
+
     }
 
     post_model.retweet
@@ -245,16 +326,38 @@ function getRetweetByUserId(callback) { //simple retweet
 }
 
 //find quote retweet from userid
-function getQuoteRetweetByUserId(callback) { //simple retweet
+function getQuoteRetweetByUserId(showPostLoggedUser, userid, callback) { //simple retweet
 
-    var query = {
+    if (showPostLoggedUser) {
 
-        ret_user_id: {
-            $in: followingIds
-        },
-        privacy_setting: {
-            $ne: 2
+        var query = {
+
+            $or: [{
+                ret_user_id: {
+                    $in: followingIds
+                },
+                privacy_setting: {
+                    $ne: 2
+                }
+
+            }, {
+                ret_user_id: userid
+            }]
+
         }
+
+    } else {
+
+        var query = {
+            ret_user_id: {
+                $in: followingIds
+            },
+            privacy_setting: {
+                $ne: 2
+            }
+
+        }
+
     }
 
     post_model.retweet_quote
@@ -339,17 +442,40 @@ function getQuoteRetweetByUserId(callback) { //simple retweet
 }
 
 //find reply from userid
-function getReplyByUserId(callback) {
+function getReplyByUserId(showPostLoggedUser, userid, callback) {
 
-    var query = {
+    if (showPostLoggedUser) {
 
-        reply_user_id: {
-            $in: followingIds
-        },
-        privacy_setting: {
-            $ne: 2
+        var query = {
+
+            $or: [{
+
+                reply_user_id: {
+                    $in: followingIds
+                },
+                privacy_setting: {
+                    $ne: 2
+                }
+            }, {
+                reply_user_id: userid
+            }]
+
         }
+
+    } else {
+
+        var query = {
+
+            reply_user_id: {
+                $in: followingIds
+            },
+            privacy_setting: {
+                $ne: 2
+            }
+        }
+
     }
+
 
     post_model.reply
         .find(query)

@@ -6,7 +6,8 @@ var request = require('request');
 var follower = require('../models/followersSchema.js');
 var users = require('../models/userSchema.js');
 var postSchema = require('../models/postSchema.js');
-var log = require('../../config/logging')()
+var log = require('../../config/logging')();
+var master = require('./master.js');
 
 //Set following
 var setfollowing = function(req, res) {
@@ -44,6 +45,7 @@ var setfollowing = function(req, res) {
             }]
         })
         .exec(function(err, result) {
+
             if (result.length !== 0) {
                 log.info('User already following');
                 // res.json({
@@ -52,7 +54,7 @@ var setfollowing = function(req, res) {
                 return;
             } else { //add new follower
                 log.info('update follower status');
-                /*update user follower status true*/
+
                 follower
                     .find({
                         $and: [{
@@ -63,6 +65,7 @@ var setfollowing = function(req, res) {
                     })
                     .select('follow_back')
                     .exec(function(err, result) {
+
                         if (err) {
                             log.error(err);
                             res.send(err);
@@ -70,6 +73,7 @@ var setfollowing = function(req, res) {
 
                         if (result.length == 1) {
                             log.info(result);
+                            /*update user follower status true*/
                             follower
                                 .update({
                                     _id: result[0]._id
@@ -77,26 +81,34 @@ var setfollowing = function(req, res) {
                                     follow_back: 'true'
                                 })
                                 .exec(function(err, statusResult) {
+
                                     if (err) {
+                                        log.error(err);
                                         res.send(err);
-                                    };
+                                    }
+
                                     log.info(statusResult);
                                 })
+
                             follow_back = 'true';
 
                         } else {
                             follow_back = 'false';
                         };
-                        isFollowing(user_id, following_id, function(result) {
+
+                        master.isFollowing(user_id, following_id, function(result) {
+
                             log.info(result);
-                            if (result) {
+                            if (!result) {
 
                                 var followingModel = new follower({
                                     user_id: user_id,
                                     following_id: following_id,
                                     follow_back: follow_back
                                 });
+
                                 followingModel.save(function(err) {
+
                                     if (err) {
                                         log.error(err);
                                         res.send(err);
@@ -104,7 +116,9 @@ var setfollowing = function(req, res) {
 
                                     log.info('following/followers set saved');
                                 });
+
                             } else {
+
                                 follower
                                     .update({
                                         user_id: user_id,
@@ -114,6 +128,7 @@ var setfollowing = function(req, res) {
                                         follow_status: true
                                     })
                                     .exec(function(err, result) {
+
                                         if (err) {
                                             log.error(err);
                                             res.send(err);
@@ -121,10 +136,13 @@ var setfollowing = function(req, res) {
 
                                         log.info('following/followers update');
                                     });
+
                                 log.info('update following');
                             }
+
                         });
-                    });
+
+                    })
 
                 res.json({
                     message: 'following/followers set'
@@ -137,28 +155,8 @@ var setfollowing = function(req, res) {
             }
         })
 }
-var isFollowing = function(user_id, following_id, callback) {
-        follower
-            .find({
-                user_id: user_id,
-                following_id: following_id,
-                follow_status: 'false'
-            })
-            .lean()
-            .exec(function(err, result) {
-                if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
-                log.info(result);
-                if (result.length == 0) {
-                    return callback(true);
-                } else {
-                    return callback(false);
-                }
-            })
-    }
-    //Get following
+
+//Get following
 var getfollowing = function(req, res) {
 
     var user_name = req.params.user_name;
@@ -176,26 +174,32 @@ var getfollowing = function(req, res) {
         })
         .select('_id')
         .exec(function(err, result) {
-            // log.info(result[0]._id);
-            if (result[0]._id) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+            if (result.length !== 0) {
+
                 follower
                     .find({
-                        $and: [{
-                            user_id: result[0]._id
-                        }, {
-                            follow_status: true
-                        }]
+                        user_id: result[0]._id
+                    }, {
+                        follow_status: true
                     })
                     .populate('user_id following_id')
                     .exec(function(err, result) {
                         log.info(result);
-
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
                         res.json({
                             FollowingList: result
                         })
 
                     })
             };
+
         })
 
 }
@@ -230,7 +234,7 @@ var getfollowers = function(req, res) {
                     })
                     .populate('following_id user_id')
                     .exec(function(err, followerResult) {
-                        
+
                         if (err) {
                             log.error(err);
                             res.send(err);
@@ -315,9 +319,9 @@ var getCountFollower = function(req, res) {
                             follow_status: true
                         }, function(err, followercount) {
                             if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
+                                log.error(err);
+                                res.send(err);
+                            }
                             log.info('Count is ' + followercount);
                             res.json({
                                 FollowerCount: followercount

@@ -1,4 +1,5 @@
 // Packages
+
 var util 		= require('util');
 var async		= require('async');
 var express 	= require('express');
@@ -32,7 +33,7 @@ var getuserdetails = function(req, res) {
             userdetails: userdetails,
             user: req.user
         });
-        
+
     });
 
     function allpost(callback) {
@@ -415,10 +416,10 @@ var setpost = function(req, res) { // create a post
 
     log.info('Add post api hitted');
 
-    var userid 				= req.body.userid; 				
-    var post_description 	= req.body.post_description; 	
-	var privacy_setting 	= req.body.privacy_setting; 
-
+    var userid = req.body.userid; // get the post name (comes from the request)
+    var post_description = req.body.post_description; // get the post name (comes from the request)
+    var privacy_setting = req.body.privacy_setting;
+    //var post_links = req.body.post_links;
 
     var mentionusers = new Array();
     var hashtags = new Array();
@@ -426,8 +427,9 @@ var setpost = function(req, res) { // create a post
     var regexat = /@([^\s]+)/g;
     var regexhash = /#([^\s]+)/g;
 
-    req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
     req.checkBody('userid', 'userid is empty').notEmpty();
+    req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
+    req.checkBody('privacy_setting', 'privacy setting is empty').notEmpty();
 
     var errors = req.validationErrors();
 
@@ -456,82 +458,79 @@ var setpost = function(req, res) { // create a post
 
         posted_by: userid,
         post_description: post_description,
-		privacy_setting: privacy_setting
+        privacy_setting: privacy_setting
 
     }); // create a new instance of the post model
 
-    // save the post and check for errors
-    post.save(function(err, result) {
+    master.updateUser(userid, function(err, updateResult){
 
         if (err) {
             log.error(err);
             res.send(err);
         }
 
-        master.getusername(result.posted_by, function(err, username) {
+        // save the post and check for errors
+        post.save(function(err, result) {
 
-            // user_final_followers_schema
-            // .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
-            // .lean()
-            // .exec(function(err, resValue){
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-            // if (err)
-            // res.send(err);
+            master.getusername(result.posted_by, function(err, username) {
 
-            // })
+                log.info('Mention Users :' + mentionusers);
 
-            log.info('Mention Users :' + mentionusers);
+                if (mentionusers != "") {
 
-            if (mentionusers != "") {
+                    var notification_message = username + ' Has Mentioned you in post';
 
-                var notification_message = username + ' Has Mentioned you in post';
+                    var notification = new notificationModel.notification({
 
-                var notification = new notificationModel.notification({
+                        notification_message: notification_message,
+                        notification_user: mentionusers,
+                        post_id: post._id,
+                        usrname: username
 
-                    notification_message: notification_message,
-                    notification_user: mentionusers,
-                    post_id: post._id,
-                    username: username
+                    });
 
-                });
+                    // log.info(notification_user);
+                    notification.save(function(err) {
 
-                // log.info(notification_user);
-                notification.save(function(err) {
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
+
+                        log.info('Notification Saved');
+
+                    })
+
+                }
+
+                master.hashtagMention(1, post, mentionusers, hashtags, function(err, result) {
 
                     if (err) {
                         log.error(err);
                         res.send(err);
+
                     }
 
-                    log.info('Notification Saved');
+                    res.json({
+                        message: result
+                    });
 
-                })
+                    log.info('Post Created.');
 
-            }
-
-            master.hashtagMention(1, post, mentionusers, hashtags, function(err, result) {
-
-                if (err) {
-                    log.error(err);
-                    res.send(err);
-
-                }
-
-                res.json({
-                    message: result
                 });
-
-                log.info('Post Created.');
 
             });
 
-        })
+        });
 
     });
 
-    // res.redirect('/about');
-
-};
+}
 
 //Set users
 var setuser = function(req, res) { //Create new user
@@ -562,7 +561,7 @@ var setuser = function(req, res) { //Create new user
     });
 
     setuser.save(function(err) {
-        
+
         if (err) {
             log.error(err);
             res.send(err);
@@ -700,7 +699,7 @@ var deletepost = function(req, res) {
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
-    
+
     post_model.post
 	.findOneAndRemove({ _id: post_id, posted_by: posted_by })
 	.exec(function(err, result) {
@@ -776,6 +775,24 @@ var deletepost = function(req, res) {
 		
 	})
 };
+
+
+//Get all post 
+// var getpost = function(req, res) {
+
+//     post_model.post
+//  .find()
+//  .exec(function(err, allpost) {
+//         if (err)
+// log.error(err);
+//             res.send(err);
+
+//         res.json({
+//             posts: allpost
+//         });
+//     });
+
+// };
 
 module.exports = ({
     getuserdetails: getuserdetails,

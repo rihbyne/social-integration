@@ -1,9 +1,9 @@
 var post_model = require('../models/postSchema.js');
 var master = require('./master.js');
-var log = require('../../config/logging')()
+var log = require('../../config/logging')();
 
 //Set retweet
-var setretweet = function(req, res) {
+var setretweet = function (req, res) {
 
     var post_id = req.body.post_id;
     var post_type = req.body.post_type;
@@ -23,6 +23,7 @@ var setretweet = function(req, res) {
     req.checkBody('ret_user_id', 'ret_user_id').notEmpty();
     req.checkBody('retweet_type', 'retweet_type').notEmpty();
     req.checkBody('post_id', 'post id').notEmpty();
+    req.checkBody('privacy_setting', 'privacy setting').notEmpty();
 
     var errors = req.validationErrors();
 
@@ -35,7 +36,6 @@ var setretweet = function(req, res) {
     if (post_type == 1) { //if post
 
         collectionName = post_model.post;
-        userIdFrom = 'posted_by';
         message = 'User retweeted on Post';
         query = {
             post_id: post_id,
@@ -54,14 +54,10 @@ var setretweet = function(req, res) {
             retweet_quote_id: post_id,
             ret_user_id: ret_user_id
         };
-        // }
-
-        var userIdFrom = 'ret_user_id';
 
     } else if (post_type == 3) { //if reply        
 
         collectionName = post_model.reply;
-        userIdFrom = 'reply_user_id';
         message = 'User retweeted On Reply';
         query = {
             reply_id: post_id,
@@ -294,7 +290,6 @@ var setretweet = function(req, res) {
                                 log.info('Retweet Saved.');
 
                             });
-
 
                         });
 

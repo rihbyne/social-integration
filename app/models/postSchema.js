@@ -4,12 +4,12 @@ var User 			= require('../models/userSchema.js');							// For Referring User Co
 // Post Schema
 var post = mongoose.Schema({
     
-    posted_by:                       {type: String, ref:'User'},       				// Posted By (User Id From user Colloction) 
+    posted_by:                       {type: String, ref:'User', required:true},       				// Posted By (User Id From user Colloction) 
     post_description:                {type: String},        						// Post Description 
     retweet_count:                   {type: Number, default: 0, min: 0},			// Retweet Count
     like_count:                      {type: Number, default: 0, min: 0},			// Post Like Count
     post_type :                      {type: Number, default: 1},
-	privacy_setting :				 {type: Number, default: 1}, 					// 1 - Public, 2 - Private, 3 - Followers
+	privacy_setting :				 {type: Number, required:true}, 					// 1 - Public, 2 - Private, 3 - Followers
     created_at:                      {type: Date, default: Date.now},          		// created date
     
 }, { versionKey: false });
@@ -30,7 +30,7 @@ var retweet_schema = mongoose.Schema({
 	reply_id:						 {type: String, ref:'reply'},					// Reply Id (Mongoose Id of Reply document on which retweet is Made)
     ret_user_id:                     {type: String, ref:'User'},                    // User Id Who Retweeted (User Id From user Colloction) 						
     post_type :                      {type: Number, default: 2},    
-	privacy_setting :				 {type: Number, default: 1}, 					// 1 - Public, 2 - Private, 3 - Followers	
+	privacy_setting :				 {type: Number, required:true}, 					// 1 - Public, 2 - Private, 3 - Followers	
     retweet_type :                   {type: Number, default: 1},                  
     created_at :                     {type: Date, default: Date.now}				// Time of Retweet Made
 	
@@ -48,7 +48,7 @@ var retweet_quote_schema = mongoose.Schema({
     retweet_quote:                   {type: String},								// String of Message		
     post_type :                      {type: Number, default: 2},					
     retweet_type :                   {type: Number, default: 2},                 
-	privacy_setting :				 {type: Number, default: 1}, 					// 1 - Public, 2 - Private, 3 - Followers
+	privacy_setting :				 {type: Number, required: true}, 					// 1 - Public, 2 - Private, 3 - Followers
     created_at :                     {type: Date, default: Date.now}				// Time of Retweet Made
 
 }, { versionKey: false });
@@ -98,7 +98,7 @@ var reply_schema = mongoose.Schema({
     retweet_count:                   {type: Number, default: 0, min: 0},			// Number of Retweets Made on this 	
     like_count:                      {type: Number, default: 0, min: 0},			// Number of Likes on this
     post_type :                      {type: Number, default: 3},
-	privacy_setting :				 {type: Number, default: 1}, 					// 1 - Public, 2 - Private, 3 - Followers	
+	privacy_setting :				 {type: Number, required:true}, 					// 1 - Public, 2 - Private, 3 - Followers	
     created_at :                     {type: Date, default: Date.now}          		// Time of Reply
 	
 }, { versionKey: false });

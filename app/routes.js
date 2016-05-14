@@ -10,36 +10,18 @@ var follow 			= require('./controllers/following.js');
 var hashtag 		= require('./controllers/hashtag.js');
 var like 			= require('./controllers/like.js');
 var retweet 		= require('./controllers/retweet.js');
-var userhome 		= require('./controllers/userhome.js');
+var profileTimeline = require('./controllers/profileTimeline.js');
 var reply 			= require('./controllers/reply.js');
 var blockuser 		= require('./controllers/blockuser.js');
 var suggest			= require('./controllers/suggestion.js');
 var notification	= require('./controllers/notification.js');
+var privacy         = require('./controllers/privacy.js');
+var homeTimeline   = require('./controllers/homeTimeline.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
 
-    // app.get('/', isLoggedIn, function(req, res) {
-    //     // save the bear and check for errors
-    //     var drinks = [{
-				// 		name: 'Bloody Mary',
-				// 		drunkness: 3
-				// 	},{
-				// 		name: 'Martini',
-				// 		drunkness: 5
-				// 	},{
-				// 		name: 'Scotch',
-				// 		drunkness: 10
-				// 	}];
-					
-    //     var tagline = "Any code of your own that you haven't looked at for six or more months might as well have been written by someone else.";
-
-    //     res.render('pages/index', {
-          
-    //     });
-
-    // });
-    app.get('/' ,  isLoggedIn , userhome.loggednin_home_userdetails);
+    app.get('/' ,  isLoggedIn , profileTimeline.loggednin_home_userdetails);
 
     // =====================================
     // LOGIN ===============================
@@ -139,11 +121,13 @@ module.exports = function(app, passport) {
 
 /*===========================================================================================================================*/
 
-
     // UserHome
-    app.get('/user_timeline/:username/1', userhome.getuserhomeposts);    			// user home timeline post API
-    app.get('/user_timeline/:username/2', userhome.getpostsrtreply);   				// tweet,retweet & reply post
- 
+    app.post('/user_timeline/1', profileTimeline.getuserhomeposts);    				// user home timeline post API
+    app.post('/user_timeline/2', profileTimeline.getpostsrtreply);   				// tweet,retweet & reply post
+
+    //Home Timeline
+    app.post('/homeTimeline', homeTimeline.homeTimeline);
+    
     // Mention
     app.get('/mention/:mention_user', mention.getmentionuser);     					// Get post of user by mention user
     // app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); 		// Get post of user by mention user
@@ -195,12 +179,16 @@ module.exports = function(app, passport) {
     app.get('/allSuggestion/:user_id', suggest.allSuggestion);    					// Get All Suggestions
                                                                                                                                                                            
     //Like
+<<<<<<< HEAD
     app.post('/setLike', like.setLike);          									// Set Like
     app.get('/like/:post_type/:post_id', like.getlike);      						// Get like by reply
 	app.get('/like/:username', like.getLikeByUser);      							// Get like by User
     // app.get('/like/post/:post_id', like.getLikeByPost);      					// Get like by post
     // app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   		// Get like by retweet
     // app.get('/like/reply/:reply_id', like.getLikeByReply);      					// Get like by reply
+
+	//Privacy Setting
+    app.put('/privacy/update', privacy.updatePrivacy);								// Update Privacy
 
 	// Notification
 	app.get('/notification/:username', notification.getNotification);				// Get Notification

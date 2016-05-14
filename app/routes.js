@@ -179,7 +179,6 @@ module.exports = function(app, passport) {
     app.get('/allSuggestion/:user_id', suggest.allSuggestion);    					// Get All Suggestions
                                                                                                                                                                            
     //Like
-<<<<<<< HEAD
     app.post('/setLike', like.setLike);          									// Set Like
     app.get('/like/:post_type/:post_id', like.getlike);      						// Get like by reply
 	app.get('/like/:username', like.getLikeByUser);      							// Get like by User

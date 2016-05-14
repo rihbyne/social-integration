@@ -228,11 +228,13 @@ function getPostByUserId(userid, privacyStatus, callback) {
     var query, privacyStatus;
 
     switch (privacyStatus) {
+
         case 1:
             query = {
                 posted_by: userid
             }
             break;
+
         case 2:
             query = {
                 $and: [{
@@ -244,11 +246,13 @@ function getPostByUserId(userid, privacyStatus, callback) {
                 }]
             }
             break;
+
         default:
             query = {
                 posted_by: userid,
                 privacy_setting: 1
             }
+
     }
 
     //use userid to find all post of users
@@ -386,6 +390,7 @@ function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
             }
 
         });
+
 }
 
 //find quote retweet from userid
@@ -494,6 +499,7 @@ function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple ret
             }
 
         });
+
 }
 
 //find reply from userid

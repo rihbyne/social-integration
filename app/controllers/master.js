@@ -201,7 +201,7 @@ var isFollowing = function(user_id, following_id, callback) {
                 log.error(err);
                 res.send(err);
             }
-            log.info('isFollowing Result',result);
+            log.info('isFollowing Result', result);
             if (result.length !== 0) {
                 return callback(true); //following
             } else {
@@ -240,10 +240,40 @@ var getPrivacyStatus = function(userid, loggedid, callback) {
 
 }
 
+var updateUser = function(userid, callback) {
+
+    user
+        .findOneAndUpdate({
+            _id: userid
+        }, {
+            update_at: new Date()
+        })
+        .lean()
+        .exec(function(err, updateResult) {
+
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+
+            if (updateResult.length !== 0) {
+
+                callback(null, updateResult);
+
+            } else{
+
+                callback(true, 'No user found to update');
+                
+            }
+
+        })
+}
+
 module.exports = ({
     getUserId: getUserId,
     hashtagMention: hashtagMention,
     getusername: getusername,
     isFollowing: isFollowing,
-    getPrivacyStatus : getPrivacyStatus
+    getPrivacyStatus: getPrivacyStatus,
+    updateUser:updateUser
 })

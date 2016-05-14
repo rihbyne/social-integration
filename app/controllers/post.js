@@ -3,7 +3,7 @@ var util = require('util');
 var async = require('async');
 var express = require('express');
 var router = express.Router(); // get an instance of the express Router
-var log = require('../../config/logging')()
+var log = require('../../config/logging')();
 
 // Pages
 var master = require('./master.js');
@@ -491,121 +491,77 @@ var setpost = function(req, res) { // create a post
 
     }); // create a new instance of the post model
 
-    // save the post and check for errors
-    post.save(function(err, result) {
+    master.updateUser(userid, function(err, updateResult){
 
         if (err) {
             log.error(err);
             res.send(err);
         }
 
-        master.getusername(result.posted_by, function(err, username) {
+        // save the post and check for errors
+        post.save(function(err, result) {
 
-            // user_final_followers_schema
-            // .update({following_id:post.posted_by},{$set:{recent_activity:post.created_at}})
-            // .lean()
-            // .exec(function(err, resValue){
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-            // if (err)
-            // res.send(err);
+            master.getusername(result.posted_by, function(err, username) {
 
-            // })
+                log.info('Mention Users :' + mentionusers);
 
-            log.info('Mention Users :' + mentionusers);
+                if (mentionusers != "") {
 
-            if (mentionusers != "") {
-                // log.info('Users : ',mentionusers);
-                //var notification_user = [];
-                var i = -1;
+                    var i = -1;
 
-                var notification_message = username + ' Has Mentioned you in post';
+                    var notification_message = username + ' Has Mentioned you in post';
 
-                var notification = new notificationModel.notification({
+                    var notification = new notificationModel.notification({
 
-                    notification_message: notification_message,
-                    notification_user: mentionusers,
-                    post_id: post._id,
-                    usrname: username
+                        notification_message: notification_message,
+                        notification_user: mentionusers,
+                        post_id: post._id,
+                        usrname: username
 
-                });
+                    });
 
-                // log.info(notification_user);
-                notification.save(function(err) {
+                    // log.info(notification_user);
+                    notification.save(function(err) {
+
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
+
+                        log.info('Notification Saved');
+
+                    })
+
+                }
+
+                master.hashtagMention(1, post, mentionusers, hashtags, function(err, result) {
 
                     if (err) {
                         log.error(err);
                         res.send(err);
+
                     }
 
-                    log.info('Notification Saved');
+                    res.json({
+                        message: result
+                    });
 
-                })
+                    log.info('Post Created.');
 
-                // async.each(mentionusers, function(mentionuser, callback){
-
-                // master.getUserId(mentionuser, function(err, getId) {
-
-                // if (err)
-                // res.send(err);
-
-                // if(getId != 'No user found')
-                // {
-                // i++;
-                // var result = {username:mentionuser, userId:getId};
-                // notification_user[i] = result
-                // }
-
-                // callback();
-
-                // })
-
-                // }, function(err){
-
-                // var notification = new notificationModel.notification({
-
-                // notification_message: notification_message,
-                // notification_user: notification_user,
-                // post_id:post._id,
-                // usrname: username
-
-                // });
-
-                // log.info(notification_user);
-                // notification.save(function(err) {
-
-                // if (err)
-                // res.send(err);
-
-                // log.info('Notification Saved');
-
-                // })
-
-                // })
-            }
-
-            master.hashtagMention(1, post, mentionusers, hashtags, function(err, result) {
-
-                if (err) {
-                    log.error(err);
-                    res.send(err);
-
-                }
-
-                res.json({
-                    message: result
                 });
-
-                log.info('Post Created.');
 
             });
 
-        })
+        });
 
     });
 
-    // res.redirect('/about');
-
-};
+}
 
 //Set users
 var setuser = function(req, res) { //Create new user

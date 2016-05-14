@@ -10,17 +10,18 @@ var follow 			= require('./controllers/following.js');
 var hashtag 		= require('./controllers/hashtag.js');
 var like 			= require('./controllers/like.js');
 var retweet 		= require('./controllers/retweet.js');
-var profile 		= require('./controllers/profile.js');
+var profileTimeline = require('./controllers/profileTimeline.js');
 var reply 			= require('./controllers/reply.js');
 var blockuser 		= require('./controllers/blockuser.js');
 var suggest			= require('./controllers/suggestion.js');
 var notification	= require('./controllers/notification.js');
 var privacy         = require('./controllers/privacy.js');
+var homeTimeline   = require('./controllers/homeTimeline.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
 
-    app.get('/' ,  isLoggedIn , profile.loggednin_home_userdetails);
+    app.get('/' ,  isLoggedIn , profileTimeline.loggednin_home_userdetails);
 
     // =====================================
     // LOGIN ===============================
@@ -121,9 +122,12 @@ module.exports = function(app, passport) {
 /*===========================================================================================================================*/
 
     // UserHome
-    app.post('/user_timeline/1', profile.getuserhomeposts);    // user home timeline post API
-    app.post('/user_timeline/2', profile.getpostsrtreply);   // tweet,retweet & reply post
+    app.post('/user_timeline/1', profileTimeline.getuserhomeposts);    // user home timeline post API
+    app.post('/user_timeline/2', profileTimeline.getpostsrtreply);   // tweet,retweet & reply post
  
+    //Home Timeline
+    app.post('/homeTimeline', homeTimeline.homeTimeline);
+    
     // Mention
     app.get('/mention/:mention_user', mention.getmentionuser);     // Get post of user by mention user
     // app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); // Get post of user by mention user
@@ -183,7 +187,7 @@ module.exports = function(app, passport) {
     app.get('/like/:username', like.getLikeByUser);      // Get like by User
     
 	//Privacy Setting
-    app.put('/privacy/update', privacy.updatePrivacy)
+    app.put('/privacy/update', privacy.updatePrivacy);
 
 	// Notification
 	app.get('/notification/:username', notification.getNotification);

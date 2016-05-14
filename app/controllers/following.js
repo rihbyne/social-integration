@@ -54,7 +54,7 @@ var setfollowing = function(req, res) {
                 return;
             } else { //add new follower
                 log.info('update follower status');
-                
+
                 follower
                     .find({
                         $and: [{
@@ -95,7 +95,7 @@ var setfollowing = function(req, res) {
                         } else {
                             follow_back = 'false';
                         };
-                        
+
                         master.isFollowing(user_id, following_id, function(result) {
 
                             log.info(result);
@@ -128,7 +128,7 @@ var setfollowing = function(req, res) {
                                         follow_status: true
                                     })
                                     .exec(function(err, result) {
-                                        
+
                                         if (err) {
                                             log.error(err);
                                             res.send(err);
@@ -156,7 +156,7 @@ var setfollowing = function(req, res) {
         })
 }
 
-    //Get following
+//Get following
 var getfollowing = function(req, res) {
 
     var user_name = req.params.user_name;
@@ -174,26 +174,32 @@ var getfollowing = function(req, res) {
         })
         .select('_id')
         .exec(function(err, result) {
-            // log.info(result[0]._id);
-            if (result[0]._id) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+            if (result.length !== 0) {
+
                 follower
                     .find({
-                        $and: [{
-                            user_id: result[0]._id
-                        }, {
-                            follow_status: true
-                        }]
+                        user_id: result[0]._id
+                    }, {
+                        follow_status: true
                     })
                     .populate('user_id following_id')
                     .exec(function(err, result) {
                         log.info(result);
-
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
                         res.json({
                             FollowingList: result
                         })
 
                     })
             };
+
         })
 
 }
@@ -228,7 +234,7 @@ var getfollowers = function(req, res) {
                     })
                     .populate('following_id user_id')
                     .exec(function(err, followerResult) {
-                        
+
                         if (err) {
                             log.error(err);
                             res.send(err);
@@ -316,9 +322,9 @@ var getCountFollower = function(req, res) {
                             follow_status: true
                         }, function(err, followercount) {
                             if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
+                                log.error(err);
+                                res.send(err);
+                            }
                             log.info('Count is ' + followercount);
                             res.json({
                                 FollowerCount: followercount

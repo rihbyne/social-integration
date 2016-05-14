@@ -244,39 +244,36 @@ var getfollowers = function(req, res) {
             };
         })
     }
+	
     //Unlink following
-var unlink_following = function(req, res) {
+	var unlink_following = function(req, res) {
+	
         log.info('unlink_followings api called');
         var user_id = req.body.user_id;
         var unlink_following = req.body.unlink_following;
+		
         //validation for blank variables
         req.checkBody('user_id', 'User id is mandatory').notEmpty();
         req.checkBody('unlink_following', 'unlink_following is mandatory').notEmpty();
         var errors = req.validationErrors();
+		
         if (errors) {
             // res.send('There have been validation errors: ' + util.inspect(errors), 400);
             res.status('400').json('There have been validation errors: ' + util.inspect(errors));
             return;
         }
+		
         follower
-            .update({
-                $and: [{
-                    user_id: user_id
-                }, {
-                    following_id: unlink_following
-                }]
-            }, {
-                follow_status: false,
-                follow_back: false
-            })
-            .exec(function(err, result) {
-                if (err) {
-                    log.info("found err" + err);
-                } else {
-                    follower
-                        .update({
-                            $and: [{
-                                following_id: user_id
+        .update({ $and: [{ user_id: user_id }, { following_id: unlink_following }] }, 
+				{ follow_status: false, follow_back: false })
+		.exec(function(err, result) {
+		
+			if (err) {
+				log.info("found err" + err);
+			} else {
+                    
+				follower
+				.update({$and: [{ following_id: user_id
                             }, {
                                 user_id: unlink_following
                             }]

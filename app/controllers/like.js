@@ -3,563 +3,590 @@ var async		= require('async');
 
 var master     = require('./master.js');
 var notificationModel = require('../models/notificationSchema.js');
+
 var log = require('../../config/logging')()
 
 //Set Post Like
 var setLike = function(req, res) {
 
-    var post_id 			= req.body.post_id;
-    var retweet_quote_id 	= req.body.retweet_quote_id;
-    var reply_id 			= req.body.reply_id;
-    var like_user_id 		= req.body.like_user_id;
-	var type				= req.body.type;
+    var post_id = req.body.post_id;
+    var retweet_quote_id = req.body.retweet_quote_id;
+    var reply_id = req.body.reply_id;
+    var like_user_id = req.body.like_user_id;
+    var type = req.body.type;
+    var postId;
 
-	if(type==1 || type=='1')	// Post Selected
-	{
-		// To Like or unlike Post (check whether it is already liked or not)
-		postModel.post_like
-		.find({ post_id: post_id, like_user_id: like_user_id })
-		.lean()
-		.exec(function(err, likedata) {
+    req.checkBody('type', 'post type').notEmpty();
+    req.checkBody('like_user_id', 'like_user_id').notEmpty();
 
-			// Post is Already liked by the same user
-			if (likedata.length !== 0) 
-			{
-				console.log('Make it unlike.');
+    var errors = req.validationErrors();
 
-				postModel.post_like
-				.findOneAndRemove({$and:[{post_id : post_id}, {like_user_id : like_user_id}]})
-				.lean()
-				.exec(function(err, result) {
+    if (errors) {
+        log.warn('There have been validation errors: \n' + util.inspect(errors));
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
+    //blank validation
+    if (type == 1) { //post
 
-					if (err) {
-						res.send(err);
-						return;
-					};
+        collectionName = postModel.post;
+        postId = post_id
+    } else if (type == 2) { //retweet
 
-					console.log('Post Unliked', result);
-					log.info('Post Unliked Successfully');
-					res.redirect('/')
-				})
-	  
-			} 
-			// Set Like for Post
-			else  
-			{	
-				var likeModel = new postModel.post_like({
-					post_id: post_id,
-					like_user_id: like_user_id
-				});
+        collectionName = postModel.retweet_quote;
+        postId = retweet_quote_id
+    } else if (type == 3) { //reply
 
-				likeModel.save(function(err) {
+        collectionName = postModel.reply;
+        postId = reply_id
+    }
 
-					if (err)
-						res.send(err);
+    collectionName
+        .find({
+            _id: postId
+        })
+        .lean()
+        .exec(function(err, likeResult) {
 
-					console.log('Post Like');
-					log.info('Post Liked Successfully');					
-             		res.redirect('/')
-				});
-				
-				master.getusername(like_user_id, function(err, result){
-					
-					if(err)
-					{
-						res.send(err);
-					}
-				
-					if(result !== 'No user found')
-					{
-						postModel.post
-						.find({_id:post_id})
-						.populate('posted_by')
-						.exec(function(err, postResult){
-						
-							if(err)
-							{
-								res.send(err);
-								return;
-							}
-							
-							// console.log(like_user_id);
-							// console.log(postResult[0].posted_by.username);
-							
-							if(like_user_id != postResult[0].posted_by._id)
-							{
-								var notification_message = result+' Likes your Post';
-								var notification = new notificationModel.notification({
+            if (err) {
+                log.error(err);
+                res.send(err);
+                return
+            }
 
-									notification_message: notification_message,
-									notification_user: postResult[0].posted_by.username,
-									post_id: post_id,
-									username: result[0]
-									
-								});
-								
-								notification.save(function(err) {
-							
-									if (err)
-										res.send(err);
-										
-									console.log('Notification Saved');
-									
-								})
-							}
+            if (likeResult.length !== 0) {
 
-						})
-					}
-				
-				})
+                if (type == 1 || type == '1') // Post Selected
+                {
+                    // To Like or unlike Post (check whether it is already liked or not)
+                    postModel.post_like
+                        .find({
+                            post_id: post_id,
+                            like_user_id: like_user_id
+                        })
+                        .lean()
+                        .exec(function(err, likedata) {
 
-			}
-			
-			setLikeCount(post_id, 1, function(result){
-				console.log(result);
-			})
-			
-		})
-	}	
-	
-	if(type==2 || type=='2')	// Retweet Selected
-	{
-		// To Like or unlike Retweet (check whether it is already liked or not)
-		postModel.retweet_like
-		.find({ retweet_quote_id: retweet_quote_id, like_user_id: like_user_id })
-		.lean()
-		.exec(function(err, likedata) {
+                            // Post is Already liked by the same user
+                            if (likedata.length !== 0) {
+                                log.info('Make it unlike.');
 
-			// Retweet is Already liked by the same user
-			if (likedata.length !== 0) 
-			{
-				console.log('Make it unlike.');
+                                postModel.post_like
+                                    .findOneAndRemove({
+                                        $and: [{
+                                            post_id: post_id
+                                        }, {
+                                            like_user_id: like_user_id
+                                        }]
+                                    })
+                                    .lean()
+                                    .exec(function(err, result) {
 
-				postModel.retweet_like
-				.findOneAndRemove({$and:[{retweet_quote_id : retweet_quote_id}, {like_user_id : like_user_id}]})
-				.lean()
-				.exec(function(err, result) {
+                                        if (err) {
+                                            log.error(err);
+                                            res.send(err);
+                                        }
 
-					if (err) {
-						res.send(err);
-						return;
-					};
+                                        log.info('Post Unliked', result);
+                                        res.send('Post Unliked Successfully');
+                                    })
 
-					console.log('Retweet Unliked', result);
-					res.send('Retweet Unliked Successfully');
-				})
-	  
-			} 
-			// Set Like for Retweet
-			else  
-			{	
-				var likeModel = new postModel.retweet_like({
-					retweet_quote_id: retweet_quote_id,
-					like_user_id: like_user_id
-				});
+                            }
+                            // Set Like for Post
+                            else {
+                                var likeModel = new postModel.post_like({
+                                    post_id: post_id,
+                                    like_user_id: like_user_id
+                                });
 
-				likeModel.save(function(err) {
+                                likeModel.save(function(err) {
 
-					if (err)
-						res.send(err);
+                                    if (err) {
+                                        log.error(err);
+                                        res.send(err);
+                                    }
 
-					console.log('Retweet Like');   
-					res.send('Retweet Liked Successfully');
+                                    log.info('Post Like');
+                                    res.send('Post Liked Successfully');
 
-				});
+                                });
 
-			}
-			
-			setLikeCount(retweet_quote_id, 2, function(result){
-				console.log(result);
-			})
-			
-		})
-	}
-	
-	if(type==3 || type=='3')	// Reply Selected
-	{
-		// To Like or unlike Reply (check whether it is already liked or not)
-		postModel.reply_like
-		.find({ reply_id: reply_id, like_user_id: like_user_id })
-		.lean()
-		.exec(function(err, likedata) {
+                            }
 
-			// Reply is Already liked by the same user
-			if (likedata.length !== 0) 
-			{
-				console.log('Make it unlike.');
+                            setLikeCount(post_id, 1, function(result) {
+                                log.info(result);
+                            })
 
-				postModel.reply_like
-				.findOneAndRemove({$and:[{reply_id : reply_id}, {like_user_id : like_user_id}]})
-				.lean()
-				.exec(function(err, result) {
+                        })
+                }
 
-					if (err) {
-						res.send(err);
-						return;
-					};
+                if (type == 2 || type == '2') // Retweet Selected
+                {
+                    // To Like or unlike Retweet (check whether it is already liked or not)
+                    postModel.retweet_like
+                        .find({
+                            retweet_quote_id: retweet_quote_id,
+                            like_user_id: like_user_id
+                        })
+                        .lean()
+                        .exec(function(err, likedata) {
 
-					console.log('Reply Unliked', result);
-					res.send('Reply Unliked Successfully');
-				})
-	  
-			} 
-			// Set Like for Reply
-			else  
-			{	
-				var likeModel = new postModel.reply_like({
-					reply_id: reply_id,
-					like_user_id: like_user_id
-				});
+                            // Retweet is Already liked by the same user
+                            if (likedata.length !== 0) {
+                                log.info('Make it unlike.');
 
-				likeModel.save(function(err) {
+                                postModel.retweet_like
+                                    .findOneAndRemove({
+                                        $and: [{
+                                            retweet_quote_id: retweet_quote_id
+                                        }, {
+                                            like_user_id: like_user_id
+                                        }]
+                                    })
+                                    .lean()
+                                    .exec(function(err, result) {
 
-					if (err)
-						res.send(err);
+                                        if (err) {
+                                            log.error(err);
+                                            res.send(err);
+                                        }
 
-					console.log('Reply Like');       
-					res.send('Reply Like Successfully');					
+                                        log.info('Retweet Unliked', result);
+                                        res.send('Retweet Unliked Successfully');
+                                    })
 
-				});
-				
-				master.getusername(like_user_id, function(err, result){
-					
-					if(err)
-					{
-						res.send(err);
-					}
-				
-					if(result !== 'No user found')
-					{
-						postModel.reply
-						.find({_id:reply_id})
-						.populate('reply_user_id')
-						.exec(function(err, replyResult){
-						
-							if(err)
-							{
-								res.send(err);
-								return;
-							}
-							
-							// console.log(like_user_id);
-							// console.log(postResult[0].posted_by.username);
-							
-							if(like_user_id != replyResult[0].reply_user_id._id)
-							{
-								var notification_message = result+' Replied on your Post';
-								var notification = new notificationModel.notification({
+                            }
+                            // Set Like for Retweet
+                            else {
+                                var likeModel = new postModel.retweet_like({
+                                    retweet_quote_id: retweet_quote_id,
+                                    like_user_id: like_user_id
+                                });
 
-									notification_message: notification_message,
-									notification_user: replyResult[0].reply_user_id.username,
-									reply_id: reply_id,
-									username: result
-									
-								});
-								
-								notification.save(function(err) {
-							
-									if (err)
-										res.send(err);
-										
-									console.log('Notification Saved');
-									
-								})
-							}
+                                likeModel.save(function(err) {
 
-						})
-					}
-				
-				})
+                                    if (err) {
+                                        log.error(err);
+                                        res.send(err);
+                                    }
 
-			}
-			
-			setLikeCount(reply_id, 3, function(result){
-				console.log(result);
-			})
-			
-		})
-	}
-    
+                                    log.info('Retweet Like');
+                                    res.send('Retweet Liked Successfully');
+
+                                });
+
+                            }
+
+                            setLikeCount(retweet_quote_id, 2, function(result) {
+                                log.info(result);
+                            })
+
+                        })
+                }
+
+                if (type == 3 || type == '3') // Reply Selected
+                {
+                    // To Like or unlike Reply (check whether it is already liked or not)
+                    postModel.reply_like
+                        .find({
+                            reply_id: reply_id,
+                            like_user_id: like_user_id
+                        })
+                        .lean()
+                        .exec(function(err, likedata) {
+
+                            // Reply is Already liked by the same user
+                            if (likedata.length !== 0) {
+                                log.info('Make it unlike.');
+
+                                postModel.reply_like
+                                    .findOneAndRemove({
+                                        $and: [{
+                                            reply_id: reply_id
+                                        }, {
+                                            like_user_id: like_user_id
+                                        }]
+                                    })
+                                    .lean()
+                                    .exec(function(err, result) {
+
+                                        if (err) {
+                                            log.error(err);
+                                            res.send(err);
+                                        }
+
+                                        log.info('Reply Unliked', result);
+                                        res.send('Reply Unliked Successfully');
+                                    })
+
+                            }
+                            // Set Like for Reply
+                            else {
+                                var likeModel = new postModel.reply_like({
+                                    reply_id: reply_id,
+                                    like_user_id: like_user_id
+                                });
+
+                                likeModel.save(function(err) {
+
+                                    if (err) {
+                                        log.error(err);
+                                        res.send(err);
+                                    }
+
+                                    log.info('Reply Like');
+                                    res.send('Reply Like Successfully');
+
+                                });
+
+                            }
+
+                            setLikeCount(reply_id, 3, function(result) {
+                                log.info(result);
+                            })
+
+                        })
+                }
+
+            } else {
+                res.send('No post found');
+                return;
+            }
+
+        })
+
 }
 
 // Get Likes On Post
-var getLikeByPost = function(req, res) { 
+var getLikeByPost = function(req, res) {
 
     var post_id = req.params.post_id;
 
     postModel.post_like
-    .find({post_id: post_id})
-    .exec(function(err, postLikeResult){
-
-        console.info(postLikeResult.length+ '\n' +postLikeResult);
-
-        res.json({
-            count: postLikeResult.length,
-            likeinfo :postLikeResult
+        .find({
+            post_id: post_id
         })
+        .exec(function(err, postLikeResult) {
 
-    });
+            log.info(postLikeResult.length + '\n' + postLikeResult);
+
+            res.json({
+                count: postLikeResult.length,
+                likeinfo: postLikeResult
+            })
+
+        });
 
 }
 
 // Get Likes On Retweet
-var getLikeByRetweet = function(req, res) { 
+var getLikeByRetweet = function(req, res) {
 
     var retweet_quote_id = req.params.retweet_quote_id;
 
     postModel.retweet_like
-    .find({retweet_quote_id: retweet_quote_id})
-    .exec(function(err, retweetLikeResult){
-
-        console.info(retweetLikeResult.length+ '\n' +retweetLikeResult);
-
-        res.json({
-            count: retweetLikeResult.length,
-            likeinfo :retweetLikeResult
+        .find({
+            retweet_quote_id: retweet_quote_id
         })
+        .exec(function(err, retweetLikeResult) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+            log.info(retweetLikeResult.length + '\n' + retweetLikeResult);
 
-    });
+            res.json({
+                count: retweetLikeResult.length,
+                likeinfo: retweetLikeResult
+            })
+
+        });
 
 }
 
 // Get Likes On Reply
-var getLikeByReply = function(req, res) { 
+var getLikeByReply = function(req, res) {
 
     var reply_id = req.params.reply_id;
 
     postModel.reply_like
-    .find({reply_id: reply_id})
-    .exec(function(err, replyLikeResult){
-
-        console.info(replyLikeResult.length+ '\n' +replyLikeResult);
-
-        res.json({
-            count: replyLikeResult.length,
-            likeinfo :replyLikeResult
+        .find({
+            reply_id: reply_id
         })
+        .exec(function(err, replyLikeResult) {
 
-    });
+            log.info(replyLikeResult.length + '\n' + replyLikeResult);
+
+            res.json({
+                count: replyLikeResult.length,
+                likeinfo: replyLikeResult
+            })
+
+        });
 
 }
 
 var getLikeByUser = function(req, res) { //get new like
 
-    var user_id = req.params.user_id;
+    var username = req.params.username;
 
-	async.parallel([
-		
-		postLike,
-		retweetLike,
-		replyLike
-		
-    ], function (err, results){
+    master.getUserId(username, function(err, user_id) {
 
-		var length =results.length;
-		var count = 0;
-		for(var i=0; i<length; i++)
-		{
-			count = count+ + +results[i].length;
-		}
+        if (err) {
+            log.error(err);
+            res.send(err);
+        }
+        async.parallel([
 
-		var data ={result:results, count:count};
-        res.send(data);
+            postLike,
+            retweetLike,
+            replyLike
 
-    });
-	
-	function postLike(callback)
-	{
-		postModel.post_like
-		.find({like_user_id: user_id})
-		.populate('post_id')
-		.exec(function(err, userPostLikeResult){
+        ], function(err, results) {
 
-			if (err) {
-				res.send(err);
-				return;
-			};
-			//console.log(userPostLikeResult);
-			callback(null, userPostLikeResult);
-			
-		});
-	}
+            var length = results.length;
+            var count = 0;
 
-	function retweetLike(callback)
-	{
-		postModel.retweet_like
-		.find({like_user_id: user_id})
-		.populate('retweet_quote_id')
-		.exec(function(err, userRetweetLikeResult){
+            for (var i = 0; i < length; i++) {
+                count = count + ++results[i].length;
+            }
 
-			if (err) {
-				res.send(err);
-				return;
-			};
-			
-			callback(null, userRetweetLikeResult);
-			
-		});
-	}
-	
-	function replyLike(callback)
-	{
-		postModel.reply_like
-		.find({like_user_id: user_id})
-		.populate('reply_id')
-		.exec(function(err, userRetweetLikeResult){
+            var data = {
+                result: results,
+                count: count
+            };
+            res.send(data);
 
-			if (err) {
-				res.send(err);
-				return;
-			};
-			
-			callback(null, userRetweetLikeResult);
-			
-		});
-	}
-	
+        });
+
+        function postLike(callback) {
+            postModel.post_like
+                .find({
+                    like_user_id: user_id
+                })
+                .populate('post_id')
+                .exec(function(err, userPostLikeResult) {
+
+                   if (err) {
+                log.error(err);
+                res.send(err);
+            }
+                    //log.info(userPostLikeResult);
+                    callback(null, userPostLikeResult);
+
+                });
+        }
+
+        function retweetLike(callback) {
+            postModel.retweet_like
+                .find({
+                    like_user_id: user_id
+                })
+                .populate('retweet_quote_id')
+                .exec(function(err, userRetweetLikeResult) {
+
+                    if (err) {
+                        log.error(err);
+                        res.send(err);
+                    }
+
+                    callback(null, userRetweetLikeResult);
+
+                });
+        }
+
+        function replyLike(callback) {
+            postModel.reply_like
+                .find({
+                    like_user_id: user_id
+                })
+                .populate('reply_id')
+                .exec(function(err, userRetweetLikeResult) {
+
+                    if (err) {
+                        log.error(err);
+                        res.send(err);
+                    }
+                    callback(null, userRetweetLikeResult);
+
+                });
+        }
+
+    })
+
 }
 
 // Update Count of likes For Post/Retweet/Reply
-var setLikeCount = function(id, type, res){
+var setLikeCount = function(id, type, res) {
 
-	// For Post
-	if(type==1 || type=='1')
-	{
-		postModel.post_like
-		.count({post_id:id})
-		.lean()
-		.exec(function(err, postLikeCount){
-		
-			if(err)
-				res.send(err);
-				
-			postModel.post
-            .findOneAndUpdate({_id: id}, {like_count: postLikeCount})
-			.exec(function(err, postUpdateResult){
-			
-				if (err)
+    // For Post
+    if (type == 1 || type == '1') {
+        postModel.post_like
+            .count({
+                post_id: id
+            })
+            .lean()
+            .exec(function(err, postLikeCount) {
+
+                if (err) {
+                    log.error(err);
                     res.send(err);
+                }
 
-                res(postUpdateResult);
-			
-			})
-		
-		})
-		
-		return;
-	}
-	
-	// For Retweet
-	if(type==2 || type=='2')
-	{
-		postModel.retweet_like
-		.count({retweet_quote_id:id})
-		.lean()
-		.exec(function(err, retweetLikeCount){
-		
-			if(err)
-				res.send(err);
-				
-			postModel.retweet_quote
-            .findOneAndUpdate({_id:id}, {like_count: retweetLikeCount})
-			.exec(function(err, retweetUpdateResult){
-			
-				if (err)
+                postModel.post
+                    .findOneAndUpdate({
+                        _id: id
+                    }, {
+                        like_count: postLikeCount
+                    })
+                    .exec(function(err, postUpdateResult) {
+
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
+
+                        res(postUpdateResult);
+
+                    })
+
+            })
+
+        return;
+    }
+
+    // For Retweet
+    if (type == 2 || type == '2') {
+        postModel.retweet_like
+            .count({
+                retweet_quote_id: id
+            })
+            .lean()
+            .exec(function(err, retweetLikeCount) {
+
+                if (err) {
+                    log.error(err);
                     res.send(err);
+                }
 
-                res(retweetUpdateResult);
-			
-			})
-		
-		})
-		
-		return;
-	}
-	
-	// For Reply
-	if(type==3 || type=='3')
-	{
-		postModel.reply_like
-		.count({reply_id:id})
-		.lean()
-		.exec(function(err, replyLikeCount){
-		
-			if(err)
-				res.send(err);
-				
-			postModel.reply
-            .findOneAndUpdate({_id:id}, {like_count: replyLikeCount})
-			.exec(function(err, replytUpdateResult){
-			
-				if (err)
+                postModel.retweet_quote
+                    .findOneAndUpdate({
+                        _id: id
+                    }, {
+                        like_count: retweetLikeCount
+                    })
+                    .exec(function(err, retweetUpdateResult) {
+
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
+
+                        res(retweetUpdateResult);
+
+                    })
+
+            })
+
+        return;
+    }
+
+    // For Reply
+    if (type == 3 || type == '3') {
+        postModel.reply_like
+            .count({
+                reply_id: id
+            })
+            .lean()
+            .exec(function(err, replyLikeCount) {
+
+                if (err) {
+                    log.error(err);
                     res.send(err);
+                }
 
-                res(replytUpdateResult);
-			
-			})
-		
-		})
-		
-		return;
-	}
+                postModel.reply
+                    .findOneAndUpdate({
+                        _id: id
+                    }, {
+                        like_count: replyLikeCount
+                    })
+                    .exec(function(err, replytUpdateResult) {
+
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
+
+                        res(replytUpdateResult);
+
+                    })
+
+            })
+
+        return;
+    }
 }
 
 //Get Retweets of single post
-var getlike = function(req, res) { 
+var getlike = function(req, res) {
 
     var post_id = req.params.post_id;
     var post_type = req.params.post_type;
     var query, collectionName;
 
-    if(post_type == 1){
-    	collectionName = postModel.post_like;
-        query = {post_id: post_id}
-    }
-    else if(post_type == 2){
-    	collectionName = postModel.retweet_like;
-        query = {retweet_quote_id: post_id}
-    }
-    else if(post_type == 3){
-    	collectionName = postModel.reply_id;
-        query = {reply_id: post_id}
-    }
-    else{
-        console.info('wrong post type');
+    if (post_type == 1) {
+        collectionName = postModel.post_like;
+        query = {
+            post_id: post_id
+        }
+    } else if (post_type == 2) {
+        collectionName = postModel.retweet_like;
+        query = {
+            retweet_quote_id: post_id
+        }
+    } else if (post_type == 3) {
+        collectionName = postModel.reply_id;
+        query = {
+            reply_id: post_id
+        }
+    } else {
+        log.info('wrong post type');
         res.json({
-            Result : 'No post_type found'
+            Result: 'No post_type found'
         })
         return;
     }
 
     collectionName
-    .find(query)
-    .select('like_user_id')
-    .populate('like_user_id')
-    .lean()
-    .exec(function(err, getRetweetResult){
+        .find(query)
+        .select('like_user_id')
+        .populate('like_user_id')
+        .lean()
+        .exec(function(err, getRetweetResult) {
 
-        if (err) {
-            res.send(err);
-            return
-        };
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-        console.info(getRetweetResult.length);
-        console.info(getRetweetResult);
+            log.info(getRetweetResult.length);
+            log.info(getRetweetResult);
 
-        res.json({
-            count: getRetweetResult.length,
-            likeinfo :getRetweetResult
-        })
+            res.json({
+                count: getRetweetResult.length,
+                likeinfo: getRetweetResult
+            })
 
-    });
+        });
 
 }
 module.exports = ({
-	getlike 			: getlike,
-    getLikeByUser 		: getLikeByUser,
-    getLikeByPost 		: getLikeByPost,
-    getLikeByRetweet 	: getLikeByRetweet,
-    getLikeByReply 		: getLikeByReply,
-    setLike       		: setLike,
-    setLikeCount  		: setLikeCount
+    getlike: getlike,
+    getLikeByUser: getLikeByUser,
+    getLikeByPost: getLikeByPost,
+    getLikeByRetweet: getLikeByRetweet,
+    getLikeByReply: getLikeByReply,
+    setLike: setLike,
+    setLikeCount: setLikeCount
 })

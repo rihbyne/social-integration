@@ -13,7 +13,6 @@ var domain              = 'searchtrade.com';								// Domain Name
 var ip                  = 'http://192.168.1.29:5000';
 var mailgun             = new Mailgun({apiKey: api_key, domain: domain});	// Mailgun Object
 
-
 // Response Function
 var sendResponse = function(req, res, status, errCode, errMsg) {
 

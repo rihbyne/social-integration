@@ -2,62 +2,65 @@ var user = require('../models/userSchema.js');
 var post_model = require('../models/postSchema.js');
 var mention_model = require('../models/mentionSchema.js');
 var hashtag_model = require('../models/hashtagSchema.js');
-
+var follower = require('../models/followersSchema.js');
+var log = require('../../config/logging')()
 
 //find id of user from username
-var getUserId = function(username, res){
+var getUserId = function(username, res) {
 
     user
-    .find({ username: username })
-    // .select('_id')
-    .exec(function(err, userdata) {
+        .find({
+            username: username
+        })
+        .select('_id')
+        .lean()
+        .exec(function(err, userdata) {
 
-        if (err)
-            res.send(err);
+            if (err) {
+                log.error(err);
+                res.send(err);
 
-        else if (userdata.length !== 0) {
+            } else if (userdata.length !== 0) {
 
-            userid = userdata[0]._id;
-            user_details_all = userdata[0];
+                userid = (userdata[0]._id).toString();
+                return res(null, userid);
 
-            return res(null, userid , user_details_all);
-        }
-        else{
+            } else {
 
-            return res(true, 'No user found');
-        }
+                return res(true, 'No user found');
+            }
 
-    });
+        });
 
 }
 
-var getusername = function(id, res){
+var getusername = function(id, res) {
 
     user
-    .find({ _id: id })
-    .select('username')
-    .exec(function(err, userdata) {
+        .find({
+            _id: id
+        })
+        .select('username')
+        .exec(function(err, userdata) {
 
-        if (err)
-            res.send(err);
+            if (err) {
+                log.error(err);
+                res.send(err);
+            } else if (userdata.length !== 0) {
 
-        else if (userdata.length !== 0) {
+                username = userdata[0].username;
 
-            username = userdata[0].username;
-            //user_details_all = userdata[0];
+                return res(null, username);
+            } else {
 
-            return res(null, username);
-        }
-        else{
+                return res(true, 'No user found');
+            }
 
-            return res(true, 'No user found');
-        }
-
-    });
+        });
 
 }
 
-var hashtagMention = function(type, post, mentionusers, hashtags, res){
+var hashtagMention = function(type, post, mentionusers, hashtags, res) {
 
     console.info(post._id);
 
@@ -78,27 +81,27 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
                 mention_users: mention_users
             });
 
-        }
-        else if(type == 2){
+        } else if (type == 2) {
 
             var mention = new mention_model.retweet_quote_mention({
                 retweet_quote_id: post._id,
                 mention_users: mention_users
             });
 
-        }
-        else if(type == 3){
+        } else if (type == 3) {
 
             var mention = new mention_model.reply_mention({
                 reply_id: post._id,
                 mention_users: mention_users
             });
 
-        }        
+        }
 
         mention.save(function(err) {
-            if (err)
+            if (err) {
+                log.error(err);
                 res.send(err);
+            }
         });
 
     };
@@ -110,7 +113,7 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
         for (var k = 0; k < hashtags.length; k++) {
 
             hashtagkd[k] = hashtags[k];
-            console.log('hashtagkeyword', hashtagkd[k]);
+            log.info('hashtagkeyword', hashtagkd[k]);
 
             post_model.trends
                 .findOneAndUpdate({
@@ -126,30 +129,29 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
                 }, function(err, result) {
 
                     if (err) {
+                        log.error(err);
                         res.send(err);
-                    };
-                    console.log('Trends updated');
+                    }
+                    log.info('Trends updated');
                 })
 
         }
 
-         if (type == 1) {
+        if (type == 1) {
 
             var hashtag = new hashtag_model.post_hashtag({
                 post_id: post._id,
                 hashtag: hashtagkd
             });
 
-        }
-        else if(type == 2){
+        } else if (type == 2) {
 
             var hashtag = new hashtag_model.retweet_quote_hashtag({
                 retweet_quote_id: post._id,
                 hashtag: hashtagkd
             });
 
-        }
-        else if(type == 3){
+        } else if (type == 3) {
 
             var hashtag = new hashtag_model.reply_hashtag({
                 reply_id: post._id,
@@ -160,8 +162,10 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
 
         //find keyword if it is present update count, other wise create new trend
         hashtag.save(function(err) {
-            if (err)
+            if (err) {
+                log.error(err);
                 res.send(err);
+            }
         });
 
     };
@@ -183,8 +187,93 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res){
 
 }
 
+var isFollowing = function(user_id, following_id, callback) {
+
+    follower
+        .find({
+            user_id: user_id,
+            following_id: following_id,
+            follow_status: 'true'
+        })
+        .lean()
+        .exec(function(err, result) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+            log.info('isFollowing Result', result);
+            if (result.length !== 0) {
+                return callback(true); //following
+            } else {
+                return callback(false);
+            }
+        })
+}
+
+var getPrivacyStatus = function(userid, loggedid, callback) {
+    //check userid and loggeduser same or not
+    if (loggedid == userid) {
+
+        privacyStatus = 1;
+
+        callback(null, privacyStatus);
+
+    } else {
+
+        isFollowing(userid, loggedid, function(followResult) {
+
+            if (followResult) {
+
+                privacyStatus = 2;
+
+            } else {
+
+                privacyStatus = 3;
+
+            }
+
+            callback(null, privacyStatus);
+            console.info('master', privacyStatus);
+        });
+
+    }
+
+}
+
+var updateUser = function(userid, callback) {
+
+    user
+        .findOneAndUpdate({
+            _id: userid
+        }, {
+            update_at: new Date()
+        })
+        .lean()
+        .exec(function(err, updateResult) {
+
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+
+            if (updateResult.length !== 0) {
+
+                callback(null, updateResult);
+
+            } else{
+
+                callback(true, 'No user found to update');
+                
+            }
+
+        })
+}
+
 module.exports = ({
-    getUserId : getUserId,
-    hashtagMention : hashtagMention,
-	getusername : getusername
+    getUserId: getUserId,
+    hashtagMention: hashtagMention,
+    getusername: getusername,
+    isFollowing: isFollowing,
+    getPrivacyStatus: getPrivacyStatus,
+    updateUser:updateUser
 })

@@ -9,7 +9,7 @@ var userSchema = mongoose.Schema({
     email       :   {type: String},										// Email of User
     password    :   {type: String},										// Password of User		
     username    :   {type: String},										// Username of User
-    update_at   :   {type: Date, default: Date.now}
+    update_at   :   {type: Number, default: Date.now}
 	
 }, { versionKey: false });
 

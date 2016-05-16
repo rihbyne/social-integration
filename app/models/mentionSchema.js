@@ -6,7 +6,7 @@ var post_mention = mongoose.Schema({
     
     post_id:                         {type: String, ref:"post"},        			// Post Id
     mention_users:					 {type: Array},        							// Mention Users
-    created_at:                      {type: Date, default: Date.now}          		// created date
+    created_at:                      {type: Number, default: Date.now}          		// created date
 
 }, { versionKey: false });
 
@@ -15,7 +15,7 @@ var retweet_quote_mention = mongoose.Schema({
     
     retweet_quote_id:     			 {type: String, ref:"retweet_quote"},                    // Post Id
     mention_users:                   {type: Array},                                  // Mention Users
-    created_at:                      {type: Date, default: Date.now}          		// created date
+    created_at:                      {type: Number, default: Date.now}          		// created date
 
 }, { versionKey: false });
 
@@ -24,7 +24,7 @@ var reply_mention = mongoose.Schema({
     
     reply_id:                		 {type: String, ref:"reply"},                    // Post Id
     mention_users:                   {type: Array},                                  // Mention Users
-    created_at:                      {type: Date, default: Date.now}          		// created date
+    created_at:                      {type: Number, default: Date.now}          		// created date
 
 
 }, { versionKey: false });

@@ -246,14 +246,14 @@ var updateUser = function(userid, callback) {
         .findOneAndUpdate({
             _id: userid
         }, {
-            update_at: new Date()
+            update_at: Number(new Date())
         })
         .lean()
         .exec(function(err, updateResult) {
 
             if (err) {
                 log.error(err);
-                res.send(err);
+                callback(true, err);
             }
 
             if (updateResult.length !== 0) {

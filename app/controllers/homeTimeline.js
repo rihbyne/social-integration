@@ -24,14 +24,14 @@ var homeTimeline = function(req, res) {
             user_id: userid,
             follow_status: true
         })
-        .select('following_id')
+        .select('following_id count')
         .populate({
             path: 'following_id',
             select: ('_id update_at')
 
         })
         .sort({
-            '_id': -1
+            'update_at': -1
         })
         .limit(10)
         .lean()
@@ -67,32 +67,31 @@ var homeTimeline = function(req, res) {
                             res.send(err);
                         };
 
-                        
+                        followingIds = followingResult.map(function(singleFollowing) {
+
+                            return singleFollowing.following_id._id;
+
+                        });
+
                         var showPostLoggedUser = 'false';
 
                         if (userResult[0].update_at <= followingResult[0].following_id.update_at) {
 
                             followingResult[followingResult.length++] = userResult[0];
 
-                            // console.info(followingResult);
+                            console.info(followingResult);
 
                             var showPostLoggedUser = 'true';
                         }
-
-                        followingIds = followingResult.map(function(singleFollowing) {
-
-                            return singleFollowing.following_id._id;
-
-                        });
-                        
-                        log.info(userResult[0].update_at+''+followingResult[2].following_id.update_at);
-                        log.info('show post logged user: ',showPostLoggedUser);
 
                         if (showPostLoggedUser) {
 
                             followingIds.push(userResult[0]._id);
 
                         }
+
+                        log.info(userResult[0].update_at + '' + followingResult[0].following_id.update_at);
+                        log.info('show post logged user: ', showPostLoggedUser);
 
                         async.parallel([
                                 callback => getPostByUserId(showPostLoggedUser, userid, callback),
@@ -201,7 +200,7 @@ function getPostByUserId(showPostLoggedUser, userid, callback) {
 
                 console.info(result);
                 callback(null, result);
-                
+
             }
 
         });

@@ -10,7 +10,7 @@ var post = mongoose.Schema({
     like_count:                      {type: Number, default: 0, min: 0},			// Post Like Count
     post_type :                      {type: Number, default: 1},
 	privacy_setting :				 {type: Number, required:true}, 					// 1 - Public, 2 - Private, 3 - Followers
-    created_at:                      {type: Date, default: Date.now},          		// created date
+    created_at:                      {type: Number, default: Date.now},          		// created date
     
 }, { versionKey: false });
 
@@ -32,7 +32,7 @@ var retweet_schema = mongoose.Schema({
     post_type :                      {type: Number, default: 2},    
 	privacy_setting :				 {type: Number, required:true}, 					// 1 - Public, 2 - Private, 3 - Followers	
     retweet_type :                   {type: Number, default: 1},                  
-    created_at :                     {type: Date, default: Date.now}				// Time of Retweet Made
+    created_at :                     {type: Number, default: Date.now}				// Time of Retweet Made
 	
 }, { versionKey: false });
 
@@ -49,7 +49,7 @@ var retweet_quote_schema = mongoose.Schema({
     post_type :                      {type: Number, default: 2},					
     retweet_type :                   {type: Number, default: 2},                 
 	privacy_setting :				 {type: Number, required: true}, 					// 1 - Public, 2 - Private, 3 - Followers
-    created_at :                     {type: Date, default: Date.now}				// Time of Retweet Made
+    created_at :                     {type: Number, default: Date.now}				// Time of Retweet Made
 
 }, { versionKey: false });
 
@@ -82,8 +82,8 @@ var trends = mongoose.Schema({
     
     keyword:                         {type: String},        						// Post Id
     count:                           {type: Number},        						// Count of Trends Mentioned in Post (by #)  
-    created_at:                      {type: Date, default: Date.now},          		// Created date
-    updated_at:                      {type: Date, default: Date.now}           		// last update date
+    created_at:                      {type: Number, default: Date.now},          		// Created date
+    updated_at:                      {type: Number, default: Date.now}           		// last update date
 
 }, { versionKey: false });
 
@@ -99,7 +99,7 @@ var reply_schema = mongoose.Schema({
     like_count:                      {type: Number, default: 0, min: 0},			// Number of Likes on this
     post_type :                      {type: Number, default: 3},
 	privacy_setting :				 {type: Number, required:true}, 					// 1 - Public, 2 - Private, 3 - Followers	
-    created_at :                     {type: Date, default: Date.now}          		// Time of Reply
+    created_at :                     {type: Number, default: Date.now}          		// Time of Reply
 	
 }, { versionKey: false });
 

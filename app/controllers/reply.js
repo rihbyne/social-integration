@@ -7,7 +7,6 @@ var log = require('../../config/logging')()
 //update reply to post
 var setreply = function(req, res) {
 
-
     var post_type       = req.body.post_type;
     var reply_user_id   = req.body.reply_user_id;
     var reply_msg       = req.body.reply_msg;

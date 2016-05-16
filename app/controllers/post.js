@@ -1,18 +1,20 @@
 // Packages
 
-var util 		= require('util');
-var async		= require('async');
-var express 	= require('express');
-var router 		= express.Router(); // get an instance of the express Router
-var log 		= require('../../config/logging')()
+var util = require('util');
+var async = require('async');
+var express = require('express');
+var router = express.Router(); // get an instance of the express Router
+var log = require('../../config/logging')()
+var querystring = require('querystring');
+var http = require('http');
 
 // Pages
-var master 				= require('./master.js');
-var user_model 			= require('../models/userSchema.js');
-var post_model 			= require('../models/postSchema.js');
-var notificationModel 	= require('../models/notificationSchema.js');
-var user_followers 		= require('../models/followersSchema.js');
-var mentionModel		= require('../models/mentionSchema.js');
+var master = require('./master.js');
+var user_model = require('../models/userSchema.js');
+var post_model = require('../models/postSchema.js');
+var notificationModel = require('../models/notificationSchema.js');
+var user_followers = require('../models/followersSchema.js');
+var mentionModel = require('../models/mentionSchema.js');
 
 var getuserdetails = function(req, res) {
 
@@ -38,50 +40,56 @@ var getuserdetails = function(req, res) {
     function allpost(callback) {
 
         post_model.post
-        .find({posted_by: user_id})
-		.sort({created_at: -1})
-		.lean()
-        .exec(function(err, allpost) {
+            .find({
+                posted_by: user_id
+            })
+            .sort({
+                created_at: -1
+            })
+            .lean()
+            .exec(function(err, allpost) {
 
-			if (err) {
-				log.error(err);
-				res.send(err);
-			}
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
 
-			// log.info(allpost);
-			async.each(allpost, function(singlepost, callback) {
+                // log.info(allpost);
+                async.each(allpost, function(singlepost, callback) {
 
-				post_model.post_like
-				.count({ post_id: singlepost._id })
-				.lean()
-				.exec(function(err, countPostLikes) {
-                                
-					if (err) {
-						log.error(err);
-						res.send(err);
-					}
-					// log.info(countPostLikes);
-					if (countPostLikes !== 0) {
-						singlepost.postLikeCount = countPostLikes;
-						// log.info(singlepost);
-					} else {
-						singlepost.postLikeCount = 0;
-					}
-					// log.info(singlepost);
-					callback();
-				})
+                        post_model.post_like
+                            .count({
+                                post_id: singlepost._id
+                            })
+                            .lean()
+                            .exec(function(err, countPostLikes) {
 
-			},
-				// 3rd param is the function to call when everything's done
-				function(err) {
-					// All tasks are done now
-					log.info(allpost);
-					userdetails.allpost = allpost
-					callback(null, userdetails);
+                                if (err) {
+                                    log.error(err);
+                                    res.send(err);
+                                }
+                                // log.info(countPostLikes);
+                                if (countPostLikes !== 0) {
+                                    singlepost.postLikeCount = countPostLikes;
+                                    // log.info(singlepost);
+                                } else {
+                                    singlepost.postLikeCount = 0;
+                                }
+                                // log.info(singlepost);
+                                callback();
+                            })
 
-			});
+                    },
+                    // 3rd param is the function to call when everything's done
+                    function(err) {
+                        // All tasks are done now
+                        log.info(allpost);
+                        userdetails.allpost = allpost
+                        callback(null, userdetails);
 
-		});
+                    });
+
+            });
 
     }
 
@@ -89,56 +97,62 @@ var getuserdetails = function(req, res) {
 
         async.parallel([
 
-            function(callback) {
-				// show count of post and check for errors
-				post_model.post
-				.count({ posted_by: user_id })
-				.exec(function(err, postcount) {
+                function(callback) {
+                    // show count of post and check for errors
+                    post_model.post
+                        .count({
+                            posted_by: user_id
+                        })
+                        .exec(function(err, postcount) {
 
-					if (err) {
-						log.error(err);
-						res.send(err);
-					}
-					callback(null, postcount);
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
+                            callback(null, postcount);
 
-				});
+                        });
 
-			},
-			function(callback) {
+                },
+                function(callback) {
 
-				// show count of post and check for errors
-				post_model.retweet_quote
-				.count({ ret_user_id: user_id })
-				.exec(function(err, retweetcount) {
+                    // show count of post and check for errors
+                    post_model.retweet_quote
+                        .count({
+                            ret_user_id: user_id
+                        })
+                        .exec(function(err, retweetcount) {
 
-					if (err) {
-						log.error(err);
-						res.send(err);
-					}
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
 
-					callback(null, retweetcount);
+                            callback(null, retweetcount);
 
-				});
+                        });
 
-			},
-			function(callback) {
+                },
+                function(callback) {
 
-				// show count of post and check for errors
-				post_model.reply
-				.count({ reply_user_id: user_id })
-				.exec(function(err, replycount) {
+                    // show count of post and check for errors
+                    post_model.reply
+                        .count({
+                            reply_user_id: user_id
+                        })
+                        .exec(function(err, replycount) {
 
-					if (err) {
-						log.error(err);
-						res.send(err);
-					}
+                            if (err) {
+                                log.error(err);
+                                res.send(err);
+                            }
 
-					callback(null, replycount);
+                            callback(null, replycount);
 
-				});
+                        });
 
-			}
-		],
+                }
+            ],
             function(err, result) {
 
                 var sumArray = function() {
@@ -167,56 +181,70 @@ var getuserdetails = function(req, res) {
     function trends(callback) {
 
         post_model.trends
-		.find()
-		.sort({ count: -1 })
-		.limit(5)
-		.exec(function(err, results) {
+            .find()
+            .sort({
+                count: -1
+            })
+            .limit(5)
+            .exec(function(err, results) {
 
-            if (err) {
-                log.error(err);
-                res.send(err);
-            };
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                };
 
-            userdetails.trends = results
-            callback(null, userdetails);
+                userdetails.trends = results
+                callback(null, userdetails);
 
-        });
+            });
 
     }
 
     function following(callback) {
 
         user_followers
-		.count({ $and: [{ following_id: user_id }, { follow_status: true }] })
-		.exec(function(err, followingcount) {
+            .count({
+                $and: [{
+                    following_id: user_id
+                }, {
+                    follow_status: true
+                }]
+            })
+            .exec(function(err, followingcount) {
 
-			if (err) {
-				log.error(err);
-				res.send(err);
-			}
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
 
-			userdetails.followingcount = followingcount
-			callback(null, userdetails);
+                userdetails.followingcount = followingcount
+                callback(null, userdetails);
 
-		});
+            });
 
     }
 
     function followers(callback) {
 
         user_followers
-		.count({ $and:[{ user_id: user_id },{ follow_status: true }]})
-		.exec(function(err, followercount) {
+            .count({
+                $and: [{
+                    user_id: user_id
+                }, {
+                    follow_status: true
+                }]
+            })
+            .exec(function(err, followercount) {
 
-			if (err) {
-				log.error(err);
-				res.send(err);
-			}
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
 
-			userdetails.followerCount = followercount
-			callback(null, userdetails);
+                userdetails.followerCount = followercount
+                callback(null, userdetails);
 
-		});
+            });
 
     }
 
@@ -226,21 +254,23 @@ var getuserdetails = function(req, res) {
 var trend = function(req, res) {
 
     post_model.trends
-	.find()
-	.sort({ count: -1 })
-	.limit(5)
-	.exec(function(err, results) {
+        .find()
+        .sort({
+            count: -1
+        })
+        .limit(5)
+        .exec(function(err, results) {
 
-		if (err) {
-			log.error(err);
-			res.send(err);
-		}
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-		res.json({
-			trends_data: results
-		});
+            res.json({
+                trends_data: results
+            });
 
-	});
+        });
 };
 
 //Get all post 
@@ -269,23 +299,25 @@ var getsinglepost = function(req, res) { // get a post
     // get the post and check for errors
 
     post_model.post
-	.findOne({ post_title: post_title })
-	.exec(function(err, singlepost) {
-        if (err) {
-            log.error(err);
-            res.send(err);
-        }
+        .findOne({
+            post_title: post_title
+        })
+        .exec(function(err, singlepost) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-        if (singlepost) {
-            res.json({
-                posts: singlepost
-            });
-        } else {
-            log.info('No post found')
-            res.json('No Post Found')
-        }
+            if (singlepost) {
+                res.json({
+                    posts: singlepost
+                });
+            } else {
+                log.info('No post found')
+                res.json('No Post Found')
+            }
 
-    });
+        });
 
 };
 
@@ -301,83 +333,97 @@ var getuserposts = function(req, res) { // get a post
 
     //find id of user from user collection
     user_model
-	.find({ username: username })
-	.exec(function(err, userdata) {
+        .find({
+            username: username
+        })
+        .exec(function(err, userdata) {
 
-		if (err) {
-			log.error(err);
-			res.send(err);
-		} else if (userdata.length !== 0) {
-			userid = userdata[0]._id;
-			// log.info(userid);
-			//use userid to find all post of users
-			post_model.post
-			.find({ posted_by: userid }, { _id: 0 })
-            .populate('posted_by')
-			.sort({ created_at: -1 })
-			.limit(10)
-			.exec(function(err, result) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            } else if (userdata.length !== 0) {
+                userid = userdata[0]._id;
+                // log.info(userid);
+                //use userid to find all post of users
+                post_model.post
+                    .find({
+                        posted_by: userid
+                    }, {
+                        _id: 0
+                    })
+                    .populate('posted_by')
+                    .sort({
+                        created_at: -1
+                    })
+                    .limit(10)
+                    .exec(function(err, result) {
 
-				if (err) {
-					log.error(err);
-					res.send(err);
-					
-				} else if (result.length == 0) {
-					res.json({
-						message: 'No post found'
-					});
-					
-				} else {
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
 
-					post_model.post_retweet
-					.find({ ret_user_id: userid }, { _id: 0 })
-					.select('post_id')
-					.populate('post_id')
-					.sort({ retweet_at: -1 })
-					.limit(10)
-					.exec(function(err, retweetpostids) {
+                        } else if (result.length == 0) {
+                            res.json({
+                                message: 'No post found'
+                            });
 
-						async.each(retweetpostids,
+                        } else {
 
-							function(retweetpostid, callback) {
+                            post_model.post_retweet
+                                .find({
+                                    ret_user_id: userid
+                                }, {
+                                    _id: 0
+                                })
+                                .select('post_id')
+                                .populate('post_id')
+                                .sort({
+                                    retweet_at: -1
+                                })
+                                .limit(10)
+                                .exec(function(err, retweetpostids) {
 
-								finalObj.push(retweetpostid['post_id'])
+                                    async.each(retweetpostids,
 
-							},
-							// 3rd param is the function to call when everything's done
-							function(err) {
-								// All tasks are done now
-							}
-						);
+                                        function(retweetpostid, callback) {
 
-						var finalObj1 = result.concat(finalObj);
+                                            finalObj.push(retweetpostid['post_id'])
 
-						log.info('\n\n', finalObj1);
-						// sortOut(finalObj1, function(){
+                                        },
+                                        // 3rd param is the function to call when everything's done
+                                        function(err) {
+                                            // All tasks are done now
+                                        }
+                                    );
 
-						// var finalObjResult = JSON.stringify(finalObjResult);
+                                    var finalObj1 = result.concat(finalObj);
 
-						// log.info('\n\n', finalObjResult);
+                                    log.info('\n\n', finalObj1);
+                                    // sortOut(finalObj1, function(){
 
-						// })
+                                    // var finalObjResult = JSON.stringify(finalObjResult);
 
-						res.json({
-							posts: finalObj1
-						});
+                                    // log.info('\n\n', finalObjResult);
 
-					})
+                                    // })
 
-				}
+                                    res.json({
+                                        posts: finalObj1
+                                    });
 
-			});
+                                })
 
-		} else {
-			res.json({
-				message: 'No user found'
-			})
-		}
+                        }
 
-	});
+                    });
+
+            } else {
+                res.json({
+                    message: 'No user found'
+                })
+            }
+
+        });
 
 };
 
@@ -427,7 +473,7 @@ var setpost = function(req, res) { // create a post
 
     req.checkBody('userid', 'userid is empty').notEmpty();
     req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
-    req.checkBody('post_description','0 to 300 characters required').len(0, 300);
+    req.checkBody('post_description', '0 to 300 characters required').len(0, 300);
     req.checkBody('privacy_setting', 'privacy setting is empty').notEmpty();
 
     var errors = req.validationErrors();
@@ -461,7 +507,7 @@ var setpost = function(req, res) { // create a post
 
     }); // create a new instance of the post model
 
-    master.updateUser(userid, function(err, updateResult){
+    master.updateUser(userid, function(err, updateResult) {
 
         if (err) {
             log.error(err);
@@ -559,12 +605,69 @@ var setuser = function(req, res) { //Create new user
         username: username
     });
 
-    setuser.save(function(err) {
+    setuser.save(function(err, result) {
 
         if (err) {
             log.error(err);
             res.send(err);
         }
+        // console.log(result);
+        var userId = result._id.toString();
+
+        /* setfollowing api called using curl request for superuser*/
+        (function setFollowingSearchtradeUser() {
+
+            user_model
+            .findById(process.env.SUPERUSERID)
+            .exec(function(err, result){
+
+                if (err) {
+                    log.error('no searchtrade user exist');
+                    return;
+                }
+
+                var postData = querystring.stringify({
+                    'user_id': userId,
+                    'following_id': process.env.SUPERUSERID //superuser id 
+
+                });
+
+                var options = {
+                    hostname: process.env.NODE_SERVER_IP,
+                    port: process.env.NODE_SERVER_PORT,
+                    path: '/setfollowing',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Length': postData.length
+                    }
+                };
+
+                var req = http.request(options, (res) => {
+                    console.log(`STATUS: ${res.statusCode}`);
+                    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+                    res.setEncoding('utf8');
+                    res.on('data', (chunk) => {
+                        console.log(`BODY: ${chunk}`);
+                    });
+                    res.on('end', () => {
+                        console.log('No more data in response.')
+                    })
+                });
+
+                req.on('error', (e) => {
+                    console.log(`problem with request: ${e.message}`);
+                });
+
+                // write data to request body
+                req.write(postData);
+                req.end();
+
+            })
+
+        })(userId);
+        /* setfollowing api called using curl request for superuser*/
+
 
         res.json({
             message: 'Users Inserted'
@@ -685,8 +788,8 @@ var getuserpostcount = function(req, res) { // get a post
 
 var deletepost = function(req, res) {
 
-    var post_id 	= req.body.post_id;
-    var posted_by 	= req.body.posted_by;
+    var post_id = req.body.post_id;
+    var posted_by = req.body.posted_by;
 
     req.checkBody('post_id', 'post_id').notEmpty();
     req.checkBody('posted_by', 'posted_by').notEmpty();
@@ -700,79 +803,87 @@ var deletepost = function(req, res) {
     }
 
     post_model.post
-	.findOneAndRemove({ _id: post_id, posted_by: posted_by })
-	.exec(function(err, result) {
-		if (err) {
-			log.error(err);
-			res.send(err);
-		}
+        .findOneAndRemove({
+            _id: post_id,
+            posted_by: posted_by
+        })
+        .exec(function(err, result) {
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
 
-		if (result !== null) {
+            if (result !== null) {
 
-			log.info('Post Deleted');
+                log.info('Post Deleted');
 
-			res.json({
-				message: 'Post Deleted'
-			});
-		} else {
+                res.json({
+                    message: 'Post Deleted'
+                });
+            } else {
 
-			log.info('No Post Found');
+                log.info('No Post Found');
 
-			res.json({
-				message: 'No Post Found'
-			});
-		}
+                res.json({
+                    message: 'No Post Found'
+                });
+            }
 
-	});
-	
-	master.getusername(posted_by, function(err, username) {
-	
-		if (err) {
-			log.error(err);
-			res.send(err);
-		}
-	
-		notificationModel.notification
-		.findOneAndRemove({post_id:post_id, username:username})
-		.exec(function(err, result){
-		
-			if (err) {
-				log.error(err);
-				res.send(err);
-			}
-			
-			if (result !== null) {
+        });
 
-				log.info('Notification Deleted');
-				
-			} else {
+    master.getusername(posted_by, function(err, username) {
 
-				log.info('No Notification Found');
-			}
-		
-		})
-	
-	})
-	
-	mentionModel.post_mention
-	.findOneAndRemove({post_id:post_id})
-	.exec(function(err, result){
-		
-		if (err) {
-			log.error(err);
-			res.send(err);
-		}
-		
-		if (result !== null) {
+        if (err) {
+            log.error(err);
+            res.send(err);
+        }
 
-			log.info('Mention Document Deleted');
-			
-		} else {
+        notificationModel.notification
+            .findOneAndRemove({
+                post_id: post_id,
+                username: username
+            })
+            .exec(function(err, result) {
 
-			log.info('No Mention Document Found');
-		}
-		
-	})
+                if (err) {
+                    log.error(err);
+                    res.send(err);
+                }
+
+                if (result !== null) {
+
+                    log.info('Notification Deleted');
+
+                } else {
+
+                    log.info('No Notification Found');
+                }
+
+            })
+
+    })
+
+    mentionModel.post_mention
+        .findOneAndRemove({
+            post_id: post_id
+        })
+        .exec(function(err, result) {
+
+            if (err) {
+                log.error(err);
+                res.send(err);
+            }
+
+            if (result !== null) {
+
+                log.info('Mention Document Deleted');
+
+            } else {
+
+                log.info('No Mention Document Found');
+            }
+
+        })
 };
 
 

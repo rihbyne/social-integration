@@ -197,16 +197,19 @@ var isFollowing = function(user_id, following_id, callback) {
         })
         .lean()
         .exec(function(err, result) {
+
             if (err) {
                 log.error(err);
                 res.send(err);
             }
             log.info('isFollowing Result', result);
+
             if (result.length !== 0) {
                 return callback(true); //following
             } else {
                 return callback(false);
             }
+            
         })
 }
 

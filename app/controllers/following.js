@@ -72,88 +72,86 @@ var setfollowing = function(req, res) {
                             res.send(err);
                         }
 
-                        if (result.length == 1) {
-                            log.info(result);
-                            /*update user follower status true*/
-                            follower
-                                .update({
-                                    _id: result[0]._id
-                                }, {
-                                    follow_back: 'true'
-                                })
-                                .exec(function(err, statusResult) {
-
-                                    if (err) {
-                                        log.error(err);
-                                        res.send(err);
-                                    }
-
-                                    log.info(statusResult);
-                                })
-
-                            follow_back = 'true';
-
-                        } else {
-                            follow_back = 'false';
-                        };
-
-                        master.isFollowing(user_id, following_id, function(result) {
-
-                            log.info(result);
-                            if (!result) {
-
-                                var followingModel = new follower({
-                                    user_id: user_id,
-                                    following_id: following_id,
-                                    follow_back: follow_back
-                                });
-
-                                followingModel.save(function(err) {
-
-                                    if (err) {
-                                        log.error(err);
-                                        res.send(err);
-                                    }
-
-                                    log.info('following/followers set saved');
-                                });
-
-                            } else {
-
+                            if (result.length == 1) {
+                                log.info(result);
+                                /*update user follower status true*/
                                 follower
                                     .update({
-                                        user_id: user_id,
-                                        following_id: following_id,
-                                        follow_status: false
+                                        _id: result[0]._id
                                     }, {
-                                        follow_status: true
+                                        follow_back: 'true'
                                     })
-                                    .exec(function(err, result) {
+                                    .exec(function(err, statusResult) {
 
                                         if (err) {
                                             log.error(err);
                                             res.send(err);
                                         }
 
-                                        log.info('following/followers update');
+                                        log.info(statusResult);
+                                    })
+
+                                follow_back = 'true';
+
+                            } else {
+                                follow_back = 'false';
+                            };
+
+                            master.isFollowing(user_id, following_id, function(result) {
+
+                                log.info(result);
+
+                                if (!result) {
+
+                                    var followingModel = new follower({
+                                        user_id: user_id,
+                                        following_id: following_id,
+                                        follow_back: follow_back
                                     });
 
-                                log.info('update following');
-                            }
+                                    followingModel.save(function(err) {
 
-                        });
+                                        if (err) {
+                                            log.error(err);
+                                            res.send(err);
+                                        }
+
+                                        log.info('following/followers set saved');
+                                    });
+
+                                } else {
+
+                                    follower
+                                        .update({
+                                            user_id: user_id,
+                                            following_id: following_id,
+                                            follow_status: false
+                                        }, {
+                                            follow_status: true
+                                        })
+                                        .exec(function(err, result) {
+
+                                            if (err) {
+                                                log.error(err);
+                                                res.send(err);
+                                            }
+
+                                            log.info('following/followers update');
+                                        });
+
+                                    log.info('update following');
+                                }
+
+                            });
 
                     })
 
                 res.json({
                     message: 'following/followers set'
                 })
-                // var u_name = req.user.username
-                // res.redirect('/' + u_name + '/following');
-                // log.info('following/ followers set')
-                // var url = req.url;
-                // log.info('now url path is' +url)
+
             }
+
         })
 
 }
@@ -270,6 +268,11 @@ var unlink_following = function(req, res) {
         return;
     }
 
+    if (following_id == process.env.SUPERUSERID) {
+
+
+    }
+    
     follower
         .update({
             $and: [{
@@ -308,6 +311,7 @@ var unlink_following = function(req, res) {
                         }
                     })
             }
+
         })
 
 }

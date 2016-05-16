@@ -25,6 +25,12 @@ var setretweet = function (req, res) {
     req.checkBody('post_id', 'post id').notEmpty();
     req.checkBody('privacy_setting', 'privacy setting').notEmpty();
 
+    if (retweet_type == 2) {
+
+        req.checkBody('retweet_quote', 'Can not post empty tweet').notEmpty();
+        req.checkBody('retweet_type','0 to 300 characters required').len(0, 300);
+    };
+
     var errors = req.validationErrors();
 
     if (errors) {
@@ -198,16 +204,6 @@ var setretweet = function (req, res) {
 
                         var regexat = /@([^\s]+)/g;
                         var regexhash = /#([^\s]+)/g;
-
-                        req.checkBody('retweet_quote', 'Can not post empty tweet').notEmpty();
-
-                        var errors = req.validationErrors();
-
-                        if (errors) {
-                            // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-                            res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-                            return;
-                        }
 
                         while (match_at = regexat.exec(retweet_quote)) {
                             mentionusers.push(match_at[1]);

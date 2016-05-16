@@ -10,7 +10,6 @@ var log 		= require('../../config/logging')()
 var master 				= require('./master.js');
 var user_model 			= require('../models/userSchema.js');
 var post_model 			= require('../models/postSchema.js');
-var User 				= require('../models/userSchema.js');
 var notificationModel 	= require('../models/notificationSchema.js');
 var user_followers 		= require('../models/followersSchema.js');
 var mentionModel		= require('../models/mentionSchema.js');
@@ -237,7 +236,6 @@ var trend = function(req, res) {
 			res.send(err);
 		}
 
-		var TD = results
 		res.json({
 			trends_data: results
 		});
@@ -302,7 +300,7 @@ var getuserposts = function(req, res) { // get a post
     log.info('user ', req.params.user);
 
     //find id of user from user collection
-    User
+    user_model
 	.find({ username: username })
 	.exec(function(err, userdata) {
 
@@ -429,6 +427,7 @@ var setpost = function(req, res) { // create a post
 
     req.checkBody('userid', 'userid is empty').notEmpty();
     req.checkBody('post_description', 'Can not post empty tweet').notEmpty();
+    req.checkBody('post_description','0 to 300 characters required').len(0, 300);
     req.checkBody('privacy_setting', 'privacy setting is empty').notEmpty();
 
     var errors = req.validationErrors();

@@ -198,8 +198,10 @@ function getPostByUserId(showPostLoggedUser, userid, callback) {
                 callback(null, []); //No post found
 
             } else {
+
                 console.info(result);
                 callback(null, result);
+                
             }
 
         });

@@ -1,6 +1,7 @@
 var log = require('../../config/logging')();
 var postModel = require('../models/postSchema.js'); // Including postModel File
 var util = require('util');
+var master = require('./master.js');
 
 var updatePrivacy = function(req, res) {
 
@@ -56,7 +57,7 @@ var updatePrivacy = function(req, res) {
         };
     }
 
-    isValidUser(collectionName, query, function(err, validResult) {
+    master.isValidUser(collectionName, query, function(err, validResult) {
 
         if (err) {
             log.error(validResult);
@@ -85,30 +86,6 @@ var updatePrivacy = function(req, res) {
 
 };
 
-function isValidUser(collectionName, query, callback) {
-
-    collectionName
-        .find(query)
-        .lean()
-        .exec(function(err, postResult) {
-
-            if (err) {
-
-                log.error(err);
-            }
-
-            if (postResult.length === 0) {
-
-                callback(true, 'Not valid user');
-
-            } else {
-
-                callback(null, 'valid user');
-            }
-
-        });
-
-}
 
 module.exports = ({
     updatePrivacy: updatePrivacy

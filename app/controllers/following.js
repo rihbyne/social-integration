@@ -2,8 +2,8 @@
 var util = require('util');
 var async = require('async');
 var request = require('request');
-// Pages
 
+// Pages
 var follower = require('../models/followersSchema.js');
 var users = require('../models/userSchema.js');
 var postSchema = require('../models/postSchema.js');
@@ -255,61 +255,62 @@ var getfollowers = function(req, res) {
 //Unlink following
 var unlink_following = function(req, res) {
 
-        log.info('unlink_followings api called');
-        var user_id = req.body.user_id;
-        var unlink_following = req.body.unlink_following;
+    log.info('unlink_followings api called');
+    var user_id = req.body.user_id;
+    var unlink_following = req.body.unlink_following;
 
-        //validation for blank variables
-        req.checkBody('user_id', 'User id is mandatory').notEmpty();
-        req.checkBody('unlink_following', 'unlink_following is mandatory').notEmpty();
-        var errors = req.validationErrors();
+    //validation for blank variables
+    req.checkBody('user_id', 'User id is mandatory').notEmpty();
+    req.checkBody('unlink_following', 'unlink_following is mandatory').notEmpty();
+    var errors = req.validationErrors();
 
-        if (errors) {
-            // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-            res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-            return;
-        }
-
-        follower
-            .update({
-                $and: [{
-                    user_id: user_id
-                }, {
-                    following_id: unlink_following
-                }]
-            }, {
-                follow_status: false,
-                follow_back: false
-            })
-            .exec(function(err, result) {
-
-                if (err) {
-                    log.info("found err" + err);
-                } else {
-
-                    follower
-                        .update({
-                            $and: [{
-                                following_id: user_id
-                            }, {
-                                user_id: unlink_following
-                            }]
-                        }, {
-                            follow_back: false
-                        })
-                        .exec(function(err, result) {
-                            if (err) {
-                                log.info("found err" + err);
-                            } else {
-                                res.json({
-                                    message: 'Removed following'
-                                })
-                                log.info('Removed following')
-                            }
-                        })
-                }
-            })
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
     }
+
+    follower
+        .update({
+            $and: [{
+                user_id: user_id
+            }, {
+                following_id: unlink_following
+            }]
+        }, {
+            follow_status: false,
+            follow_back: false
+        })
+        .exec(function(err, result) {
+
+            if (err) {
+                log.info("found err" + err);
+            } else {
+
+                follower
+                    .update({
+                        $and: [{
+                            following_id: user_id
+                        }, {
+                            user_id: unlink_following
+                        }]
+                    }, {
+                        follow_back: false
+                    })
+                    .exec(function(err, result) {
+                        if (err) {
+                            log.info("found err" + err);
+                        } else {
+                            res.json({
+                                message: 'Removed following'
+                            })
+                            log.info('Removed following')
+                        }
+                    })
+            }
+        })
+
+}
     //Get Count of Follwer
 var getCountFollower = function(req, res) {
 
@@ -347,6 +348,7 @@ var getCountFollower = function(req, res) {
                 });
             }
         });
+
 }
 
 //Get Count of Follwing
@@ -389,6 +391,7 @@ var getCountFollowing = function(req, res) {
 }
 
 var getMutualFollowerYouKnow = function(req, res) {
+
     var user_id = req.params.user_id;
     var following_id = req.params.following_id;
     var count = 0;
@@ -460,6 +463,7 @@ var getMutualFollowerYouKnow = function(req, res) {
                     });
                 })
         })
+
 }
 
 module.exports = ({

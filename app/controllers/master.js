@@ -269,6 +269,32 @@ var updateUser = function(userid, callback) {
         })
 }
 
+
+function isValidUser(collectionName, query, callback) {
+
+    collectionName
+        .find(query)
+        .lean()
+        .exec(function(err, postResult) {
+
+            if (err) {
+
+                log.error(err);
+            }
+
+            if (postResult.length === 0) {
+
+                callback(true, 'Not valid user');
+
+            } else {
+
+                callback(null, 'valid user');
+            }
+
+        });
+
+}
+
 module.exports = ({
     getUserId: getUserId,
     hashtagMention: hashtagMention,

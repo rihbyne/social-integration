@@ -190,7 +190,10 @@ var getfollowing = function(req, res) {
                 follower
                     .find({
                         user_id: result[0]._id,
-                        follow_status: true
+                        follow_status: true,
+                        following_id: {
+                            $ne: process.env.SUPERUSERID
+                        }
                     })
                     .populate('user_id following_id')
                     .exec(function(err, result) {
@@ -229,102 +232,108 @@ var getfollowers = function(req, res) {
         .find({
             username: user_name
         })
-    .select('_id')
-    .exec(function(err, result) {
+        .select('_id')
+        .exec(function(err, result) {
 
-        if (result.length !== 0) {
+            if (result.length !== 0) {
 
-            follower
-                .find({
-                    following_id: result[0]._id,
-                    follow_status: true
-                })
-                .populate('following_id user_id')
-                .exec(function(err, followerResult) {
-
-                    if (err) {
-                        log.error(err);
-                        res.send(err);
-                    }
-
-                    res.json({
-                        FollowersList: followerResult
+                follower
+                    .find({
+                        following_id: result[0]._id,
+                        follow_status: true
                     })
+                    .populate('following_id user_id')
+                    .exec(function(err, followerResult) {
 
-                })
-        }
-        
-    })
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                        }
+
+                        res.json({
+                            FollowersList: followerResult
+                        })
+
+                    })
+            }
+
+        })
 
 }
 
 //Unlink following
 var unlink_following = function(req, res) {
 
-        log.info('unlink_followings api called');
-        var user_id = req.body.user_id;
-        var unlink_following = req.body.unlink_following;
+    log.info('unlink_followings api called');
 
-        //validation for blank variables
-        req.checkBody('user_id', 'User id is mandatory').notEmpty();
-        req.checkBody('unlink_following', 'unlink_following is mandatory').notEmpty();
-        var errors = req.validationErrors();
+    var user_id = req.body.user_id;
+    var unlink_following = req.body.unlink_following;
 
-        if (errors) {
-            // res.send('There have been validation errors: ' + util.inspect(errors), 400);
-            res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-            return;
-        }
+    //validation for blank variables
+    req.checkBody('user_id', 'User id is mandatory').notEmpty();
+    req.checkBody('unlink_following', 'unlink_following is mandatory').notEmpty();
 
-        if (following_id == process.env.SUPERUSERID) {
+    var errors = req.validationErrors();
 
-            log.info('You can not unfollow searchtrade user');
-            res.send('You can not unfollow searchtrade user');
-        }
-
-        follower
-            .update({
-                $and: [{
-                    user_id: user_id
-                }, {
-                    following_id: unlink_following
-                }]
-            }, {
-                follow_status: false,
-                follow_back: false
-            })
-            .exec(function(err, result) {
-
-                if (err) {
-                    log.info("found err" + err);
-                } else {
-
-                    follower
-                        .update({
-                            $and: [{
-                                following_id: user_id
-                            }, {
-                                user_id: unlink_following
-                            }]
-                        }, {
-                            follow_back: false
-                        })
-                        .exec(function(err, result) {
-                            if (err) {
-                                log.info("found err" + err);
-                            } else {
-                                res.json({
-                                    message: 'Removed following'
-                                })
-                                log.info('Removed following')
-                            }
-                        })
-                }
-
-            })
-
+    if (errors) {
+        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
     }
-    //Get Count of Follwer
+
+    if (following_id == process.env.SUPERUSERID) {
+
+        log.info('You can not unfollow searchtrade user');
+        res.send('You can not unfollow searchtrade user');
+    }
+
+    follower
+        .update({
+            $and: [{
+                user_id: user_id
+            }, {
+                following_id: unlink_following
+            }]
+        }, {
+            follow_status: false,
+            follow_back: false
+        })
+        .exec(function(err, result) {
+
+            if (err) {
+
+                log.info("found err" + err);
+                res.send(err);
+
+            } else {
+
+                follower
+                    .update({
+                        $and: [{
+                            following_id: user_id
+                        }, {
+                            user_id: unlink_following
+                        }]
+                    }, {
+                        follow_back: false
+                    })
+                    .exec(function(err, result) {
+                        if (err) {
+                            log.info("found err" + err);
+                        } else {
+                            res.json({
+                                message: 'Removed following'
+                            })
+                            log.info('Removed following')
+                        }
+                    })
+            }
+
+        })
+
+}
+
+//Get Count of Follwer
 var getCountFollower = function(req, res) {
 
     var user_id = req.params.user_id;

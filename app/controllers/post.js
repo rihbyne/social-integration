@@ -510,8 +510,9 @@ var setpost = function(req, res) { // create a post
     master.updateUser(userid, function(err, updateResult) {
 
         if (err) {
-            log.error(err);
-            res.send(err);
+            log.error(updateResult);
+            res.send(updateResult);
+            return;
         }
 
         // save the post and check for errors
@@ -626,42 +627,48 @@ var setuser = function(req, res) { //Create new user
                     return;
                 }
 
-                var postData = querystring.stringify({
-                    'user_id': userId,
-                    'following_id': process.env.SUPERUSERID //superuser id 
+                if(result){
 
-                });
+                    var postData = querystring.stringify({
+                        'user_id': userId,
+                        'following_id': process.env.SUPERUSERID //superuser id 
 
-                var options = {
-                    hostname: process.env.NODE_SERVER_IP,
-                    port: process.env.NODE_SERVER_PORT,
-                    path: '/setfollowing',
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Content-Length': postData.length
-                    }
-                };
-
-                var req = http.request(options, (res) => {
-                    console.log(`STATUS: ${res.statusCode}`);
-                    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-                    res.setEncoding('utf8');
-                    res.on('data', (chunk) => {
-                        console.log(`BODY: ${chunk}`);
                     });
-                    res.on('end', () => {
-                        console.log('No more data in response.')
-                    })
-                });
 
-                req.on('error', (e) => {
-                    console.log(`problem with request: ${e.message}`);
-                });
+                    var options = {
+                        hostname: process.env.NODE_SERVER_IP,
+                        port: process.env.NODE_SERVER_PORT,
+                        path: '/setfollowing',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Content-Length': postData.length
+                        }
+                    };
 
-                // write data to request body
-                req.write(postData);
-                req.end();
+                    var req = http.request(options, (res) => {
+                        console.log(`STATUS: ${res.statusCode}`);
+                        console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+                        res.setEncoding('utf8');
+                        res.on('data', (chunk) => {
+                            console.log(`BODY: ${chunk}`);
+                        });
+                        res.on('end', () => {
+                            console.log('No more data in response.')
+                        })
+                    });
+
+                    req.on('error', (e) => {
+                        console.log(`problem with request: ${e.message}`);
+                    });
+
+                    // write data to request body
+                    req.write(postData);
+                    req.end();
+                }
+                else{
+                    log.error('super user is not registered');
+                }
 
             })
 

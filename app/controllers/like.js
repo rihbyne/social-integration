@@ -31,14 +31,17 @@ var setLike = function(req, res) {
 
         collectionName = postModel.post;
         postId = post_id
+
     } else if (type == 2) { //retweet
 
         collectionName = postModel.retweet_quote;
         postId = retweet_quote_id
+
     } else if (type == 3) { //reply
 
         collectionName = postModel.reply;
         postId = reply_id
+        
     }
 
     collectionName

@@ -98,10 +98,12 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
         }
 
         mention.save(function(err) {
+
             if (err) {
                 log.error(err);
                 res.send(err);
             }
+
         });
 
     };
@@ -162,10 +164,12 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
 
         //find keyword if it is present update count, other wise create new trend
         hashtag.save(function(err) {
+
             if (err) {
                 log.error(err);
                 res.send(err);
             }
+
         });
 
     };
@@ -209,7 +213,7 @@ var isFollowing = function(user_id, following_id, callback) {
             } else {
                 return callback(false);
             }
-            
+
         })
 }
 
@@ -245,6 +249,8 @@ var getPrivacyStatus = function(userid, loggedid, callback) {
 
 var updateUser = function(userid, callback) {
 
+    log.info('Update user api called');
+    
     user
         .findOneAndUpdate({
             _id: userid
@@ -259,14 +265,14 @@ var updateUser = function(userid, callback) {
                 callback(true, err);
             }
 
-            if (updateResult.length !== 0) {
+            if (updateResult) {
 
                 callback(null, updateResult);
 
-            } else{
+            } else {
 
                 callback(true, 'No user found to update');
-                
+
             }
 
         })
@@ -304,5 +310,5 @@ module.exports = ({
     getusername: getusername,
     isFollowing: isFollowing,
     getPrivacyStatus: getPrivacyStatus,
-    updateUser:updateUser
+    updateUser: updateUser
 })

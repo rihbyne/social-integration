@@ -12,6 +12,7 @@ var master = require('./master.js');
 
 //Set following
 var setfollowing = function(req, res) {
+    
     var user_id = req.body.user_id; // User Id
     var following_id = req.body.following_id; // Following Id
     var follow_back;
@@ -289,11 +290,8 @@ var unlink_following = function(req, res) {
 
     follower
         .update({
-            $and: [{
-                user_id: user_id
-            }, {
-                following_id: unlink_following
-            }]
+            user_id: user_id,
+            following_id: unlink_following
         }, {
             follow_status: false,
             follow_back: false
@@ -309,11 +307,9 @@ var unlink_following = function(req, res) {
 
                 follower
                     .update({
-                        $and: [{
-                            following_id: user_id
-                        }, {
-                            user_id: unlink_following
-                        }]
+                        following_id: user_id,
+                        user_id: unlink_following
+
                     }, {
                         follow_back: false
                     })

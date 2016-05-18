@@ -10,11 +10,12 @@ var gethashtag = function(req, res) { // get a post
     post_model.post_hashtag
         .find(function(err, allhashtag) {
 
-            if (err) {
-                log.error(err);
-                res.send(err);
-            }
-
+           if (err) {
+                    
+                    log.error(err);
+                    res.send(err);
+                    return;
+                }
             res.json({
                 posts: allhashtag
             });
@@ -39,9 +40,11 @@ var allhashtagcount = function(req, res) { // get a post
     }, function(err, allhashtag) {
 
         if (err) {
-            log.error(err);
-            res.send(err);
-        }
+                    
+                    log.error(err);
+                    res.send(err);
+                    return;
+                }
 
         res.json({
             posts: allhashtag
@@ -70,9 +73,11 @@ var hashtagcount = function(req, res) { // get a post
     }, function(err, allhashtag) {
 
         if (err) {
-            log.error(err);
-            res.send(err);
-        }
+                    
+                    log.error(err);
+                    res.send(err);
+                    return;
+                }
 
         res.json({
             posts: allhashtag
@@ -85,6 +90,7 @@ var hashtagcount = function(req, res) { // get a post
 
 //Get all post
 var gethashtaglist = function(req, res) { // get a post 
+
     log.info('Show all HashTag');
 
     // find the hashtag and check for errors
@@ -95,9 +101,11 @@ var gethashtaglist = function(req, res) { // get a post
         log.info(result);
 
         if (err) {
-            log.error(err);
-            res.send(err);
-        }
+                    
+                    log.error(err);
+                    res.send(err);
+                    return;
+                }
 
         res.json({
             message: result
@@ -175,8 +183,10 @@ var gethashposts = function(req, res) { // get a post
             .exec(function(err, hashtagpost) {
 
                 if (err) {
+                    
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 if (hashtagpost.length !== '') {
@@ -184,9 +194,6 @@ var gethashposts = function(req, res) { // get a post
                     // log.info(mentionspost);
 
                     callback(null, hashtagpost)
-                    // res.json({
-                    //     posts: mentionspost
-                    // });
 
                 } else {
 
@@ -220,23 +227,19 @@ var gethashposts = function(req, res) { // get a post
             .exec(function(err, hashtagpost) {
 
                 if (err) {
+                    
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 if (hashtagpost.length !== '') {
 
                     callback(null, hashtagpost);
 
-                    // res.json({
-                    //     posts: mentionspost
-                    // });
-
                 } else {
 
                     callback(null, [])
-
-                    // res.json('No Post Found')
                 }
 
             });
@@ -263,15 +266,16 @@ var gethashposts = function(req, res) { // get a post
             .exec(function(err, hashtagpost) {
 
                 if (err) {
+                    
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 if (hashtagpost.length !== '') {
 
                     callback(null, hashtagpost)
-                    log.info('hashtag post', 
-                        hashtagpost)
+                    log.info('hashtag post', hashtagpost)
 
                 } else {
 

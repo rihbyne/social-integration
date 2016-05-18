@@ -17,8 +17,10 @@ var getUserId = function(username, res) {
         .exec(function(err, userdata) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
 
             } else if (userdata.length !== 0) {
 
@@ -44,13 +46,16 @@ var getusername = function(id, res) {
         .exec(function(err, userdata) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
+
             } else if (userdata.length !== 0) {
 
                 username = userdata[0].username;
-
                 return res(null, username);
+
             } else {
 
                 return res(true, 'No user found');
@@ -100,8 +105,10 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
         mention.save(function(err) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
         });
@@ -131,9 +138,12 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
                 }, function(err, result) {
 
                     if (err) {
+
                         log.error(err);
                         res.send(err);
+                        return;
                     }
+
                     log.info('Trends updated');
                 })
 
@@ -166,8 +176,10 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
         hashtag.save(function(err) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
         });
@@ -203,14 +215,20 @@ var isFollowing = function(user_id, following_id, callback) {
         .exec(function(err, result) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
+
             log.info('isFollowing Result', result);
 
             if (result.length !== 0) {
+
                 return callback(true); //following
+
             } else {
+
                 return callback(false);
             }
 
@@ -241,6 +259,7 @@ var getPrivacyStatus = function(userid, loggedid, callback) {
 
             callback(null, privacyStatus);
             console.info('master', privacyStatus);
+
         });
 
     }
@@ -250,7 +269,7 @@ var getPrivacyStatus = function(userid, loggedid, callback) {
 var updateUser = function(userid, callback) {
 
     log.info('Update user api called');
-    
+
     user
         .findOneAndUpdate({
             _id: userid
@@ -289,6 +308,8 @@ function isValidUser(collectionName, query, callback) {
             if (err) {
 
                 log.error(err);
+                res.send(err);
+                return;
             }
 
             if (postResult.length === 0) {
@@ -310,5 +331,6 @@ module.exports = ({
     getusername: getusername,
     isFollowing: isFollowing,
     getPrivacyStatus: getPrivacyStatus,
-    updateUser: updateUser
+    updateUser: updateUser,
+    isValidUser: isValidUser
 })

@@ -12,15 +12,17 @@ var master = require('./master.js');
 
 //Set following
 var setfollowing = function(req, res) {
-    
+
     var user_id = req.body.user_id; // User Id
     var following_id = req.body.following_id; // Following Id
     var follow_back;
+
     //validation for blank variables
     req.checkBody('user_id', 'User id is mandatory').notEmpty();
     req.checkBody('following_id', 'following_id is mandatory').notEmpty();
 
     var errors = req.validationErrors();
+
     if (errors) {
         log.warn('There have been validation errors: \n' + util.inspect(errors));
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
@@ -38,39 +40,37 @@ var setfollowing = function(req, res) {
     // validation for the profile if already followed
     follower
         .find({
-            $and: [{
-                user_id: user_id
-            }, {
-                following_id: following_id
-            }, {
-                follow_status: true
-            }]
+            user_id: user_id,
+            following_id: following_id,
+            follow_status: true
         })
+        .lean()
         .exec(function(err, result) {
 
             if (result.length !== 0) {
+
                 log.info('User already following');
-                // res.json({
-                //     message: 'User already following'
-                // })
+                res.json({
+                    message: 'User already following'
+                })
                 return;
+
             } else { //add new follower
                 log.info('update follower status');
 
                 follower
                     .find({
-                        $and: [{
-                            user_id: following_id
-                        }, {
-                            following_id: user_id
-                        }]
+                        user_id: following_id,
+                        following_id: user_id
                     })
+                    .lean()
                     .select('follow_back')
                     .exec(function(err, result) {
 
                         if (err) {
                             log.error(err);
                             res.send(err);
+                            return;
                         }
 
                         if (result.length == 1) {
@@ -87,6 +87,7 @@ var setfollowing = function(req, res) {
                                     if (err) {
                                         log.error(err);
                                         res.send(err);
+                                        return;
                                     }
 
                                     log.info(statusResult);
@@ -115,6 +116,7 @@ var setfollowing = function(req, res) {
                                     if (err) {
                                         log.error(err);
                                         res.send(err);
+                                        return;
                                     }
 
                                     log.info('following/followers set saved');
@@ -135,6 +137,7 @@ var setfollowing = function(req, res) {
                                         if (err) {
                                             log.error(err);
                                             res.send(err);
+                                            return;
                                         }
 
                                         log.info('following/followers update');
@@ -184,6 +187,7 @@ var getfollowing = function(req, res) {
             if (err) {
                 log.error(err);
                 res.send(err);
+                return;
             }
 
             if (result.length !== 0) {
@@ -204,6 +208,7 @@ var getfollowing = function(req, res) {
                         if (err) {
                             log.error(err);
                             res.send(err);
+                            return;
                         }
 
                         res.json({
@@ -234,6 +239,7 @@ var getfollowers = function(req, res) {
             username: user_name
         })
         .select('_id')
+        .lean()
         .exec(function(err, result) {
 
             if (result.length !== 0) {
@@ -244,11 +250,13 @@ var getfollowers = function(req, res) {
                         follow_status: true
                     })
                     .populate('following_id user_id')
+                    .lean()
                     .exec(function(err, followerResult) {
 
                         if (err) {
                             log.error(err);
                             res.send(err);
+                            return;
                         }
 
                         res.json({
@@ -314,13 +322,17 @@ var unlink_following = function(req, res) {
                         follow_back: false
                     })
                     .exec(function(err, result) {
+
                         if (err) {
                             log.info("found err" + err);
+
                         } else {
+
                             res.json({
                                 message: 'Removed following'
                             })
                             log.info('Removed following')
+                            
                         }
                     })
             }
@@ -352,9 +364,10 @@ var getCountFollower = function(req, res) {
                         follow_status: true
                     }, function(err, followercount) {
                         if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
+                log.error(err);
+                res.send(err);
+                return;
+            }
                         log.info('Count is ' + followercount);
                         res.json({
                             FollowerCount: followercount
@@ -391,9 +404,10 @@ var getCountFollowing = function(req, res) {
                         following_id: following_id
                     }, function(err, followingcount) {
                         if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
+                log.error(err);
+                res.send(err);
+                return;
+            }
                         log.info('Count is ' + followingcount);
                         res.json({
                             Followingcount: followingcount

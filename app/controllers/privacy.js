@@ -62,6 +62,7 @@ var updatePrivacy = function(req, res) {
         if (err) {
             log.error(validResult);
             res.send(validResult);
+            return;
         }
 
         console.info(validResult);
@@ -76,6 +77,7 @@ var updatePrivacy = function(req, res) {
                 if (err) {
                     log.error(validResult);
                     res.send(validResult);
+                    return;
                 };
 
                 res.json('Privacy setting Updated');

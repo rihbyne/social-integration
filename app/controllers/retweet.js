@@ -3,7 +3,7 @@ var master = require('./master.js');
 var log = require('../../config/logging')();
 
 //Set retweet
-var setretweet = function (req, res) {
+var setretweet = function(req, res) {
 
     var post_id = req.body.post_id;
     var post_type = req.body.post_type;
@@ -11,7 +11,7 @@ var setretweet = function (req, res) {
     var retweet_type = req.body.retweet_type;
     var retweet_quote = req.body.retweet_quote;
     var collectionName, message, userIdFrom, query;
-    var privacy_setting = req.body.privacy_setting; 
+    var privacy_setting = req.body.privacy_setting;
 
     log.info('Retweet Api hitted');
 
@@ -28,7 +28,7 @@ var setretweet = function (req, res) {
     if (retweet_type == 2) {
 
         req.checkBody('retweet_quote', 'Can not post empty tweet').notEmpty();
-        req.checkBody('retweet_type','0 to 300 characters required').len(0, 300);
+        req.checkBody('retweet_type', '0 to 300 characters required').len(0, 300);
     };
 
     var errors = req.validationErrors();
@@ -87,7 +87,6 @@ var setretweet = function (req, res) {
 
             if (retweetResult.length !== 0) {
 
-
                 if (post_type == 1) { //if post
 
                     var retweetUser = retweetResult[0].posted_by;
@@ -95,10 +94,12 @@ var setretweet = function (req, res) {
                 } else if (post_type == 2) { //if retweet
 
                     if (retweet_type == 1) { //simple retweet
-                        var retweetUser = retweetResult[0].ret_user_id;
-                    } else if (retweet_type == 2) {
+
                         var retweetUser = retweetResult[0].ret_user_id;
 
+                    } else if (retweet_type == 2) {
+
+                        var retweetUser = retweetResult[0].ret_user_id;
                     }
 
                 } else if (post_type == 3) { //if reply        
@@ -116,7 +117,14 @@ var setretweet = function (req, res) {
                             .lean()
                             .exec(function(err, simpleRetweet) {
 
-                                if (simpleRetweet.length == 0) { //save new tweet
+                                if (err) {
+
+                                    log.error(err)
+                                    res.send(err);
+                                    return;
+                                }
+
+                                if (simpleRetweet.length == 0) { //save new simple tweet
 
                                     if (post_type == 1) {
 
@@ -156,6 +164,7 @@ var setretweet = function (req, res) {
                                             return;
                                         }
 
+                                        //increment simple retweet count
                                         setretweetcount(post_id, post_type, collectionName, function() {
 
                                             log.info(message);
@@ -181,6 +190,7 @@ var setretweet = function (req, res) {
                                                 return;
                                             }
 
+                                            //increment simple retweet count
                                             setretweetcount(post_id, post_type, collectionName, function() {
 
                                                 log.info('Retweet document removed');
@@ -272,7 +282,7 @@ var setretweet = function (req, res) {
 
                             master.hashtagMention(2, retweet, mentionusers, hashtags, function(err, result) {
 
-                                if (err){
+                                if (err) {
 
                                     log.error(err)
                                     res.send(err);
@@ -323,18 +333,25 @@ var getretweet = function(req, res) {
     var query;
 
     if (post_type == 1) {
+
         var query = {
             post_id: post_id
         }
+
     } else if (post_type == 2) {
+
         var query = {
             retweet_quote_id: post_id
         }
+
     } else if (post_type == 3) {
+
         var query = {
             reply_id: post_id
         }
+
     } else {
+
         log.info('wrong post type');
         res.json({
             Result: 'No post_type found'
@@ -374,20 +391,28 @@ var setretweetcount = function(post_id, post_type, collectionName, res) {
     var query;
 
     if (post_type == 1) {
+
         query = {
             post_id: post_id
         }
+
     } else if (post_type == 2) {
+
         query = {
             retweet_quote_id: post_id
         }
+
     } else if (post_type == 3) {
+
         query = {
             reply_id: post_id
         }
+
     } else {
+
         log.info('collectionName is blank');
         return;
+
     }
 
     if (collectionName !== '') {
@@ -412,8 +437,7 @@ var setretweetcount = function(post_id, post_type, collectionName, res) {
                             return;
                         }
 
-                        log.info(postUpdateResult);
-
+                        // log.info(postUpdateResult);
                         res(null, postUpdateResult)
 
                     });
@@ -445,12 +469,16 @@ var deleteRetweet = function(req, res) {
             }
 
             if (result == null || result == undefined || result == "") {
-                log.info('No Retweet Found');
-                res.send('No Retweet Found');
+
+                log.info('Can not delete retweet');
+                res.send('Can not delete retweet');
                 return;
+
             } else {
-                log.info('Reply Deleted');
-                res.send('Retweet Deleted Successfully');
+
+                log.info('Quote retweet Deleted Successfully');
+                res.send('Quote retweet Deleted Successfully');
+
             }
 
         })

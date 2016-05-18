@@ -1,7 +1,7 @@
-var postModel 	= require('../models/postSchema.js');		// Including postModel File
-var async		= require('async');
+var postModel = require('../models/postSchema.js'); // Including postModel File
+var async = require('async');
 
-var master     = require('./master.js');
+var master = require('./master.js');
 var notificationModel = require('../models/notificationSchema.js');
 
 var log = require('../../config/logging')()
@@ -41,7 +41,7 @@ var setLike = function(req, res) {
 
         collectionName = postModel.reply;
         postId = reply_id
-        
+
     }
 
     collectionName
@@ -70,6 +70,13 @@ var setLike = function(req, res) {
                         .lean()
                         .exec(function(err, likedata) {
 
+                            if (err) {
+
+                                log.error(err);
+                                res.send(err);
+                                return;
+                            }
+
                             // Post is Already liked by the same user
                             if (likedata.length !== 0) {
                                 log.info('Make it unlike.');
@@ -86,8 +93,10 @@ var setLike = function(req, res) {
                                     .exec(function(err, result) {
 
                                         if (err) {
+
                                             log.error(err);
                                             res.send(err);
+                                            return;
                                         }
 
                                         log.info('Post Unliked', result);
@@ -105,10 +114,11 @@ var setLike = function(req, res) {
                                 likeModel.save(function(err) {
 
                                     if (err) {
+
                                         log.error(err);
                                         res.send(err);
+                                        return;
                                     }
-
                                     log.info('Post Like');
                                     res.send('Post Liked Successfully');
 
@@ -134,6 +144,13 @@ var setLike = function(req, res) {
                         .lean()
                         .exec(function(err, likedata) {
 
+                            if (err) {
+
+                                log.error(err);
+                                res.send(err);
+                                return;
+                            }
+
                             // Retweet is Already liked by the same user
                             if (likedata.length !== 0) {
                                 log.info('Make it unlike.');
@@ -150,8 +167,10 @@ var setLike = function(req, res) {
                                     .exec(function(err, result) {
 
                                         if (err) {
+
                                             log.error(err);
                                             res.send(err);
+                                            return;
                                         }
 
                                         log.info('Retweet Unliked', result);
@@ -169,8 +188,10 @@ var setLike = function(req, res) {
                                 likeModel.save(function(err) {
 
                                     if (err) {
+
                                         log.error(err);
                                         res.send(err);
+                                        return;
                                     }
 
                                     log.info('Retweet Like');
@@ -214,10 +235,11 @@ var setLike = function(req, res) {
                                     .exec(function(err, result) {
 
                                         if (err) {
+
                                             log.error(err);
                                             res.send(err);
+                                            return;
                                         }
-
                                         log.info('Reply Unliked', result);
                                         res.send('Reply Unliked Successfully');
                                     })
@@ -233,10 +255,11 @@ var setLike = function(req, res) {
                                 likeModel.save(function(err) {
 
                                     if (err) {
+
                                         log.error(err);
                                         res.send(err);
+                                        return;
                                     }
-
                                     log.info('Reply Like');
                                     res.send('Reply Like Successfully');
 
@@ -271,6 +294,13 @@ var getLikeByPost = function(req, res) {
         })
         .exec(function(err, postLikeResult) {
 
+            if (err) {
+
+                log.error(err);
+                res.send(err);
+                return;
+            }
+
             log.info(postLikeResult.length + '\n' + postLikeResult);
 
             res.json({
@@ -292,10 +322,14 @@ var getLikeByRetweet = function(req, res) {
             retweet_quote_id: retweet_quote_id
         })
         .exec(function(err, retweetLikeResult) {
+
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
+
             log.info(retweetLikeResult.length + '\n' + retweetLikeResult);
 
             res.json({
@@ -318,6 +352,13 @@ var getLikeByReply = function(req, res) {
         })
         .exec(function(err, replyLikeResult) {
 
+            if (err) {
+
+                log.error(err);
+                res.send(err);
+                return;
+            }
+
             log.info(replyLikeResult.length + '\n' + replyLikeResult);
 
             res.json({
@@ -336,9 +377,13 @@ var getLikeByUser = function(req, res) { //get new like
     master.getUserId(username, function(err, user_id) {
 
         if (err) {
+
             log.error(err);
             res.send(err);
+            return;
+
         }
+
         async.parallel([
 
             postLike,
@@ -370,10 +415,12 @@ var getLikeByUser = function(req, res) { //get new like
                 .populate('post_id')
                 .exec(function(err, userPostLikeResult) {
 
-                   if (err) {
-                log.error(err);
-                res.send(err);
-            }
+                    if (err) {
+
+                        log.error(err);
+                        res.send(err);
+                        return;
+                    }
                     //log.info(userPostLikeResult);
                     callback(null, userPostLikeResult);
 
@@ -389,8 +436,10 @@ var getLikeByUser = function(req, res) { //get new like
                 .exec(function(err, userRetweetLikeResult) {
 
                     if (err) {
+
                         log.error(err);
                         res.send(err);
+                        return;
                     }
 
                     callback(null, userRetweetLikeResult);
@@ -407,9 +456,12 @@ var getLikeByUser = function(req, res) { //get new like
                 .exec(function(err, userRetweetLikeResult) {
 
                     if (err) {
+
                         log.error(err);
                         res.send(err);
+                        return;
                     }
+
                     callback(null, userRetweetLikeResult);
 
                 });
@@ -432,8 +484,10 @@ var setLikeCount = function(id, type, res) {
             .exec(function(err, postLikeCount) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 postModel.post
@@ -445,10 +499,11 @@ var setLikeCount = function(id, type, res) {
                     .exec(function(err, postUpdateResult) {
 
                         if (err) {
+
                             log.error(err);
                             res.send(err);
+                            return;
                         }
-
                         res(postUpdateResult);
 
                     })
@@ -468,8 +523,10 @@ var setLikeCount = function(id, type, res) {
             .exec(function(err, retweetLikeCount) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 postModel.retweet_quote
@@ -481,8 +538,10 @@ var setLikeCount = function(id, type, res) {
                     .exec(function(err, retweetUpdateResult) {
 
                         if (err) {
+
                             log.error(err);
                             res.send(err);
+                            return;
                         }
 
                         res(retweetUpdateResult);
@@ -504,8 +563,10 @@ var setLikeCount = function(id, type, res) {
             .exec(function(err, replyLikeCount) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 postModel.reply
@@ -517,8 +578,10 @@ var setLikeCount = function(id, type, res) {
                     .exec(function(err, replytUpdateResult) {
 
                         if (err) {
+
                             log.error(err);
                             res.send(err);
+                            return;
                         }
 
                         res(replytUpdateResult);
@@ -539,21 +602,28 @@ var getlike = function(req, res) {
     var query, collectionName;
 
     if (post_type == 1) {
+
         collectionName = postModel.post_like;
         query = {
             post_id: post_id
         }
+
     } else if (post_type == 2) {
+
         collectionName = postModel.retweet_like;
         query = {
             retweet_quote_id: post_id
         }
+
     } else if (post_type == 3) {
+
         collectionName = postModel.reply_id;
         query = {
             reply_id: post_id
         }
+
     } else {
+
         log.info('wrong post type');
         res.json({
             Result: 'No post_type found'
@@ -569,8 +639,10 @@ var getlike = function(req, res) {
         .exec(function(err, getRetweetResult) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
             log.info(getRetweetResult.length);

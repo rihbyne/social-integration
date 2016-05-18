@@ -296,6 +296,13 @@ var getReply = function(req, res) {
 				.lean()
 				.exec(function(err, result) {
 
+                    if (err) {
+
+                        log.error(err)
+                        res.send(err);
+                        return;
+                    }    
+
 					singleretweetReplys.count = result;
 					callback();
 
@@ -311,6 +318,7 @@ var getReply = function(req, res) {
     }
 
     if (type == 3 || type == '3') {
+
         var reply_id = id;
 
         post_model.reply
@@ -343,6 +351,13 @@ var getReply = function(req, res) {
                         })
                         .lean()
                         .exec(function(err, result) {
+
+                            if (err) {
+
+                                log.error(err)
+                                res.send(err);
+                                return;
+                            }
 
                             singlereplyReplys.count = result;
                             callback();
@@ -396,6 +411,7 @@ var deletereply = function(req, res) {
                 res.json({
                     message: 'Reply Deleted'
                 });
+
             } else {
 
                 log.info('No Reply Found');
@@ -403,6 +419,7 @@ var deletereply = function(req, res) {
                 res.json({
                     message: 'No Reply Found'
                 });
+                
             }
 
         });

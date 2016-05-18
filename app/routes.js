@@ -145,7 +145,7 @@ module.exports = function(app, passport) {
     app.delete('/deleteretweet', retweet.deleteRetweet);       						// delete retweet
 
     //Post
-    app.get('/getpost/:user', post.getuserposts);        							// Get post by username
+    //app.get('/getpost/:user', post.getuserposts);        							// Get post by username
     app.get('/getpost/:user/:post_id', post.getuserpost);      						// Get single post of user
     app.get('/getpost/count/:user', post.getuserpostcount);     					// Get post count by username
     app.delete('/deletepost', post.deletepost);         							// delete post

@@ -66,8 +66,10 @@ var getmentionuser = function(req, res) { // get a post
             .exec(function(err, mentionspost) {
 
                 if (err) {
+                    
                     log.error(err);
                     res.send(err);
+                    return;
                 }
                 
                 if (mentionspost.length !== '') {
@@ -106,8 +108,10 @@ var getmentionuser = function(req, res) { // get a post
             .exec(function(err, mentionspostdata) {
 
                 if (err) {
+                    
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 if (mentionspostdata.length !== '') {
@@ -146,8 +150,10 @@ var getmentionuser = function(req, res) { // get a post
             .exec(function(err, mentionspost) {
 
                 if (err) {
+                    
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 if (mentionspost.length !== '') {

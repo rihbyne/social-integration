@@ -6,7 +6,7 @@ var log = require('../../config/logging')();
 var homeTimeline = function(req, res) {
 
     log.info('home timeline api hitted');
-    //FInd 10 active follwing
+
     var userid = req.body.userid;
 
     req.checkBody('userid', 'User id is mandatory').notEmpty();
@@ -14,11 +14,12 @@ var homeTimeline = function(req, res) {
     var errors = req.validationErrors();
 
     if (errors) {
-        // res.send('There have been validation errors: ' + util.inspect(errors), 400);
+        log.info('There have been validation errors: ' + util.inspect(errors));
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
 
+    //find latest following users 
     follower
         .find({
             user_id: userid,
@@ -28,7 +29,6 @@ var homeTimeline = function(req, res) {
         .populate({
             path: 'following_id',
             select: ('_id update_at')
-
         })
         .sort({
             'update_at': -1
@@ -38,35 +38,30 @@ var homeTimeline = function(req, res) {
         .exec(function(err, followingResult) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
-            if (followingResult.length == 0) {
+            //find update time of logged user
+            user
+                .find({
+                    _id: userid
+                })
+                .select('_id update_at')
+                .exec(function(err, userResult) {
 
-                log.info('No Following Found');
-                res.send('No Result Found');
+                    if (err) {
 
-            } else {
+                        log.error(err);
+                        res.send(err);
+                        return;
+                    }
+                    //if result is not blank
+                    if (userResult.length !== 0) {
 
-                // log.info(followingResult[2]);
-
-                var options = {
-                    path: 'user_id'
-                }
-
-                user
-                    .find({
-                        _id: userid
-                    })
-                    .select('update_at')
-                    .exec(function(err, userResult) {
-
-                        if (err) {
-                            log.error(err);
-                            res.send(err);
-                        };
-
+                        //make array of following uses
                         followingIds = followingResult.map(function(singleFollowing) {
 
                             return singleFollowing.following_id._id;
@@ -75,24 +70,29 @@ var homeTimeline = function(req, res) {
 
                         var showPostLoggedUser = 'false';
 
-                        if (userResult[0].update_at <= followingResult[0].following_id.update_at) {
+                        //if following users avaliable
+                        if (followingResult.length !== 0) {
 
-                            followingResult[followingResult.length++] = userResult[0];
+                            if (userResult[0].update_at <= followingResult[0].following_id.update_at) {
 
-                            console.info(followingResult);
+                                followingResult[followingResult.length++] = userResult[0];
 
-                            var showPostLoggedUser = 'true';
-                        }
+                                console.info(followingResult);
 
-                        if (showPostLoggedUser) {
+                                var showPostLoggedUser = 'true';
+                            }
+
+                            log.info(userResult[0].update_at + '' + followingResult[0].following_id.update_at);
+
+                        } else {
 
                             followingIds.push(userResult[0]._id);
 
                         }
 
-                        log.info(userResult[0].update_at + '' + followingResult[0].following_id.update_at);
                         log.info('show post logged user: ', showPostLoggedUser);
 
+                        //async call for post, retweet, quote, reply
                         async.parallel([
                                 callback => getPostByUserId(showPostLoggedUser, userid, callback),
                                 callback => getRetweetByUserId(showPostLoggedUser, userid, callback),
@@ -103,20 +103,15 @@ var homeTimeline = function(req, res) {
 
                                 if (err) {
 
-                                    if (result[0] === 0) {
-                                        log.info('Own posts are zero');
-                                        var homePosts = result[1]
-                                    }
-
-                                    if (result[1] === 0) {
-                                        log.info('Retweet posts are zero');
-                                        var homePosts = result[0]
-                                    }
+                                    log.info(err);
+                                    res.send(err);
 
                                 } else {
 
+                                    //Make one homeposts array
                                     var homePosts = result[0].concat(result[1]).concat(result[2]).concat(result[3]); //Got two result , concent two results
 
+                                    //date wise sort
                                     function custom_sort(a, b) {
                                         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                                     }
@@ -130,13 +125,14 @@ var homeTimeline = function(req, res) {
 
                             })
 
-                    });
+                    } else {
+                        log.info('user not found');
+                        res.send('user not found');
+                    }
 
-            }
+                });
 
         })
-
-    //Find post, retweet, reply of follwing user
 
 }
 
@@ -431,7 +427,6 @@ function getQuoteRetweetByUserId(showPostLoggedUser, userid, callback) { //simpl
                     }, function(err) {
 
                         // log.info(retweets);
-
                         return callback(null, retweets);
 
                     });

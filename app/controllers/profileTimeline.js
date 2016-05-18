@@ -105,6 +105,7 @@ var getuserhomeposts = function(req, res) { // get a post
         if (err) {
             log.error(err);
             res.send(err);
+            return;
         };
 
         //using async series function get all post 
@@ -168,8 +169,11 @@ var getpostsrtreply = function(req, res) { // get a post
     master.getPrivacyStatus(userid, loggedid, function(err, privacyStatus) {
 
         if (err) {
+
             log.error(err);
             res.send(err);
+            return;
+
         };
 
         //using async series function get all post 
@@ -290,11 +294,13 @@ function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
     var query, privacyStatus;
 
     switch (privacyStatus) {
+
         case 1:
             query = {
                 ret_user_id: userid
             }
             break;
+
         case 2:
             query = {
                 $and: [{
@@ -306,6 +312,7 @@ function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
                 }]
             }
             break;
+
         default:
             query = {
                 ret_user_id: userid,
@@ -323,9 +330,11 @@ function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
         .exec(function(err, retweets) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
                 return
+
             } else if (retweets.length == 0) {
 
                 callback(null, []); //No post found
@@ -399,11 +408,13 @@ function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple ret
     var query, privacyStatus;
 
     switch (privacyStatus) {
+
         case 1:
             query = {
                 ret_user_id: userid
             }
             break;
+
         case 2:
             query = {
                 $and: [{
@@ -415,6 +426,7 @@ function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple ret
                 }]
             }
             break;
+
         default:
             query = {
                 ret_user_id: userid,
@@ -432,9 +444,11 @@ function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple ret
         .exec(function(err, retweets) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
                 return
+
             } else if (retweets.length == 0) {
 
                 callback(null, []); //No post found
@@ -508,11 +522,13 @@ function getReplyByUserId(userid, privacyStatus, callback) {
     var query, privacyStatus;
 
     switch (privacyStatus) {
+
         case 1:
             query = {
                 reply_user_id: userid
             }
             break;
+
         case 2:
             query = {
                 $and: [{
@@ -524,6 +540,7 @@ function getReplyByUserId(userid, privacyStatus, callback) {
                 }]
             }
             break;
+
         default:
             query = {
                 reply_user_id: userid,
@@ -541,6 +558,7 @@ function getReplyByUserId(userid, privacyStatus, callback) {
         .exec(function(err, postReplyResult) {
 
             if (err) {
+                
                 log.error(err);
                 res.send(err);
                 return

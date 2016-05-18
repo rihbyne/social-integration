@@ -50,8 +50,10 @@ var getuserdetails = function(req, res) {
             .exec(function(err, allpost) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 // log.info(allpost);
@@ -65,9 +67,12 @@ var getuserdetails = function(req, res) {
                             .exec(function(err, countPostLikes) {
 
                                 if (err) {
+
                                     log.error(err);
                                     res.send(err);
+                                    return;
                                 }
+
                                 // log.info(countPostLikes);
                                 if (countPostLikes !== 0) {
                                     singlepost.postLikeCount = countPostLikes;
@@ -106,9 +111,12 @@ var getuserdetails = function(req, res) {
                         .exec(function(err, postcount) {
 
                             if (err) {
+
                                 log.error(err);
                                 res.send(err);
+                                return;
                             }
+
                             callback(null, postcount);
 
                         });
@@ -124,8 +132,10 @@ var getuserdetails = function(req, res) {
                         .exec(function(err, retweetcount) {
 
                             if (err) {
+
                                 log.error(err);
                                 res.send(err);
+                                return;
                             }
 
                             callback(null, retweetcount);
@@ -143,8 +153,10 @@ var getuserdetails = function(req, res) {
                         .exec(function(err, replycount) {
 
                             if (err) {
+
                                 log.error(err);
                                 res.send(err);
+                                return;
                             }
 
                             callback(null, replycount);
@@ -189,9 +201,11 @@ var getuserdetails = function(req, res) {
             .exec(function(err, results) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
-                };
+                    return;
+                }
 
                 userdetails.trends = results
                 callback(null, userdetails);
@@ -213,8 +227,10 @@ var getuserdetails = function(req, res) {
             .exec(function(err, followingcount) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 userdetails.followingcount = followingcount
@@ -237,8 +253,10 @@ var getuserdetails = function(req, res) {
             .exec(function(err, followercount) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 userdetails.followerCount = followercount
@@ -262,8 +280,10 @@ var trend = function(req, res) {
         .exec(function(err, results) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
             res.json({
@@ -293,8 +313,11 @@ var trend = function(req, res) {
 
 //Get single post of user
 var getsinglepost = function(req, res) { // get a post 
+
     log.info('Show single post');
+
     var post_title = req.params.post_title;
+
     log.info(post_title);
     // get the post and check for errors
 
@@ -303,18 +326,25 @@ var getsinglepost = function(req, res) { // get a post
             post_title: post_title
         })
         .exec(function(err, singlepost) {
+
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
             if (singlepost) {
+
                 res.json({
                     posts: singlepost
                 });
+
             } else {
+
                 log.info('No post found')
                 res.json('No Post Found')
+
             }
 
         });
@@ -328,7 +358,9 @@ var getuserposts = function(req, res) { // get a post
     var finalObj1;
 
     log.info('Show all posts for single user');
+
     var username = req.params.username; // find posts of user and check for errors
+
     log.info('user ', req.params.user);
 
     //find id of user from user collection
@@ -339,8 +371,11 @@ var getuserposts = function(req, res) { // get a post
         .exec(function(err, userdata) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
+
             } else if (userdata.length !== 0) {
                 userid = userdata[0]._id;
                 // log.info(userid);
@@ -359,10 +394,13 @@ var getuserposts = function(req, res) { // get a post
                     .exec(function(err, result) {
 
                         if (err) {
+
                             log.error(err);
                             res.send(err);
+                            return;
 
                         } else if (result.length == 0) {
+
                             res.json({
                                 message: 'No post found'
                             });
@@ -383,6 +421,14 @@ var getuserposts = function(req, res) { // get a post
                                 .limit(10)
                                 .exec(function(err, retweetpostids) {
 
+                                    if (err) {
+
+                                        log.error(err);
+                                        res.send(err);
+                                        return;
+
+                                    }
+
                                     async.each(retweetpostids,
 
                                         function(retweetpostid, callback) {
@@ -390,7 +436,6 @@ var getuserposts = function(req, res) { // get a post
                                             finalObj.push(retweetpostid['post_id'])
 
                                         },
-                                        // 3rd param is the function to call when everything's done
                                         function(err) {
                                             // All tasks are done now
                                         }
@@ -399,13 +444,6 @@ var getuserposts = function(req, res) { // get a post
                                     var finalObj1 = result.concat(finalObj);
 
                                     log.info('\n\n', finalObj1);
-                                    // sortOut(finalObj1, function(){
-
-                                    // var finalObjResult = JSON.stringify(finalObjResult);
-
-                                    // log.info('\n\n', finalObjResult);
-
-                                    // })
 
                                     res.json({
                                         posts: finalObj1
@@ -444,13 +482,18 @@ var getuserpost = function(req, res) { // get a post
             _id: post_id
         })
         .exec(function(err, userposts) {
+
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
+
             res.json({
                 posts: userposts
             });
+
         });
 
 };
@@ -519,8 +562,10 @@ var setpost = function(req, res) { // create a post
         post.save(function(err, result) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
             master.getusername(result.posted_by, function(err, username) {
@@ -544,8 +589,10 @@ var setpost = function(req, res) { // create a post
                     notification.save(function(err) {
 
                         if (err) {
+
                             log.error(err);
                             res.send(err);
+                            return;
                         }
 
                         log.info('Notification Saved');
@@ -557,9 +604,10 @@ var setpost = function(req, res) { // create a post
                 master.hashtagMention(1, post, mentionusers, hashtags, function(err, result) {
 
                     if (err) {
+
                         log.error(err);
                         res.send(err);
-
+                        return;
                     }
 
                     res.json({
@@ -609,9 +657,12 @@ var setuser = function(req, res) { //Create new user
     setuser.save(function(err, result) {
 
         if (err) {
+
             log.error(err);
             res.send(err);
+            return;
         }
+
         // console.log(result);
         var userId = result._id.toString();
 
@@ -619,58 +670,57 @@ var setuser = function(req, res) { //Create new user
         (function setFollowingSearchtradeUser() {
 
             user_model
-            .findById(process.env.SUPERUSERID)
-            .exec(function(err, result){
+                .findById(process.env.SUPERUSERID)
+                .exec(function(err, result) {
 
-                if (err) {
-                    log.error('no searchtrade user exist');
-                    return;
-                }
+                    if (err) {
+                        log.error('no searchtrade user exist');
+                        return;
+                    }
 
-                if(result){
+                    if (result) {
 
-                    var postData = querystring.stringify({
-                        'user_id': userId,
-                        'following_id': process.env.SUPERUSERID //superuser id 
+                        var postData = querystring.stringify({
+                            'user_id': userId,
+                            'following_id': process.env.SUPERUSERID //superuser id 
 
-                    });
-
-                    var options = {
-                        hostname: process.env.NODE_SERVER_IP,
-                        port: process.env.NODE_SERVER_PORT,
-                        path: '/setfollowing',
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Content-Length': postData.length
-                        }
-                    };
-
-                    var req = http.request(options, (res) => {
-                        console.log(`STATUS: ${res.statusCode}`);
-                        console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-                        res.setEncoding('utf8');
-                        res.on('data', (chunk) => {
-                            console.log(`BODY: ${chunk}`);
                         });
-                        res.on('end', () => {
-                            console.log('No more data in response.')
-                        })
-                    });
 
-                    req.on('error', (e) => {
-                        console.log(`problem with request: ${e.message}`);
-                    });
+                        var options = {
+                            hostname: process.env.NODE_SERVER_IP,
+                            port: process.env.NODE_SERVER_PORT,
+                            path: '/setfollowing',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'Content-Length': postData.length
+                            }
+                        };
 
-                    // write data to request body
-                    req.write(postData);
-                    req.end();
-                }
-                else{
-                    log.error('super user is not registered');
-                }
+                        var req = http.request(options, (res) => {
+                            console.log(`STATUS: ${res.statusCode}`);
+                            console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+                            res.setEncoding('utf8');
+                            res.on('data', (chunk) => {
+                                console.log(`BODY: ${chunk}`);
+                            });
+                            res.on('end', () => {
+                                console.log('No more data in response.')
+                            })
+                        });
 
-            })
+                        req.on('error', (e) => {
+                            console.log(`problem with request: ${e.message}`);
+                        });
+
+                        // write data to request body
+                        req.write(postData);
+                        req.end();
+                    } else {
+                        log.error('super user is not registered');
+                    }
+
+                })
 
         })(userId);
         /* setfollowing api called using curl request for superuser*/
@@ -717,8 +767,10 @@ var getuserpostcount = function(req, res) { // get a post
                         .exec(function(err, postcount) {
 
                             if (err) {
+
                                 log.error(err);
                                 res.send(err);
+                                return;
                             }
 
                             callback(null, postcount);
@@ -736,8 +788,10 @@ var getuserpostcount = function(req, res) { // get a post
                         .exec(function(err, retweetcount) {
 
                             if (err) {
+
                                 log.error(err);
                                 res.send(err);
+                                return;
                             }
 
                             callback(null, retweetcount);
@@ -755,8 +809,10 @@ var getuserpostcount = function(req, res) { // get a post
                         .exec(function(err, replycount) {
 
                             if (err) {
+
                                 log.error(err);
                                 res.send(err);
+                                return;
                             }
 
                             callback(null, replycount);
@@ -815,11 +871,13 @@ var deletepost = function(req, res) {
             posted_by: posted_by
         })
         .exec(function(err, result) {
+            
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
-
             if (result !== null) {
 
                 log.info('Post Deleted');
@@ -841,8 +899,10 @@ var deletepost = function(req, res) {
     master.getusername(posted_by, function(err, username) {
 
         if (err) {
+
             log.error(err);
             res.send(err);
+            return;
         }
 
         notificationModel.notification
@@ -853,8 +913,10 @@ var deletepost = function(req, res) {
             .exec(function(err, result) {
 
                 if (err) {
+
                     log.error(err);
                     res.send(err);
+                    return;
                 }
 
                 if (result !== null) {
@@ -877,8 +939,10 @@ var deletepost = function(req, res) {
         .exec(function(err, result) {
 
             if (err) {
+
                 log.error(err);
                 res.send(err);
+                return;
             }
 
             if (result !== null) {

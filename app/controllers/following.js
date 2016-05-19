@@ -332,7 +332,7 @@ var unlink_following = function(req, res) {
                                 message: 'Removed following'
                             })
                             log.info('Removed following')
-                            
+
                         }
                     })
             }
@@ -342,82 +342,122 @@ var unlink_following = function(req, res) {
 }
 
 //Get Count of Follwer
-var getCountFollower = function(req, res) {
+var getFollowerCount = function(req, res) {
 
     var user_id = req.params.user_id;
+
     //validation for blank variables
     req.checkParams('user_id', 'User name is mandatory').notEmpty();
+
     var errors = req.validationErrors();
+
     if (errors) {
         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
+
+    //check if user exist or not
     users
         .count({
             _id: user_id
         }, function(err, usercount) {
-            if (usercount > 0) {
-                follower
-                    .count({
-                        user_id: user_id,
-                        follow_status: true
-                    }, function(err, followercount) {
-                        if (err) {
+
+            if (err) {
                 log.error(err);
                 res.send(err);
                 return;
             }
+
+            if (usercount > 0) {
+                follower
+                    .count({
+                        following_id: user_id,
+                        follow_status: true
+                    }, function(err, followercount) {
+
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                            return;
+                        }
+
                         log.info('Count is ' + followercount);
+
                         res.json({
                             FollowerCount: followercount
                         });
+
                     });
+
             } else {
+
                 res.json({
                     Result: 'No user with this id'
                 });
+
             }
+
         });
 
 }
 
 //Get Count of Follwing
-var getCountFollowing = function(req, res) {
+var getFollowingCount = function(req, res) {
 
-    var following_id = req.params.following_id;
+    var user_id = req.params.user_id;
+
     //validation for blank variables
-    req.checkParams('following_id', 'User name is mandatory').notEmpty();
+    req.checkParams('user_id', 'User name is mandatory').notEmpty();
+
     var errors = req.validationErrors();
+
     if (errors) {
         // res.send('There have been validation errors: ' + util.inspect(errors), 400);
         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
         return;
     }
+
     users
         .count({
-            _id: following_id
+            _id: user_id
         }, function(err, usercount) {
-            if (usercount > 0) {
-                follower
-                    .count({
-                        following_id: following_id
-                    }, function(err, followingcount) {
-                        if (err) {
+
+            if (err) {
                 log.error(err);
                 res.send(err);
                 return;
             }
+
+            if (usercount > 0) {
+
+                follower
+                    .count({
+                        user_id: user_id, following_id:{$ne:process.env.SUPERUSERID}
+                    }, function(err, followingcount) {
+
+                        if (err) {
+                            log.error(err);
+                            res.send(err);
+                            return;
+                        }
+
                         log.info('Count is ' + followingcount);
+
                         res.json({
                             Followingcount: followingcount
                         });
+
                     });
+
             } else {
+
                 res.json({
                     Result: 'No user with this id'
                 });
+
             }
+
         });
 
 }
@@ -503,8 +543,8 @@ module.exports = ({
     getfollowing: getfollowing,
     getfollowers: getfollowers,
     unlink_following: unlink_following,
-    getCountFollower: getCountFollower,
-    getCountFollowing: getCountFollowing,
+    getFollowerCount: getFollowerCount,
+    getFollowingCount: getFollowingCount,
     getMutualFollowerYouKnow: getMutualFollowerYouKnow,
     //followLatestPost : followLatestPost
 })

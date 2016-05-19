@@ -158,8 +158,8 @@ module.exports = function(app, passport) {
     app.get('/following/:user_name', follow.getfollowing);                 			// get followings
     app.get('/followers/:user_name', follow.getfollowers);  						// get follower
     app.post('/unlink_following', follow.unlink_following);     					// unlink following
-    app.get('/follower/count/:user_id', follow.getCountFollower);    				// count follower
-    app.get('/following/count/:following_id', follow.getCountFollowing);  			// count follower
+    app.get('/follower/count/:user_id', follow.getFollowerCount);    				// count follower
+    app.get('/following/count/:user_id', follow.getFollowingCount);  			// count follower
     app.get('/following/:user_id/:following_id', follow.getMutualFollowerYouKnow);	// Mutual Followers
 	// app.get('/followLatestPost/:user_id', follow.followLatestPost);
    

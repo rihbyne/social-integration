@@ -433,7 +433,11 @@ var getFollowingCount = function(req, res) {
 
                 follower
                     .count({
-                        user_id: user_id, following_id:{$ne:process.env.SUPERUSERID}
+                        user_id: user_id,
+                        follow_status: true,
+                        following_id: {
+                            $ne: process.env.SUPERUSERID
+                        }
                     }, function(err, followingcount) {
 
                         if (err) {

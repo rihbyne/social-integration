@@ -392,18 +392,28 @@ var getLikeByUser = function(req, res) { //get new like
 
         ], function(err, results) {
 
-            var length = results.length;
-            var count = 0;
+            if (err) {
 
-            for (var i = 0; i < length; i++) {
-                count = count + ++results[i].length;
+                log.error(err);
+                res.send(err);
+                return;
+
             }
 
-            var data = {
-                result: results,
-                count: count
-            };
-            res.send(data);
+
+            var likePosts = results[0].concat(results[1]).concat(results[2]); //Got two result , concent two results
+
+            console.info(likePosts);
+
+            function custom_sort(a, b) {
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            }
+
+            likePosts.sort(custom_sort);
+
+            res.json({
+                likePosts
+            });
 
         });
 

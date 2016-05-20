@@ -400,7 +400,6 @@ var getLikeByUser = function(req, res) { //get new like
 
             }
 
-
             var likePosts = results[0].concat(results[1]).concat(results[2]); //Got two result , concent two results
 
             console.info(likePosts);
@@ -418,6 +417,7 @@ var getLikeByUser = function(req, res) { //get new like
         });
 
         function postLike(callback) {
+
             postModel.post_like
                 .find({
                     like_user_id: user_id
@@ -431,13 +431,14 @@ var getLikeByUser = function(req, res) { //get new like
                         res.send(err);
                         return;
                     }
-                    //log.info(userPostLikeResult);
+                    // log.info('Post result', userPostLikeResult);
                     callback(null, userPostLikeResult);
 
                 });
         }
 
         function retweetLike(callback) {
+
             postModel.retweet_like
                 .find({
                     like_user_id: user_id
@@ -486,6 +487,7 @@ var setLikeCount = function(id, type, res) {
 
     // For Post
     if (type == 1 || type == '1') {
+        
         postModel.post_like
             .count({
                 post_id: id
@@ -525,6 +527,7 @@ var setLikeCount = function(id, type, res) {
 
     // For Retweet
     if (type == 2 || type == '2') {
+
         postModel.retweet_like
             .count({
                 retweet_quote_id: id

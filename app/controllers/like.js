@@ -418,11 +418,20 @@ var getLikeByUser = function(req, res) { //get new like
 
         function postLike(callback) {
 
+            var option = [{
+                path: 'post_id',
+            }, {
+                path: 'post_id',
+                populate: {
+                    path: 'posted_by'
+                }
+            }];
+
             postModel.post_like
                 .find({
                     like_user_id: user_id
                 })
-                .populate('post_id')
+                .populate(option)
                 .exec(function(err, userPostLikeResult) {
 
                     if (err) {
@@ -439,11 +448,20 @@ var getLikeByUser = function(req, res) { //get new like
 
         function retweetLike(callback) {
 
+            var option = [{
+                path: 'retweet_quote_id'
+            }, {
+                path: 'retweet_quote_id',
+                populate: {
+                    path: 'ret_user_id'
+                }
+            }];
+
             postModel.retweet_like
                 .find({
                     like_user_id: user_id
                 })
-                .populate('retweet_quote_id')
+                .populate(option)
                 .exec(function(err, userRetweetLikeResult) {
 
                     if (err) {
@@ -459,11 +477,21 @@ var getLikeByUser = function(req, res) { //get new like
         }
 
         function replyLike(callback) {
+
+            var option = [{
+                path: 'reply_id'
+            }, {
+                path: 'reply_id',
+                populate: {
+                    path: 'reply_user_id'
+                }
+            }];
+
             postModel.reply_like
                 .find({
                     like_user_id: user_id
                 })
-                .populate('reply_id')
+                .populate(option)
                 .exec(function(err, userRetweetLikeResult) {
 
                     if (err) {
@@ -487,7 +515,7 @@ var setLikeCount = function(id, type, res) {
 
     // For Post
     if (type == 1 || type == '1') {
-        
+
         postModel.post_like
             .count({
                 post_id: id

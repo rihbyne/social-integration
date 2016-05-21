@@ -144,7 +144,7 @@ var setreply = function(req, res) {
                         return;
                     }
 
-                    if (result !== 'No user found') {
+                    else{
 
                         if (mentionusers != "") {
                             

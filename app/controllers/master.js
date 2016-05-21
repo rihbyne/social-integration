@@ -233,6 +233,7 @@ var isFollowing = function(user_id, following_id, callback) {
             }
 
         })
+
 }
 
 var getPrivacyStatus = function(userid, loggedid, callback) {
@@ -295,10 +296,12 @@ var updateUser = function(userid, callback) {
             }
 
         })
+
 }
 
+var isValidUser = function(collectionName, query, callback) {
 
-function isValidUser(collectionName, query, callback) {
+    console.info('isValidUser api hitted');
 
     collectionName
         .find(query)
@@ -325,6 +328,93 @@ function isValidUser(collectionName, query, callback) {
 
 }
 
+var isValidPost = function(collectionName, query, callback) {
+
+    console.info('isValidPost api hitted');
+
+    collectionName
+        .find(query)
+        .lean()
+        .exec(function(err, postResult) {
+
+            if (err) {
+
+                log.error(err);
+                res.send(err);
+                return;
+            }
+
+            if (postResult.length == 0) {
+
+                callback(true, 'No Post/Retweet-Quote/Reply found');
+
+            } else {
+
+                callback(null, 'Post/Retweet-Quote/Reply found');
+            }
+
+        });
+
+}
+
+var isPostOwner = function(collectionName, query, callback) {
+
+    console.info('isValidUser api hitted');
+
+    collectionName
+        .find(query)
+        .lean()
+        .exec(function(err, postResult) {
+
+            if (err) {
+
+                log.error(err);
+                res.send(err);
+                return;
+            }
+
+            if (postResult.length == 0) {
+
+                callback(null, 'User is not owner of post');
+
+            } else {
+
+                callback(true, 'User is owner of post');
+            }
+
+        });
+
+}
+
+var userExistence = function(userid, callback) {
+
+    console.info('isValidUser api hitted');
+
+    user
+        .find({
+            _id: userid
+        })
+        .lean()
+        .exec(function(err, postResult) {
+
+            if (err) {
+
+                log.error(err);
+                callback(true, 'User is not found');
+                
+            }
+            else if (postResult.length == 0) {
+
+                callback(true, 'User is not found');
+
+            } else {
+
+                callback(null, 'User is found');
+            }
+
+        });
+}
+
 module.exports = ({
     getUserId: getUserId,
     hashtagMention: hashtagMention,
@@ -332,5 +422,8 @@ module.exports = ({
     isFollowing: isFollowing,
     getPrivacyStatus: getPrivacyStatus,
     updateUser: updateUser,
-    isValidUser: isValidUser
+    isValidUser: isValidUser,
+    isValidPost: isValidPost,
+    isPostOwner: isPostOwner,
+    userExistence: userExistence
 })

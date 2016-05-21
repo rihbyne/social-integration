@@ -282,10 +282,9 @@ var updateUser = function(userid, callback) {
 
             if (err) {
                 log.error(err);
-                callback(true, err);
+                callback(true, 'No user found to update');
             }
-
-            if (updateResult) {
+            else if (updateResult) {
 
                 callback(null, updateResult);
 
@@ -314,8 +313,7 @@ var isValidUser = function(collectionName, query, callback) {
                 res.send(err);
                 return;
             }
-
-            if (postResult.length === 0) {
+            else if (postResult.length === 0) {
 
                 callback(true, 'Not valid user');
 
@@ -343,8 +341,7 @@ var isValidPost = function(collectionName, query, callback) {
                 res.send(err);
                 return;
             }
-
-            if (postResult.length == 0) {
+            else if (postResult.length == 0) {
 
                 callback(true, 'No Post/Retweet-Quote/Reply found');
 
@@ -372,8 +369,7 @@ var isPostOwner = function(collectionName, query, callback) {
                 res.send(err);
                 return;
             }
-
-            if (postResult.length == 0) {
+            else if (postResult.length == 0) {
 
                 callback(null, 'User is not owner of post');
 

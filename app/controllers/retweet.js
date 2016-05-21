@@ -2,336 +2,6 @@ var post_model = require('../models/postSchema.js');
 var master = require('./master.js');
 var log = require('../../config/logging')();
 
-//Set retweet
-// var setretweet_old = function(req, res) {
-
-//     var post_id = req.body.post_id;
-//     var post_type = req.body.post_type;
-//     var ret_user_id = req.body.ret_user_id;
-//     var retweet_type = req.body.retweet_type;
-//     var retweet_quote = req.body.retweet_quote;
-//     var collectionName, message, userIdFrom, query;
-//     var privacy_setting = req.body.privacy_setting;
-
-//     log.info('Retweet Api hitted');
-
-//     log.info('Post Id', post_id);
-//     log.info('Retweet User Id', ret_user_id);
-//     log.info('Retweet Type', retweet_type);
-
-//     req.checkBody('post_type', 'post type').notEmpty();
-//     req.checkBody('ret_user_id', 'ret_user_id').notEmpty();
-//     req.checkBody('retweet_type', 'retweet_type').notEmpty();
-//     req.checkBody('post_id', 'post id').notEmpty();
-//     req.checkBody('privacy_setting', 'privacy setting').notEmpty();
-
-//     if (retweet_type == 2) {
-
-//         req.checkBody('retweet_quote', 'Can not post empty tweet').notEmpty();
-//         req.checkBody('retweet_type', '0 to 300 characters required').len(0, 300);
-//     };
-
-//     var errors = req.validationErrors();
-
-//     if (errors) {
-//         log.error('There have been validation errors: \n' + util.inspect(errors));
-//         res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-//         return;
-//     }
-
-//     if (post_type == 1) { //if post
-
-//         collectionName = post_model.post;
-//         message = 'User retweeted on Post';
-//         query = {
-//             post_id: post_id,
-//             ret_user_id: ret_user_id
-//         };
-
-//     } else if (post_type == 2) { //if retweet
-
-//         if (retweet_type == 1) { //simple retweet
-//             collectionName = post_model.retweet;
-//             message = 'User retweeted On Retweet';
-//             query = {
-//                 retweet_id: post_id,
-//                 ret_user_id: ret_user_id
-//             };
-//         } else if (retweet_type == 2) {
-//             collectionName = post_model.retweet_quote;
-//             message = 'User quote retweeted On Retweet';
-//             query = {
-//                 retweet_quote_id: post_id,
-//                 ret_user_id: ret_user_id
-//             };
-//         }
-
-//     } else if (post_type == 3) { //if reply        
-
-//         collectionName = post_model.reply;
-//         message = 'User retweeted On Reply';
-//         query = {
-//             reply_id: post_id,
-//             ret_user_id: ret_user_id
-//         };
-//     }
-
-//     collectionName
-//         .find({
-//             _id: post_id
-//         })
-//         .lean()
-//         .exec(function(err, retweetResult) {
-
-//             if (err) {
-
-//                 log.error(err)
-//                 res.send(err);
-//                 return;
-//             }
-//             console.info(retweetResult);
-//             console.info('retweett type ', retweet_type);
-//             if (retweetResult.length !== 0 || retweet_type == 1) {
-
-//                 if (post_type == 1) { //if post
-
-//                     var retweetUser = retweetResult[0].posted_by;
-
-//                 } else if (post_type == 2) { //if retweet
-
-//                     // if (retweet_type == 1) { //simple retweet
-
-//                     //     var retweetUser = retweetResult[0].ret_user_id;
-
-//                     // } else
-//                     // if (retweet_type == 2) {
-//                     console.info(retweetResult[0]);
-//                     var retweetUser = retweetResult[0].ret_user_id;
-//                     // }
-
-//                 } else if (post_type == 3) { //if reply        
-
-//                     var retweetUser = retweetResult[0].reply_user_id;
-
-//                 }
-//                 console.info(retweetUser + '..............' + ret_user_id);
-//                 if (retweetUser !== ret_user_id) {
-
-//                     if (retweet_type == 1) { //simple retweet
-
-//                         post_model.retweet
-//                             .find(query)
-//                             .lean()
-//                             .exec(function(err, simpleRetweet) {
-
-//                                 if (err) {
-
-//                                     log.error(err)
-//                                     res.send(err);
-//                                     return;
-//                                 }
-
-//                                 if (simpleRetweet.length == 0) { //save new simple tweet
-
-//                                     if (post_type == 1) {
-
-//                                         var retweet = new post_model.retweet({
-
-//                                             post_id: post_id,
-//                                             ret_user_id: ret_user_id,
-//                                             privacy_setting: privacy_setting
-//                                         });
-
-//                                     } else if (post_type == 2) {
-
-//                                         var retweet = new post_model.retweet({
-
-//                                             retweet_quote_id: post_id,
-//                                             ret_user_id: ret_user_id,
-//                                             privacy_setting: privacy_setting
-//                                         });
-
-//                                     } else if (post_type == 3) {
-
-//                                         var retweet = new post_model.retweet({
-
-//                                             reply_id: post_id,
-//                                             ret_user_id: ret_user_id,
-//                                             privacy_setting: privacy_setting
-//                                         });
-
-//                                     }
-
-//                                     retweet.save(function(err) {
-
-//                                         if (err) {
-
-//                                             log.error(err)
-//                                             res.send(err);
-//                                             return;
-//                                         }
-
-//                                         //increment simple retweet count
-//                                         setretweetcount(post_id, post_type, collectionName, function() {
-
-//                                             log.info(message);
-
-//                                             res.json({
-//                                                 message: message
-//                                             });
-
-//                                         });
-
-//                                     });
-
-//                                 } else { //remove old simple retweet
-
-//                                     post_model.retweet
-//                                         .remove(query)
-//                                         .exec(function(err, result) {
-
-//                                             if (err) {
-
-//                                                 log.error(err)
-//                                                 res.send(err);
-//                                                 return;
-//                                             }
-
-//                                             //increment simple retweet count
-//                                             setretweetcount(post_id, post_type, collectionName, function() {
-
-//                                                 log.info('Retweet document removed');
-
-//                                                 res.json({
-//                                                     message: 'Remove tweet'
-//                                                 });
-
-//                                             });
-
-//                                         })
-
-//                                 }
-
-//                             })
-
-//                     } else if (retweet_type == 2) { //quote retweet
-
-//                         var mentionusers = new Array();
-//                         var hashtags = new Array();
-
-//                         var regexat = /@([^\s]+)/g;
-//                         var regexhash = /#([^\s]+)/g;
-
-//                         while (match_at = regexat.exec(retweet_quote)) {
-//                             mentionusers.push(match_at[1]);
-//                         }
-
-//                         while (match_hash = regexhash.exec(retweet_quote)) {
-//                             hashtags.push(match_hash[1]);
-//                         }
-
-//                         // while (match_url = regexat.exec(post_description)) {
-//                         //     urls.push(match_url[1]);
-//                         // }
-
-//                         log.info('Mention Users : ', mentionusers);
-//                         log.info('Hash Tags : ', hashtags);
-
-//                         if (post_type == 1) { //if post
-
-//                             var retweet = new post_model.retweet_quote({
-
-//                                 post_id: post_id,
-//                                 ret_user_id: ret_user_id,
-//                                 retweet_quote: retweet_quote,
-//                                 privacy_setting: privacy_setting
-
-//                             });
-
-//                         } else if (post_type == 2) { //if retweet
-
-//                             if (retweet_type == 2) {
-
-//                                 var retweet = new post_model.retweet_quote({
-
-//                                     retweet_quote_id: post_id,
-//                                     ret_user_id: ret_user_id,
-//                                     retweet_quote: retweet_quote,
-//                                     privacy_setting: privacy_setting
-
-//                                 });
-
-//                             }
-
-//                         } else if (post_type == 3) { //if reply        
-
-//                             var retweet = new post_model.retweet_quote({
-
-//                                 reply_id: post_id,
-//                                 ret_user_id: ret_user_id,
-//                                 retweet_quote: retweet_quote,
-//                                 privacy_setting: privacy_setting
-
-//                             });
-
-//                         }
-
-//                         retweet.save(function(err) {
-
-//                             if (err) {
-
-//                                 log.error(err)
-//                                 res.send(err);
-//                                 return;
-//                             }
-
-//                             log.info(message);
-
-//                             master.hashtagMention(2, retweet, mentionusers, hashtags, function(err, result) {
-
-//                                 if (err) {
-
-//                                     log.error(err)
-//                                     res.send(err);
-//                                     return;
-//                                 }
-
-//                                 res.json({
-//                                     message: message
-//                                 });
-
-//                                 log.info('Retweet Saved.');
-
-//                             });
-
-//                         });
-
-//                     }
-
-//                 } else {
-
-//                     log.info('You can not RE-tweet on your own post');
-
-//                     res.json({
-//                         message: 'You can not RE-tweet on your own post'
-//                     });
-
-//                 }
-
-//             } else {
-
-//                 log.info('No Post Found');
-
-//                 res.json({
-//                     Result: 'No Post Found'
-//                 })
-
-//             }
-
-//         })
-
-// }
-
 var setretweet = function(req, res) {
 
     log.info('Retweet Api hitted');
@@ -468,6 +138,24 @@ var setretweet = function(req, res) {
                         retweet_quote.reply_id = post_id;
                     }
 
+                    var mentionusers = new Array();
+                    var hashtags = new Array();
+
+                    var regexat = /@([^\s]+)/g;
+                    var regexhash = /#([^\s]+)/g;
+
+                    while (match_at = regexat.exec(retweet_quote)) {
+                        mentionusers.push(match_at[1]);
+                    }
+
+                    while (match_hash = regexhash.exec(retweet_quote)) {
+                        hashtags.push(match_hash[1]);
+                    }
+
+                    // while (match_url = regexat.exec(post_description)) {
+                    //     urls.push(match_url[1]);
+                    // }
+
                     retweet_quote.save(function(err) {
 
                         if (err) {
@@ -477,8 +165,21 @@ var setretweet = function(req, res) {
                             return;
                         }
 
-                        res.json({
-                            message: message
+                        master.hashtagMention(2, retweet_quote, mentionusers, hashtags, function(err, result) {
+
+                            if (err) {
+
+                                log.error(err)
+                                res.send(err);
+                                return;
+                            }
+
+                            res.json({
+                                message: message
+                            });
+
+                            log.info('Retweet Saved.');
+
                         });
 
                     });

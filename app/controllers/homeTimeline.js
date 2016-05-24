@@ -279,11 +279,12 @@ function getRetweetByUserId(showPostLoggedUser, userid, callback) { //simple ret
                         } else if (singleretweet.retweet_quote_id !== undefined) {
 
                             var options = [{
-                                path: 'retweet_quote_id'
+                                path: 'retweet_quote_id',
+                                path: 'ret_user_id'
                             }, {
-                                path: 'post_id',
+                                path: 'retweet_quote_id',
                                 populate: {
-                                    path: 'posted_by'
+                                    path: 'ret_user_id'
                                 }
                             }];
 
@@ -294,7 +295,7 @@ function getRetweetByUserId(showPostLoggedUser, userid, callback) { //simple ret
                             }, {
                                 path: 'reply_id',
                                 populate: {
-                                    path: 'posted_by'
+                                    path: 'reply_user_id'
                                 }
                             }];
 

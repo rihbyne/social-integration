@@ -473,7 +473,6 @@ function getReplyByUserId(showPostLoggedUser, userid, callback) {
 
     }
 
-
     post_model.reply
         .find(query)
         .sort({
@@ -519,7 +518,8 @@ function getReplyByUserId(showPostLoggedUser, userid, callback) {
                     } else if (singleReplyResult.reply_id !== undefined) {
 
                         var options = [{
-                            path: 'reply_id'
+                            path: 'reply_id',
+                            path: 'reply_user_id'
                         }, {
                             path: 'reply_id',
                             populate: {

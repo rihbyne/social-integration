@@ -242,6 +242,7 @@ function getRetweetByUserId(showPostLoggedUser, userid, callback) { //simple ret
 
     post_model.retweet
         .find(query)
+        .populate('ret_user_id')
         .sort({
             retweet_at: -1
         })
@@ -475,6 +476,7 @@ function getReplyByUserId(showPostLoggedUser, userid, callback) {
 
     post_model.reply
         .find(query)
+        .populate('reply_user_id')
         .sort({
             created_at: -1
         })
@@ -518,8 +520,7 @@ function getReplyByUserId(showPostLoggedUser, userid, callback) {
                     } else if (singleReplyResult.reply_id !== undefined) {
 
                         var options = [{
-                            path: 'reply_id',
-                            path: 'reply_user_id'
+                            path: 'reply_id'
                         }, {
                             path: 'reply_id',
                             populate: {

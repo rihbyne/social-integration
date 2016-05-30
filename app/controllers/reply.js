@@ -20,6 +20,13 @@ var setreply = function(req, res) {
     var regexat = /@([^\s]+)/g;
     var regexhash = /#([^\s]+)/g;
 
+    log.info('Set reply api hitted');
+    log.info('post type', post_type);
+    log.info('reply user id', post_type);
+    log.info('reply msg', post_type);
+    log.info('post id', post_type);
+    log.info('privacy setting', post_type);
+
     req.checkBody('post_type', 'post type').notEmpty();
     req.checkBody('reply_user_id', 'reply user id').notEmpty();
     req.checkBody('reply_msg', 'reply msg').notEmpty();
@@ -92,100 +99,113 @@ var setreply = function(req, res) {
 
     }
 
-    collectionName
-        .find({
-            _id: post_id
-        })
-        .lean()
-        .exec(function(err, replyResult) {
+    master.userExistence(reply_user_id, function(err, result) {
 
-            if (err) {
+        if (err) {
 
-                log.error(err)
-                res.send(err);
-                return;
-            }
+            log.error(result)
+            res.send(result);
+            return;
 
-            if (replyResult.length !== 0) {
+        } else {
 
-                post_reply
-                    .save(function(err) {
+            collectionName
+                .find({
+                    _id: post_id
+                })
+                .lean()
+                .exec(function(err, replyResult) {
 
-                        if (err) {
+                    if (err) {
 
-                            log.error(err)
-                            res.send(err);
-                            return;
-                        }
+                        log.error(err)
+                        res.send(err);
+                        return;
+                    }
 
-                        master.hashtagMention(3, post_reply, mentionusers, hashtags, function(err, result) {
+                    if (replyResult.length !== 0) {
 
-                            if (err) {
+                        post_reply
+                            .save(function(err) {
 
-                                log.error(err)
-                                res.send(err);
-                                return;
-                            }
+                                if (err) {
 
-                            res.json({
-                                message: 'Reply Inserted'
-                            });
+                                    log.error(err)
+                                    res.send(err);
+                                    return;
+                                }
 
-                            log.info('Reply Inserted');
+                                master.hashtagMention(3, post_reply, mentionusers, hashtags, function(err, result) {
 
-                        });
+                                    if (err) {
 
-                        master.getusername(reply_user_id, function(err, result) {
+                                        log.error(err)
+                                        res.send(err);
+                                        return;
+                                    }
 
-                            log.info(result);
-
-                            if (err) {
-
-                                log.error(err)
-                                res.send(err);
-                                return;
-                            } else {
-
-                                if (mentionusers != "") {
-
-                                    var i = -1;
-                                    var notification_message = result + ' Has Replied on your ' + replyOn;
-                                    var notification = new notificationModel.notification({
-
-                                        notification_message: notification_message,
-                                        notification_user: mentionusers,
-                                        reply_id: post_reply._id,
-                                        usrname: result[0]
-
+                                    res.json({
+                                        message: 'Reply Inserted'
                                     });
 
-                                    notification.save(function(err) {
+                                    log.info('Reply Inserted');
 
-                                        if (err) {
+                                });
 
-                                            log.error(err)
-                                            res.send(err);
-                                            return;
+                                master.getusername(reply_user_id, function(err, result) {
+
+                                    log.info(result);
+
+                                    if (err) {
+
+                                        log.error(err)
+                                        res.send(err);
+                                        return;
+                                    } else {
+
+                                        if (mentionusers != "") {
+
+                                            var i = -1;
+                                            var notification_message = result + ' Has Replied on your ' + replyOn;
+                                            var notification = new notificationModel.notification({
+
+                                                notification_message: notification_message,
+                                                notification_user: mentionusers,
+                                                reply_id: post_reply._id,
+                                                usrname: result[0]
+
+                                            });
+
+                                            notification.save(function(err) {
+
+                                                if (err) {
+
+                                                    log.error(err)
+                                                    res.send(err);
+                                                    return;
+                                                }
+
+                                                log.info('Notification Saved');
+
+                                            })
                                         }
+                                    }
 
-                                        log.info('Notification Saved');
+                                })
 
-                                    })
-                                }
-                            }
+                            });
 
-                        })
+                    } else {
 
-                    });
+                        log.info('No post found');
+                        res.send('No post found');
 
-            } else {
+                    }
 
-                log.info('No post found');
-                res.send('No post found');
+                });
+        }
 
-            }
-
-        });
+    })
 
 };
 

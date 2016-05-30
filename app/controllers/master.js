@@ -5,7 +5,7 @@ var hashtag_model = require('../models/hashtagSchema.js');
 var follower = require('../models/followersSchema.js');
 var log = require('../../config/logging')()
 
-//find id of user from username
+//Get id of user from username
 var getUserId = function(username, res) {
 
     user
@@ -36,6 +36,7 @@ var getUserId = function(username, res) {
 
 }
 
+//Get username of user from id 
 var getusername = function(id, res) {
 
     user
@@ -65,6 +66,7 @@ var getusername = function(id, res) {
 
 }
 
+//Save hashtag and mention -- master file code for set post, retweet and reply 
 var hashtagMention = function(type, post, mentionusers, hashtags, res) {
 
     console.info(post._id);
@@ -203,6 +205,7 @@ var hashtagMention = function(type, post, mentionusers, hashtags, res) {
 
 }
 
+//check user is following to other user
 var isFollowing = function(user_id, following_id, callback) {
 
     follower
@@ -236,7 +239,14 @@ var isFollowing = function(user_id, following_id, callback) {
 
 }
 
+/*  get privacy status of user 
+
+    1. if user id and logged id same --privacyStatus - 1
+    2. if following -- privacyStatus - 2
+    3. if not following -- privacyStatus - 3
+*/
 var getPrivacyStatus = function(userid, loggedid, callback) {
+
     //check userid and loggeduser same or not
     if (loggedid == userid) {
 
@@ -259,6 +269,7 @@ var getPrivacyStatus = function(userid, loggedid, callback) {
             }
 
             callback(null, privacyStatus);
+
             console.info('master', privacyStatus);
 
         });
@@ -267,6 +278,7 @@ var getPrivacyStatus = function(userid, loggedid, callback) {
 
 }
 
+//update user's update_at time
 var updateUser = function(userid, callback) {
 
     log.info('Update user api called');
@@ -298,9 +310,10 @@ var updateUser = function(userid, callback) {
 
 }
 
+//check user is valid or not -- same as isPostOwner -- only response is different
 var isValidUser = function(collectionName, query, callback) {
 
-    console.info('isValidUser api hitted');
+    log.info('isValidUser api hitted');
 
     collectionName
         .find(query)
@@ -316,16 +329,19 @@ var isValidUser = function(collectionName, query, callback) {
             else if (postResult.length === 0) {
 
                 callback(true, 'Not valid user');
+                log.info('Not valid user');
 
             } else {
 
                 callback(null, 'valid user');
+                log.info('Valid user');
             }
 
         });
 
 }
 
+//check post, reply, retweet exist or not -- cross-side test only
 var isValidPost = function(collectionName, query, callback) {
 
     console.info('isValidPost api hitted');
@@ -354,6 +370,7 @@ var isValidPost = function(collectionName, query, callback) {
 
 }
 
+//check user is owner of post or not
 var isPostOwner = function(collectionName, query, callback) {
 
     console.info('isValidUser api hitted');
@@ -372,19 +389,22 @@ var isPostOwner = function(collectionName, query, callback) {
             else if (postResult.length == 0) {
 
                 callback(null, 'User is not owner of post');
+                log.info('User is not owner of post');
 
             } else {
 
                 callback(true, 'User is owner of post');
+                log.info('User is owner of post');
             }
 
         });
 
 }
 
+//check user existence in database
 var userExistence = function(userid, callback) {
 
-    console.info('isValidUser api hitted');
+    log.info('isValidUser api hitted');
 
     user
         .find({
@@ -409,6 +429,7 @@ var userExistence = function(userid, callback) {
             }
 
         });
+
 }
 
 module.exports = ({

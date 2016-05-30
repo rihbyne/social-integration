@@ -180,7 +180,7 @@ module.exports = function(app, passport) {
                                                      
     //Like
     app.post('/setLike', like.setLike);          									// Set Like
-    app.get('/like/:post_type/:post_id', like.getlike);      						// Get like by reply
+    app.get('/like/:post_type/:post_id', like.getlike);      						// Get like by post/retweet/reply
 	app.get('/like/:username', like.getLikeByUser);      							// Get like by User
     // app.get('/like/post/:post_id', like.getLikeByPost);      					// Get like by post
     // app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   		// Get like by retweet

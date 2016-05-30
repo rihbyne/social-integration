@@ -120,7 +120,7 @@ var homeTimeline = function(req, res) {
 
                                     homePosts.sort(custom_sort);
 
-                                    homePosts = homePosts.sort(custom_sort);
+                                    homePosts = homePosts.slice(0, 10);
                                     // log.info(homePosts);
                                     res.json(homePosts);
 

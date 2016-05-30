@@ -8,6 +8,8 @@ var homeTimeline = function(req, res) {
     log.info('home timeline api hitted');
 
     var userid = req.body.userid;
+    var timestamp = req.body.timestamp;
+    var flag = req.body.flag; // New - 1 and Old - 2 
 
     req.checkBody('userid', 'User id is mandatory').notEmpty();
 
@@ -94,10 +96,10 @@ var homeTimeline = function(req, res) {
 
                         //async call for post, retweet, quote, reply
                         async.parallel([
-                                callback => getPostByUserId(showPostLoggedUser, userid, callback),
-                                callback => getRetweetByUserId(showPostLoggedUser, userid, callback),
-                                callback => getQuoteRetweetByUserId(showPostLoggedUser, userid, callback),
-                                callback => getReplyByUserId(showPostLoggedUser, userid, callback)
+                                callback => getPostByUserId(showPostLoggedUser, userid, timestamp, flag, callback),
+                                callback => getRetweetByUserId(showPostLoggedUser, userid, timestamp, flag, callback),
+                                callback => getQuoteRetweetByUserId(showPostLoggedUser, userid, timestamp, flag, callback),
+                                callback => getReplyByUserId(showPostLoggedUser, userid, timestamp, flag, callback)
                             ],
                             function(err, result) {
 
@@ -118,6 +120,7 @@ var homeTimeline = function(req, res) {
 
                                     homePosts.sort(custom_sort);
 
+                                    homePosts = homePosts.sort(custom_sort);
                                     // log.info(homePosts);
                                     res.json(homePosts);
 
@@ -137,10 +140,9 @@ var homeTimeline = function(req, res) {
 }
 
 //find post from userid
-function getPostByUserId(showPostLoggedUser, userid, callback) {
+function getPostByUserId(showPostLoggedUser, userid, timestamp, flag, callback) {
 
     // log.info(showPostLoggedUser);
-
     if (showPostLoggedUser) {
 
         var query = {
@@ -171,6 +173,22 @@ function getPostByUserId(showPostLoggedUser, userid, callback) {
         }
 
     }
+
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
 
     //use userid to find all post of users
     post_model.post
@@ -204,7 +222,7 @@ function getPostByUserId(showPostLoggedUser, userid, callback) {
 }
 
 //find retweet from userid
-function getRetweetByUserId(showPostLoggedUser, userid, callback) { //simple retweet
+function getRetweetByUserId(showPostLoggedUser, userid, timestamp, flag, callback) { //simple retweet
 
     if (showPostLoggedUser) {
 
@@ -239,6 +257,22 @@ function getRetweetByUserId(showPostLoggedUser, userid, callback) { //simple ret
         }
 
     }
+
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
 
     post_model.retweet
         .find(query)
@@ -325,7 +359,7 @@ function getRetweetByUserId(showPostLoggedUser, userid, callback) { //simple ret
 }
 
 //find quote retweet from userid
-function getQuoteRetweetByUserId(showPostLoggedUser, userid, callback) { //simple retweet
+function getQuoteRetweetByUserId(showPostLoggedUser, userid, timestamp, flag, callback) { //simple retweet
 
     if (showPostLoggedUser) {
 
@@ -358,6 +392,22 @@ function getQuoteRetweetByUserId(showPostLoggedUser, userid, callback) { //simpl
         }
 
     }
+
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
 
     post_model.retweet_quote
         .find(query)
@@ -440,7 +490,7 @@ function getQuoteRetweetByUserId(showPostLoggedUser, userid, callback) { //simpl
 }
 
 //find reply from userid
-function getReplyByUserId(showPostLoggedUser, userid, callback) {
+function getReplyByUserId(showPostLoggedUser, userid, timestamp, flag, callback) {
 
     if (showPostLoggedUser) {
 
@@ -474,6 +524,22 @@ function getReplyByUserId(showPostLoggedUser, userid, callback) {
 
     }
 
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
+    
     post_model.reply
         .find(query)
         .populate('reply_user_id')

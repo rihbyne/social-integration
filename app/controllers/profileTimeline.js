@@ -97,6 +97,22 @@ var getuserhomeposts = function(req, res) { // get a post
 
     var userid = req.body.user_id; // find posts of user
     var loggedid = req.body.logged_id;
+    var timestamp = req.body.timestamp;
+    var flag = req.body.flag; // New - 1 and Old - 2 
+    var profilePosts;
+
+    req.checkBody('user_id', 'Mandatory field not found').notEmpty();
+    req.checkBody('logged_id', 'Mandatory field not found').notEmpty();
+    req.checkBody('timestamp', 'Mandatory field not found').isInt();
+    req.checkBody('flag', 'Mandatory field not found').isInt();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        log.warn('There have been validation errors: \n' + util.inspect(errors));
+        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
+        return;
+    }
 
     log.info('userid, loggedid', userid + '   ' + loggedid);
 
@@ -110,36 +126,30 @@ var getuserhomeposts = function(req, res) { // get a post
 
         //using async series function get all post 
         async.parallel([
-                callback => getPostByUserId(userid, privacyStatus, callback),
-                callback => getRetweetByUserId(userid, privacyStatus, callback),
-                callback => getQuoteRetweetByUserId(userid, privacyStatus, callback)
+                callback => getPostByUserId(userid, privacyStatus, timestamp, flag, callback),
+                callback => getRetweetByUserId(userid, privacyStatus, timestamp, flag, callback),
+                callback => getQuoteRetweetByUserId(userid, privacyStatus, timestamp, flag, callback)
             ],
             function(err, result) {
 
                 log.info(result);
 
-                var profilePosts;
-
                 if (err) {
 
-                    if (result[0] === 0) {
-                        log.info('Own posts are zero');
-                        var profilePosts = result[1]
-                    }
-
-                    if (result[1] === 0) {
-                        log.info('Retweet posts are zero');
-                        var profilePosts = result[0]
-                    }
+                    log.info(err);
+                    res.send(err);
 
                 } else {
 
                     var profilePosts = result[0].concat(result[1]).concat(result[2]); //Got two result , concent two results
+
                     function custom_sort(a, b) {
                         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                     }
 
                     profilePosts.sort(custom_sort);
+
+                    profilePosts = profilePosts.slice(0, 10);
 
                 };
 
@@ -151,7 +161,6 @@ var getuserhomeposts = function(req, res) { // get a post
 
     })
 
-
 }
 
 //Get all post, retweet and reply of user
@@ -161,7 +170,7 @@ var getpostsrtreply = function(req, res) { // get a post
 
     var userid = req.body.user_id; // find posts of user
     var loggedid = req.body.logged_id;
-
+    var profilePosts;
     var result1, result2;
 
     log.info('userid, loggedid', userid + '   ' + loggedid);
@@ -178,10 +187,10 @@ var getpostsrtreply = function(req, res) { // get a post
 
         //using async series function get all post 
         async.parallel([
-                callback => getPostByUserId(userid, privacyStatus, callback),
-                callback => getRetweetByUserId(userid, privacyStatus, callback),
-                callback => getQuoteRetweetByUserId(userid, privacyStatus, callback),
-                callback => getReplyByUserId(userid, privacyStatus, callback)
+                callback => getPostByUserId(userid, privacyStatus, timestamp, flag, callback),
+                callback => getRetweetByUserId(userid, privacyStatus, timestamp, flag, callback),
+                callback => getQuoteRetweetByUserId(userid, privacyStatus, timestamp, flag, callback),
+                callback => getReplyByUserId(userid, privacyStatus, timestamp, flag, callback)
             ],
             function(err, result) {
 
@@ -191,15 +200,8 @@ var getpostsrtreply = function(req, res) { // get a post
 
                 if (err) {
 
-                    if (result[0] === 0) {
-                        log.info('Own posts are zero');
-                        var profilePosts = result[1]
-                    }
-
-                    if (result[1] === 0) {
-                        log.info('Retweet posts are zero');
-                        var profilePosts = result[0]
-                    }
+                    log.info(err);
+                    res.send(err);
 
                 } else {
 
@@ -211,13 +213,12 @@ var getpostsrtreply = function(req, res) { // get a post
 
                     profilePosts.sort(custom_sort);
 
-                };
+                    profilePosts = profilePosts.slice(0, 10);
 
-                // log.info(result[0]+''+result[1]);
+                };
 
                 res.json({
                     PostRTReply: profilePosts
-                    // PostRTReply : result
                 });
 
             });
@@ -227,7 +228,7 @@ var getpostsrtreply = function(req, res) { // get a post
 }
 
 //find post from userid
-function getPostByUserId(userid, privacyStatus, callback) {
+function getPostByUserId(userid, privacyStatus, timestamp, flag, callback) {
 
     var query, privacyStatus;
 
@@ -259,6 +260,22 @@ function getPostByUserId(userid, privacyStatus, callback) {
 
     }
 
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
+
     //use userid to find all post of users
     post_model.post
         .find(query)
@@ -289,7 +306,7 @@ function getPostByUserId(userid, privacyStatus, callback) {
 }
 
 //find retweet from userid
-function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
+function getRetweetByUserId(userid, privacyStatus, timestamp, flag, callback) { //simple retweet
 
     var query, privacyStatus;
 
@@ -319,6 +336,22 @@ function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
                 privacy_setting: 1
             }
     }
+
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
 
     post_model.retweet
         .find(query)
@@ -403,7 +436,7 @@ function getRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
 }
 
 //find quote retweet from userid
-function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple retweet
+function getQuoteRetweetByUserId(userid, privacyStatus, timestamp, flag, callback) { //simple retweet
 
     var query, privacyStatus;
 
@@ -433,6 +466,22 @@ function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple ret
                 privacy_setting: 1
             }
     }
+
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
 
     post_model.retweet_quote
         .find(query)
@@ -517,7 +566,7 @@ function getQuoteRetweetByUserId(userid, privacyStatus, callback) { //simple ret
 }
 
 //find reply from userid
-function getReplyByUserId(userid, privacyStatus, callback) {
+function getReplyByUserId(userid, privacyStatus, timestamp, flag, callback) {
 
     var query, privacyStatus;
 
@@ -525,28 +574,48 @@ function getReplyByUserId(userid, privacyStatus, callback) {
 
         case 1:
             query = {
-                reply_user_id: userid
+                reply_user_id: userid,
+                timeQuery
             }
             break;
 
         case 2:
             query = {
                 $and: [{
-                    reply_user_id: userid
-                }, {
-                    privacy_setting: {
-                        $ne: 2
-                    }
-                }]
+                        reply_user_id: userid
+                    }, {
+                        privacy_setting: {
+                            $ne: 2
+                        }
+                    },
+                    timeQuery
+                ]
             }
             break;
 
         default:
             query = {
                 reply_user_id: userid,
-                privacy_setting: 1
+                privacy_setting: 1,
+                timeQuery
             }
     }
+
+    if (flag == 1) {
+
+        query.created_at = {
+            $lte: timestamp
+
+        }
+
+    } else if (flag == 2) {
+
+        query.created_at = {
+            $gte: timestamp
+
+        }
+
+    };
 
     post_model.reply
         .find(query)
@@ -558,7 +627,7 @@ function getReplyByUserId(userid, privacyStatus, callback) {
         .exec(function(err, postReplyResult) {
 
             if (err) {
-                
+
                 log.error(err);
                 res.send(err);
                 return

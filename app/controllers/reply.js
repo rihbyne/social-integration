@@ -189,29 +189,6 @@ var setreply = function(req, res) {
 
 };
 
-// var getreply = function(req, res){
-
-// var post_id = req.params.post_id;
-// var reply_user_id = req.params.reply_user_id;
-
-// post_model.reply 
-// .find({post_id : post_id})
-// .populate('user_id post_id')
-// .sort({created_at : -1})
-// .exec(function(err, result){
-// if (err) {
-// res.send(err)
-// };
-// log.info(result);
-
-// res.json({
-// reply: result
-// })
-
-// })
-
-// }
-
 var getReply = function(req, res) {
 
     var type = req.params.type;

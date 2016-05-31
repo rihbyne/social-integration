@@ -1,413 +1,347 @@
-var post_model = require('../models/postSchema.js');
-var async = require('async');
-var master = require('./master.js');
-var notificationModel = require('../models/notificationSchema.js');
+var post_model = require('../models/postSchema.js')
+var async = require('async')
+var master = require('./master.js')
+var notificationModel = require('../models/notificationSchema.js')
 var log = require('../../config/logging')()
 
-//update reply to post
-var setreply = function(req, res) {
+// update reply to post
+var setreply = function (req, res) {
+  var post_type = req.body.post_type
+  var reply_user_id = req.body.reply_user_id
+  var reply_msg = req.body.reply_msg
+  var post_id = req.body.post_id
+  var privacy_setting = req.body.privacy_setting
 
-    var post_type = req.body.post_type;
-    var reply_user_id = req.body.reply_user_id;
-    var reply_msg = req.body.reply_msg;
-    var post_id = req.body.post_id;
-    var privacy_setting = req.body.privacy_setting;
+  var mentionusers = []
+  var hashtags = []
+  var replyOn = ''
 
-    var mentionusers = new Array();
-    var hashtags = new Array();
-    var replyOn = "";
+  var regexat = /@([^\s]+)/g
+  var regexhash = /#([^\s]+)/g
 
-    var regexat = /@([^\s]+)/g;
-    var regexhash = /#([^\s]+)/g;
+  log.info('Set reply api hitted')
+  log.info('post type', post_type)
+  log.info('reply user id', post_type)
+  log.info('reply msg', post_type)
+  log.info('post id', post_type)
+  log.info('privacy setting', post_type)
 
-    log.info('Set reply api hitted');
-    log.info('post type', post_type);
-    log.info('reply user id', post_type);
-    log.info('reply msg', post_type);
-    log.info('post id', post_type);
-    log.info('privacy setting', post_type);
+  req.checkBody('post_type', 'post type').notEmpty()
+  req.checkBody('reply_user_id', 'reply user id').notEmpty()
+  req.checkBody('reply_msg', 'reply msg').notEmpty()
+  req.checkBody('reply_msg', '0 to 300 characters required').len(0, 300)
+  req.checkBody('post_id', 'post id').notEmpty()
+  req.checkBody('privacy_setting', 'Privacy Setting').notEmpty()
 
-    req.checkBody('post_type', 'post type').notEmpty();
-    req.checkBody('reply_user_id', 'reply user id').notEmpty();
-    req.checkBody('reply_msg', 'reply msg').notEmpty();
-    req.checkBody('reply_msg', '0 to 300 characters required').len(0, 300);
-    req.checkBody('post_id', 'post id').notEmpty();
-    req.checkBody('privacy_setting', 'Privacy Setting').notEmpty();
+  var errors = req.validationErrors()
 
-    var errors = req.validationErrors();
+  if (errors) {
+    log.warn('There have been validation errors: \n' + util.inspect(errors))
+    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    return
+  }
 
-    if (errors) {
-        log.warn('There have been validation errors: \n' + util.inspect(errors));
-        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-        return;
-    }
+  while (match_at = regexat.exec(reply_msg)) {
+    mentionusers.push(match_at[1])
+  }
 
-    while (match_at = regexat.exec(reply_msg)) {
-        mentionusers.push(match_at[1]);
-    }
+  while (match_hash = regexhash.exec(reply_msg)) {
+    hashtags.push(match_hash[1])
+  }
 
-    while (match_hash = regexhash.exec(reply_msg)) {
-        hashtags.push(match_hash[1]);
-    }
+  // while (match_url = regexat.exec(post_description)) {
+  //     urls.push(match_url[1])
+  // }
 
-    // while (match_url = regexat.exec(post_description)) {
-    //     urls.push(match_url[1]);
-    // }
+  log.info('Mention Users : ', mentionusers)
+  log.info('Hash Tags : ', hashtags)
 
-    log.info('Mention Users : ', mentionusers);
-    log.info('Hash Tags : ', hashtags);
+  // blank validation
+  if (post_type == 1) { // post
 
-    //blank validation
-    if (post_type == 1) { //post
+    replyOn = 'Post'
 
-        replyOn = "Post";
+    collectionName = post_model.post
 
-        collectionName = post_model.post;
+    var post_reply = new post_model.reply({
+      post_id: post_id,
+      reply_user_id: reply_user_id,
+      reply_msg: reply_msg,
+      privacy_setting: privacy_setting
+    })
+  } else if (post_type == 2) { // retweet
 
-        var post_reply = new post_model.reply({
-            post_id: post_id,
-            reply_user_id: reply_user_id,
-            reply_msg: reply_msg,
-            privacy_setting: privacy_setting
-        });
+    replyOn = 'Retweet'
 
-    } else if (post_type == 2) { //retweet
+    collectionName = post_model.retweet_quote
 
-        replyOn = "Retweet";
+    var post_reply = new post_model.reply({
+      retweet_quote_id: post_id,
+      reply_user_id: reply_user_id,
+      reply_msg: reply_msg,
+      privacy_setting: privacy_setting
+    })
+  } else if (post_type == 3) { // reply
 
-        collectionName = post_model.retweet_quote;
+    replyOn = 'Reply'
 
-        var post_reply = new post_model.reply({
-            retweet_quote_id: post_id,
-            reply_user_id: reply_user_id,
-            reply_msg: reply_msg,
-            privacy_setting: privacy_setting
-        });
+    collectionName = post_model.reply
 
-    } else if (post_type == 3) { //reply
+    var post_reply = new post_model.reply({
+      reply_id: post_id,
+      reply_user_id: reply_user_id,
+      reply_msg: reply_msg,
+      privacy_setting: privacy_setting
+    })
+  }
 
-        replyOn = "Reply";
+  master.userExistence(reply_user_id, function (err, result) {
+    if (err) {
+      log.error(result)
+      res.send(result)
+      return
+    } else {
+      collectionName
+        .find({
+          _id: post_id
+        })
+        .lean()
+        .exec(function (err, replyResult) {
+          if (err) {
+            log.error(err)
+            res.send(err)
+            return
+          }
 
-        collectionName = post_model.reply;
+          if (replyResult.length !== 0) {
+            post_reply
+              .save(function (err) {
+                if (err) {
+                  log.error(err)
+                  res.send(err)
+                  return
+                }
 
-        var post_reply = new post_model.reply({
-            reply_id: post_id,
-            reply_user_id: reply_user_id,
-            reply_msg: reply_msg,
-            privacy_setting: privacy_setting
-        });
+                master.hashtagMention(3, post_reply, mentionusers, hashtags, function (err, result) {
+                  if (err) {
+                    log.error(err)
+                    res.send(err)
+                    return
+                  }
 
-    }
+                  res.json({
+                    message: 'Reply Inserted'
+                  })
 
-    master.userExistence(reply_user_id, function(err, result) {
-
-        if (err) {
-
-            log.error(result)
-            res.send(result);
-            return;
-
-        } else {
-
-            collectionName
-                .find({
-                    _id: post_id
+                  log.info('Reply Inserted')
                 })
-                .lean()
-                .exec(function(err, replyResult) {
 
-                    if (err) {
+                master.getusername(reply_user_id, function (err, result) {
+                  log.info(result)
 
-                        log.error(err)
-                        res.send(err);
-                        return;
+                  if (err) {
+                    log.error(err)
+                    res.send(err)
+                    return
+                  } else {
+                    if (mentionusers != '') {
+                      var i = -1
+                      var notification_message = result + ' Has Replied on your ' + replyOn
+                      var notification = new notificationModel.notification({
+                        notification_message: notification_message,
+                        notification_user: mentionusers,
+                        reply_id: post_reply._id,
+                        usrname: result[0]
+
+                      })
+
+                      notification.save(function (err) {
+                        if (err) {
+                          log.error(err)
+                          res.send(err)
+                          return
+                        }
+
+                        log.info('Notification Saved')
+                      })
                     }
+                  }
+                })
+              })
+          } else {
+            log.info('No post found')
+            res.send('No post found')
+          }
+        })
+    }
+  })
+}
 
-                    if (replyResult.length !== 0) {
+var getReply = function (req, res) {
+  var type = req.params.type
+  var id = req.params.id
 
-                        post_reply
-                            .save(function(err) {
+  if (type == 1 || type == '1') {
+    var post_id = id
 
-                                if (err) {
+    var option = [{
+      path: 'post_id',
+      path: 'reply_user_id'
+    }, {
+      path: 'post_id',
+      populate: {
+        path: 'posted_by'
+      }
+    }]
 
-                                    log.error(err)
-                                    res.send(err);
-                                    return;
-                                }
-
-                                master.hashtagMention(3, post_reply, mentionusers, hashtags, function(err, result) {
-
-                                    if (err) {
-
-                                        log.error(err)
-                                        res.send(err);
-                                        return;
-                                    }
-
-                                    res.json({
-                                        message: 'Reply Inserted'
-                                    });
-
-                                    log.info('Reply Inserted');
-
-                                });
-
-                                master.getusername(reply_user_id, function(err, result) {
-
-                                    log.info(result);
-
-                                    if (err) {
-
-                                        log.error(err)
-                                        res.send(err);
-                                        return;
-                                    } else {
-
-                                        if (mentionusers != "") {
-
-                                            var i = -1;
-                                            var notification_message = result + ' Has Replied on your ' + replyOn;
-                                            var notification = new notificationModel.notification({
-
-                                                notification_message: notification_message,
-                                                notification_user: mentionusers,
-                                                reply_id: post_reply._id,
-                                                usrname: result[0]
-
-                                            });
-
-                                            notification.save(function(err) {
-
-                                                if (err) {
-
-                                                    log.error(err)
-                                                    res.send(err);
-                                                    return;
-                                                }
-
-                                                log.info('Notification Saved');
-
-                                            })
-                                        }
-                                    }
-
-                                })
-
-                            });
-
-                    } else {
-
-                        log.info('No post found');
-                        res.send('No post found');
-
-                    }
-
-                });
+    post_model.reply
+      .find({
+        post_id: post_id
+      })
+      .populate(option)
+      .lean()
+      .exec(function (err, postReplys) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
         }
 
-    })
+        if (postReplys == '' || postReplys == null || postReplys == undefined) {
+          res.send('No Reply on this Post')
+          return
+        }
 
-};
+        async.each(postReplys, function (singlepostReplys, callback) {
+          var reply_id = singlepostReplys._id
 
-var getReply = function(req, res) {
-
-    var type = req.params.type;
-    var id = req.params.id;
-
-    if (type == 1 || type == '1') {
-
-        var post_id = id;
-
-        var option = [{
-            path: 'post_id',
-            path: 'reply_user_id'
-        }, {
-            path: 'post_id',
-            populate: {
-                path: 'posted_by'
-            }
-        }];
-
-        post_model.reply
-            .find({
-                post_id: post_id
+          post_model.reply
+            .count({
+              reply_id: reply_id
             })
-            .populate(option)
             .lean()
-            .exec(function(err, postReplys) {
-
-                if (err) {
-
-                    log.error(err)
-                    res.send(err);
-                    return;
-                }
-
-                if (postReplys == "" || postReplys == null || postReplys == undefined) {
-                    res.send('No Reply on this Post');
-                    return;
-                }
-
-                async.each(postReplys, function(singlepostReplys, callback) {
-
-                    var reply_id = singlepostReplys._id
-
-                    post_model.reply
-                        .count({
-                            reply_id: reply_id
-                        })
-                        .lean()
-                        .exec(function(err, result) {
-
-                            singlepostReplys.count = result;
-                            callback();
-
-                        })
-
-                }, function(err) {
-
-                    res.send(postReplys);
-
-                })
-
+            .exec(function (err, result) {
+              singlepostReplys.count = result
+              callback()
             })
-    }
+        }, function (err) {
+          res.send(postReplys)
+        })
+      })
+  }
 
-    if (type == 2 || type == '2') {
+  if (type == 2 || type == '2') {
+    var retweet_quote_id = id
+    log.info(retweet_quote_id)
 
-        var retweet_quote_id = id;
-        log.info(retweet_quote_id);
+    var option = [{
+      path: 'retweet_quote_id',
+      path: 'reply_user_id'
+    }, {
+      path: 'retweet_quote_id',
+      populate: {
+        path: 'ret_user_id'
+      }
+    }]
 
-        var option = [{
-            path: 'retweet_quote_id',
-            path: 'reply_user_id'
-        }, {
-            path: 'retweet_quote_id',
-            populate: {
-                path: 'ret_user_id'
-            }
-        }];
+    post_model.reply
+      .find({
+        retweet_quote_id: retweet_quote_id
+      })
+      .populate(option)
+      .lean()
+      .exec(function (err, retweetReplys) {
+        log.info(retweetReplys)
 
-        post_model.reply
-            .find({
-                retweet_quote_id: retweet_quote_id
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
+
+        if (retweetReplys == '' || retweetReplys == null || retweetReplys == undefined) {
+          res.send('No Reply on this Retweet')
+          return
+        }
+
+        async.each(retweetReplys, function (singleretweetReplys, callback) {
+          var reply_id = singleretweetReplys._id
+
+          post_model.reply
+            .count({
+              reply_id: reply_id
             })
-            .populate(option)
             .lean()
-            .exec(function(err, retweetReplys) {
+            .exec(function (err, result) {
+              if (err) {
+                log.error(err)
+                res.send(err)
+                return
+              }
 
-                log.info(retweetReplys);
-
-                if (err) {
-
-                    log.error(err)
-                    res.send(err);
-                    return;
-                }
-
-                if (retweetReplys == "" || retweetReplys == null || retweetReplys == undefined) {
-                    res.send('No Reply on this Retweet');
-                    return;
-                }
-
-                async.each(retweetReplys, function(singleretweetReplys, callback) {
-
-                    var reply_id = singleretweetReplys._id
-
-                    post_model.reply
-                        .count({
-                            reply_id: reply_id
-                        })
-                        .lean()
-                        .exec(function(err, result) {
-
-                            if (err) {
-
-                                log.error(err)
-                                res.send(err);
-                                return;
-                            }
-
-                            singleretweetReplys.count = result;
-                            callback();
-
-                        })
-
-                }, function(err) {
-
-                    res.send(retweetReplys);
-
-                })
-
+              singleretweetReplys.count = result
+              callback()
             })
-    }
+        }, function (err) {
+          res.send(retweetReplys)
+        })
+      })
+  }
 
-    if (type == 3 || type == '3') {
+  if (type == 3 || type == '3') {
+    var reply_id = id
 
-        var reply_id = id;
+    var option = [{
+      path: 'reply_id',
+      path: 'reply_user_id'
+    }, {
+      path: 'reply_id',
+      populate: {
+        path: 'reply_user_id'
+      }
+    }]
 
-        var option = [{
-            path: 'reply_id',
-            path: 'reply_user_id'
-        }, {
-            path: 'reply_id',
-            populate: {
-                path: 'reply_user_id'
-            }
-        }];
+    post_model.reply
+      .find({
+        reply_id: reply_id
+      })
+      .populate(option)
+      .lean()
+      .exec(function (err, replyReplys) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
 
-        post_model.reply
-            .find({
-                reply_id: reply_id
+        if (replyReplys == '' || replyReplys == null || replyReplys == undefined) {
+          res.send('No Reply on this Reply')
+          return
+        }
+
+        async.each(replyReplys, function (singlereplyReplys, callback) {
+          var reply_id = singlereplyReplys._id
+
+          post_model.reply
+            .count({
+              reply_id: reply_id
             })
-            .populate(option)
             .lean()
-            .exec(function(err, replyReplys) {
+            .exec(function (err, result) {
+              if (err) {
+                log.error(err)
+                res.send(err)
+                return
+              }
 
-                if (err) {
-
-                    log.error(err)
-                    res.send(err);
-                    return;
-                }
-
-                if (replyReplys == "" || replyReplys == null || replyReplys == undefined) {
-                    res.send('No Reply on this Reply');
-                    return;
-                }
-
-                async.each(replyReplys, function(singlereplyReplys, callback) {
-
-                    var reply_id = singlereplyReplys._id
-
-                    post_model.reply
-                        .count({
-                            reply_id: reply_id
-                        })
-                        .lean()
-                        .exec(function(err, result) {
-
-                            if (err) {
-
-                                log.error(err)
-                                res.send(err);
-                                return;
-                            }
-
-                            singlereplyReplys.count = result;
-                            callback();
-
-                        })
-
-                }, function(err) {
-
-                    res.send(replyReplys);
-
-                })
-
+              singlereplyReplys.count = result
+              callback()
             })
-    }
-
+        }, function (err) {
+          res.send(replyReplys)
+        })
+      })
+  }
 }
 
 /*
@@ -417,316 +351,271 @@ Public - shown to all
 Private - if logged in and reply user id same
 Following - if logged in user following to reply_user_id
 */
-var getReply_new = function(req, res) {
+var getReply_new = function (req, res) {
+  var type = req.body.type
+  var id = req.body.id
+  var logged_id = req.body.logged_id
 
-    var type = req.body.type;
-    var id = req.body.id;
-    var logged_id = req.body.logged_id;
+  log.info('Get reply api hitted')
 
-    log.info('Get reply api hitted');
+  log.info('Post Type', type)
+  log.info('Post id', id)
+  log.info('logged_in', logged_id)
 
-    log.info('Post Type', type);
-    log.info('Post id', id);
-    log.info('logged_in', logged_id)
+  // master.getPrivacyStatus()
 
-    // master.getPrivacyStatus()
+  if (type == 1 || type == '1') {
+    var post_id = id
 
-    if (type == 1 || type == '1') {
+    var option = [{
+      path: 'post_id',
+      path: 'reply_user_id'
+    }, {
+      path: 'post_id',
+      populate: {
+        path: 'posted_by'
+      }
+    }]
 
-        var post_id = id;
+    post_model.reply
+      .find({
+        post_id: post_id
+      })
+      .populate(option)
+      .lean()
+      .exec(function (err, postReplys) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
 
-        var option = [{
-            path: 'post_id',
-            path: 'reply_user_id'
-        }, {
-            path: 'post_id',
-            populate: {
-                path: 'posted_by'
-            }
-        }];
+        if (postReplys == '' || postReplys == null || postReplys == undefined) {
+          res.send('No Reply on this Post')
+          return
+        }
 
-        post_model.reply
-            .find({
-                post_id: post_id
-            })
-            .populate(option)
-            .lean()
-            .exec(function(err, postReplys) {
+        // console.info(postReplys)
 
-                if (err) {
+        getReplyWithPrivacyStatus(postReplys, logged_id, function (err, result) {
+          if (err) {
+            console.info(result)
+            res.send(result)
+            return
+          }
 
-                    log.error(err)
-                    res.send(err);
-                    return;
-                }
+          res.json(
+            result
+          )
+          console.info(result)
+        })
+      })
+  }
 
-                if (postReplys == "" || postReplys == null || postReplys == undefined) {
-                    res.send('No Reply on this Post');
-                    return;
-                }
+  if (type == 2 || type == '2') {
+    var retweet_quote_id = id
+    log.info(retweet_quote_id)
 
-                // console.info(postReplys);
+    var option = [{
+      path: 'retweet_quote_id',
+      path: 'reply_user_id'
+    }, {
+      path: 'retweet_quote_id',
+      populate: {
+        path: 'ret_user_id'
+      }
+    }]
 
-                getReplyWithPrivacyStatus(postReplys, logged_id, function(err, result) {
+    post_model.reply
+      .find({
+        retweet_quote_id: retweet_quote_id
+      })
+      .populate(option)
+      .lean()
+      .exec(function (err, retweetReplys) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
 
-                    if (err) {
-                        console.info(result);
-                        res.send(result);
-                        return;
-                    };
+        if (retweetReplys == '' || retweetReplys == null || retweetReplys == undefined) {
+          res.send('No Reply on this Retweet')
+          return
+        }
 
-                    res.json(
-                        result
-                    );
-                    console.info(result);
+        getReplyWithPrivacyStatus(retweetReplys, logged_id, function (err, result) {
+          if (err) {
+            console.info(result)
+            res.send(result)
+            return
+          }
 
-                })
+          res.json(
+            result
+          )
+          console.info(result)
+        })
+      })
+  }
 
-            })
-    }
+  if (type == 3 || type == '3') {
+    var reply_id = id
 
-    if (type == 2 || type == '2') {
+    var option = [{
+      path: 'reply_id',
+      path: 'reply_user_id'
+    }, {
+      path: 'reply_id',
+      populate: {
+        path: 'reply_user_id'
+      }
+    }]
 
-        var retweet_quote_id = id;
-        log.info(retweet_quote_id);
+    post_model.reply
+      .find({
+        reply_id: reply_id
+      })
+      .populate(option)
+      .lean()
+      .exec(function (err, replyReplys) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
 
-        var option = [{
-            path: 'retweet_quote_id',
-            path: 'reply_user_id'
-        }, {
-            path: 'retweet_quote_id',
-            populate: {
-                path: 'ret_user_id'
-            }
-        }];
+        if (replyReplys == '' || replyReplys == null || replyReplys == undefined) {
+          res.send('No Reply on this Reply')
+          return
+        }
 
-        post_model.reply
-            .find({
-                retweet_quote_id: retweet_quote_id
-            })
-            .populate(option)
-            .lean()
-            .exec(function(err, retweetReplys) {
+        getReplyWithPrivacyStatus(replyReplys, logged_id, function (err, result) {
+          if (err) {
+            console.info(result)
+            res.send(result)
+            return
+          }
 
-                if (err) {
-
-                    log.error(err)
-                    res.send(err);
-                    return;
-                }
-
-                if (retweetReplys == "" || retweetReplys == null || retweetReplys == undefined) {
-                    res.send('No Reply on this Retweet');
-                    return;
-                }
-
-                getReplyWithPrivacyStatus(retweetReplys, logged_id, function(err, result) {
-
-                    if (err) {
-                        console.info(result);
-                        res.send(result);
-                        return;
-                    };
-
-                    res.json(
-                        result
-                    );
-                    console.info(result);
-
-                })
-
-            })
-    }
-
-    if (type == 3 || type == '3') {
-
-        var reply_id = id;
-
-        var option = [{
-            path: 'reply_id',
-            path: 'reply_user_id'
-        }, {
-            path: 'reply_id',
-            populate: {
-                path: 'reply_user_id'
-            }
-        }];
-
-        post_model.reply
-            .find({
-                reply_id: reply_id
-            })
-            .populate(option)
-            .lean()
-            .exec(function(err, replyReplys) {
-
-                if (err) {
-
-                    log.error(err)
-                    res.send(err);
-                    return;
-                }
-
-                if (replyReplys == "" || replyReplys == null || replyReplys == undefined) {
-                    res.send('No Reply on this Reply');
-                    return;
-                }
-
-                getReplyWithPrivacyStatus(replyReplys, logged_id, function(err, result) {
-
-                    if (err) {
-                        console.info(result);
-                        res.send(result);
-                        return;
-                    };
-
-                    res.json(
-                        result
-                    );
-                    console.info(result);
-
-                })
-                
-            })
-    }
-
+          res.json(
+            result
+          )
+          console.info(result)
+        })
+      })
+  }
 }
-var deletereply = function(req, res) {
+var deletereply = function (req, res) {
+  var reply_id = req.body.reply_id
+  var reply_user_id = req.body.reply_user_id
 
-    var reply_id = req.body.reply_id;
-    var reply_user_id = req.body.reply_user_id;
+  req.checkBody('reply_id', 'reply_id').notEmpty()
 
-    req.checkBody('reply_id', 'reply_id').notEmpty();
+  var errors = req.validationErrors()
 
-    var errors = req.validationErrors();
+  if (errors) {
+    log.warn('There have been validation errors: \n' + util.inspect(errors))
+    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    return
+  }
 
-    if (errors) {
-        log.warn('There have been validation errors: \n' + util.inspect(errors));
-        res.status('400').json('There have been validation errors: ' + util.inspect(errors));
-        return;
+  post_model.reply
+    .findOneAndRemove({
+      _id: reply_id,
+      reply_user_id: reply_user_id
+    })
+    .exec(function (err, result) {
+      if (err) {
+        log.error(err)
+        res.send(err)
+        return
+      }
+
+      if (result !== null) {
+        log.info('Reply Deleted')
+
+        res.json({
+          message: 'Reply Deleted'
+        })
+      } else {
+        log.info('No Reply Found')
+
+        res.json({
+          message: 'No Reply Found'
+        })
+      }
+    })
+}
+
+var getReplyWithPrivacyStatus = function (postReplys, logged_id, callback) {
+  log.info('Get reply with privacy status')
+
+  var reqReply = []
+
+  async.each(postReplys, function (singlepostReply, callback) {
+    var reply_id = singlepostReply._id
+    var privacyStatus = singlepostReply.privacy_setting
+    var reply_user_id = singlepostReply.reply_user_id._id
+
+    log.info(privacyStatus)
+
+    if (privacyStatus == 2) { // private post
+
+      if (logged_id == reply_user_id) {
+        reqReply.push(singlepostReply)
+        console.info('req reply', reqReply[0]._id)
+      }
+    } else if (privacyStatus == 1) { // public
+
+      reqReply.push(singlepostReply)
+    } else if (privacyStatus == 3) { // follower
+
+      if (logged_id == reply_user_id) {
+        reqReply.push(singlepostReply)
+      } else {
+        master.isFollowing(logged_id, reply_user_id, function (err, result) {
+          if (err) {
+            res.send(result)
+            log.info(result)
+            return
+          }
+
+          if (result) {
+            reqReply.push(singlepostReply)
+          }
+        })
+      }
     }
 
     post_model.reply
-        .findOneAndRemove({
-            _id: reply_id,
-            reply_user_id: reply_user_id
-        })
-        .exec(function(err, result) {
+      .count({
+        reply_id: reply_id
+      })
+      .lean()
+      .exec(function (err, result) {
+        singlepostReply.count = result
+        callback()
+      })
+  }, function (err) {
 
-            if (err) {
+    // date wise sort
+    function custom_sort (a, b) {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    }
 
-                log.error(err)
-                res.send(err);
-                return;
-            }
+    reqReply.sort(custom_sort)
 
-            if (result !== null) {
+    reqReply = reqReply.slice(0, 10)
 
-                log.info('Reply Deleted');
-
-                res.json({
-                    message: 'Reply Deleted'
-                });
-
-            } else {
-
-                log.info('No Reply Found');
-
-                res.json({
-                    message: 'No Reply Found'
-                });
-
-            }
-
-        });
-
-};
-
-var getReplyWithPrivacyStatus = function(postReplys, logged_id, callback) {
-
-    log.info('Get reply with privacy status');
-
-    var reqReply = new Array();
-
-    async.each(postReplys, function(singlepostReply, callback) {
-
-        var reply_id = singlepostReply._id;
-        var privacyStatus = singlepostReply.privacy_setting;
-        var reply_user_id = singlepostReply.reply_user_id._id;
-
-        log.info(privacyStatus);
-
-        if (privacyStatus == 2) { //private post
-
-            if (logged_id == reply_user_id) {
-
-                reqReply.push(singlepostReply);
-                console.info('req reply', reqReply[0]._id);
-            }
-
-        } else if (privacyStatus == 1) { //public
-
-            reqReply.push(singlepostReply);
-
-        } else if (privacyStatus == 3) { //follower
-
-            if (logged_id == reply_user_id) {
-
-                reqReply.push(singlepostReply);
-
-            } else {
-
-                master.isFollowing(logged_id, reply_user_id, function(err, result) {
-
-                    if (err) {
-                        res.send(result);
-                        log.info(result);
-                        return;
-                    }
-
-                    if (result) {
-                        reqReply.push(singlepostReply);
-                    }
-
-                })
-            }
-
-        }
-
-        post_model.reply
-            .count({
-                reply_id: reply_id
-            })
-            .lean()
-            .exec(function(err, result) {
-
-                singlepostReply.count = result;
-                callback();
-
-            })
-
-    }, function(err) {
-
-        //date wise sort
-        function custom_sort(a, b) {
-            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        }
-
-        reqReply.sort(custom_sort);
-
-        reqReply = reqReply.slice(0, 10);
-
-        log.info(reqReply);
-        callback(null, reqReply);
-
-    })
-
+    log.info(reqReply)
+    callback(null, reqReply)
+  })
 }
 
 module.exports = ({
-    setreply: setreply,
-    //getreply : getreply,
-    deletereply: deletereply,
-    getReply: getReply,
-    getReply_new: getReply_new
+  setreply: setreply,
+  // getreply : getreply,
+  deletereply: deletereply,
+  getReply: getReply,
+  getReply_new: getReply_new
 })

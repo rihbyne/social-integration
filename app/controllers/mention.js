@@ -1,176 +1,149 @@
-var mention_model = require('../models/mentionSchema.js');
-var async = require('async');
+var mention_model = require('../models/mentionSchema.js')
+var async = require('async')
 var log = require('../../config/logging')()
 
-//Get mentionuser's post
-var getmentionuser = function(req, res) { // get a post 
+// Get mentionuser's post
+var getmentionuser = function (req, res) { // get a post 
 
-    log.info('Show mention user\'s post');
+  log.info("Show mention user's post")
 
-    var mention_user = req.params.mention_user;
+  var mention_user = req.params.mention_user
 
-    async.parallel([
-            getPostByMentionUser,
-            getRetweetByMentionUser,
-            getReplyByMentionUser
-        ],
-        function(err, result) {
-            log.info(result);
-            if (err) {
-
-                if (result[0] === 0) {
-                    log.info('Own posts are zero');
-                    var mentionUserPosts = result[1]
-                }
-
-                if (result[1] === 0) {
-                    log.info('Retweet posts are zero');
-                    var mentionUserPosts = result[0]
-                }
-
-            } else {
-
-                var mentionUserPosts = result[0].concat(result[1]).concat(result[2]); //Got two result , concent two results
-
-                function custom_sort(a, b) {
-                    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-                }
-
-                mentionUserPosts.sort(custom_sort);
-            }
-
-            log.info(mentionUserPosts);
-            res.json({
-                mentionUserPosts
-            })
-
+  async.parallel([
+    getPostByMentionUser,
+    getRetweetByMentionUser,
+    getReplyByMentionUser
+  ],
+    function (err, result) {
+      log.info(result)
+      if (err) {
+        if (result[0] === 0) {
+          log.info('Own posts are zero')
+          var mentionUserPosts = result[1]
         }
-    );
 
-    function getPostByMentionUser(callback) {
+        if (result[1] === 0) {
+          log.info('Retweet posts are zero')
+          var mentionUserPosts = result[0]
+        }
+      } else {
+        var mentionUserPosts = result[0].concat(result[1]).concat(result[2]); // Got two result , concent two results
 
-        var optionFilter = [{
-                path: 'post_id',
-                populate: {
-                    path: 'posted_by'
-                }
-            }]
-            // find by mention collection from post_mention and check for errors
-        mention_model.post_mention
-            .find({
-                mention_users: mention_user
-            })
-            .select('post_id')
-            .populate(optionFilter)
-            .lean()
-            .exec(function(err, mentionspost) {
+        function custom_sort (a, b) {
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        }
 
-                if (err) {
-                    
-                    log.error(err);
-                    res.send(err);
-                    return;
-                }
-                
-                if (mentionspost.length !== '') {
+        mentionUserPosts.sort(custom_sort)
+      }
 
-                    // log.info(mentionspost);
-
-                    callback(null, mentionspost)
-
-                } else {
-
-                    callback(null, [])
-                }
-
-            });
+      log.info(mentionUserPosts)
+      res.json({
+      mentionUserPosts})
     }
+  )
 
-    function getRetweetByMentionUser(callback) {
-        log.info(mention_user);
+  function getPostByMentionUser (callback) {
+    var optionFilter = [{
+      path: 'post_id',
+      populate: {
+        path: 'posted_by'
+      }
+    }]
+    // find by mention collection from post_mention and check for errors
+    mention_model.post_mention
+      .find({
+        mention_users: mention_user
+      })
+      .select('post_id')
+      .populate(optionFilter)
+      .lean()
+      .exec(function (err, mentionspost) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
 
-        var filterOptions = [{
-                path: 'retweet_quote_id'
-            }, {
-                path: 'retweet_quote_id',
-                populate: {
-                    path: 'ret_user_id'
-                }
-            }]
-            // find by mention collection from post_mention and check for errors
-        mention_model.retweet_quote_mention
-            .find({
-                mention_users: mention_user
-            })
-            .select('retweet_quote_id')
-            .populate(filterOptions)
-            .lean()
-            .exec(function(err, mentionspostdata) {
+        if (mentionspost.length !== '') {
 
-                if (err) {
-                    
-                    log.error(err);
-                    res.send(err);
-                    return;
-                }
+          // log.info(mentionspost)
 
-                if (mentionspostdata.length !== '') {
+          callback(null, mentionspost)
+        } else {
+          callback(null, [])
+        }
+      })
+  }
 
-                    callback(null, mentionspostdata);
+  function getRetweetByMentionUser (callback) {
+    log.info(mention_user)
 
-                } else {
+    var filterOptions = [{
+      path: 'retweet_quote_id'
+    }, {
+      path: 'retweet_quote_id',
+      populate: {
+        path: 'ret_user_id'
+      }
+    }]
+    // find by mention collection from post_mention and check for errors
+    mention_model.retweet_quote_mention
+      .find({
+        mention_users: mention_user
+      })
+      .select('retweet_quote_id')
+      .populate(filterOptions)
+      .lean()
+      .exec(function (err, mentionspostdata) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
 
-                    callback(null, [])
+        if (mentionspostdata.length !== '') {
+          callback(null, mentionspostdata)
+        } else {
+          callback(null, [])
+        }
+      })
+  }
 
-                }
+  function getReplyByMentionUser (callback) {
+    var filterOptions = [{
+      path: 'reply_id'
+    }, {
+      path: 'reply_id',
+      populate: {
+        path: 'reply_user_id'
+      }
+    }]
 
-            });
-    }
+    log.info(mention_user)
+    // find by mention collection from post_mention and check for errors
+    mention_model.reply_mention
+      .find({
+        mention_users: mention_user
+      })
+      .select('reply_id')
+      .populate(filterOptions)
+      .lean()
+      .exec(function (err, mentionspost) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
 
-    function getReplyByMentionUser(callback) {
-
-        var filterOptions = [{
-            path: 'reply_id'
-        }, {
-            path: 'reply_id',
-            populate: {
-                path: 'reply_user_id'
-            }
-        }];
-
-        log.info(mention_user);
-        // find by mention collection from post_mention and check for errors
-        mention_model.reply_mention
-            .find({
-                mention_users: mention_user
-            })
-            .select('reply_id')
-            .populate(filterOptions)
-            .lean()
-            .exec(function(err, mentionspost) {
-
-                if (err) {
-                    
-                    log.error(err);
-                    res.send(err);
-                    return;
-                }
-
-                if (mentionspost.length !== '') {
-
-                    callback(null, mentionspost)
-
-                } else {
-
-                    callback(null, [])
-
-                }
-
-            });
-    }
-
-};
+        if (mentionspost.length !== '') {
+          callback(null, mentionspost)
+        } else {
+          callback(null, [])
+        }
+      })
+  }
+}
 
 module.exports = ({
-    getmentionuser: getmentionuser
+  getmentionuser: getmentionuser
 })

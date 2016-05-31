@@ -1,72 +1,64 @@
-var follow = require('../app/models/followersSchema.js');
+var follow = require('../app/models/followersSchema.js')
 
-var setmuteuser = function(req, res) {
+var setmuteuser = function (req, res) {
+  var userId = req.body.userId
+  var followingId = req.body.followingId
 
-    var userId = req.body.userId;
-    var followingId = req.body.followingId;
+  // Validation remaining
 
-    //Validation remaining
+  follow
+    .find({
+      $and: [{
+        user_id: userId
+      }, {
+        following_id: followingId
+      }]
+    })
+    .select('mute')
+    .exec(function (err, muteresult) {
+      if (err) {
+        log.error(err)
+        res.send(err)
+      }
 
-    follow
-        .find({
-            $and: [{
-                user_id: userId
-            }, {
-                following_id: followingId
-            }]
+      log.info(muteresult)
+
+      var blockStatus = (muteresult[0].block == false) ? true : false
+
+      follow
+        .update({_id: muteresult[0]._id}, {block: blockStatus})
+        .exec(function (err, result) {
+          if (err)
+            res.send(err)
+
+          log.info(result)
         })
-        .select('mute')
-        .exec(function(err, muteresult) {
-            if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
-            	
-            	log.info(muteresult);
-
-            	var blockStatus = (muteresult[0].block == false) ? true : false;
-
-            	follow
-            	.update({_id : muteresult[0]._id}, {block: blockStatus})
-            	.exec(function(err, result){
-
-            		 if (err)
-		                res.send(err)
-		            	
-		            	log.info(result);
-
-            	})
-
-
-        });
-
+    })
 }
 
-var getmuteuser = function(req, res){
+var getmuteuser = function (req, res) {
+  var userId = req.params.userId
+  var blockStatus = req.params.blockStatus
 
-	var userId = req.params.userId;
-    var blockStatus = req.params.blockStatus;
+  // validation Remaining
 
-    //validation Remaining
-
-    follow
+  follow
     .find({$and: [{user_id: userId}, {block: 'true'}]})
     .select('following_id')
-    .exec(function(err, result){
-    	if (err) {
-                            log.error(err);
-                            res.send(err);
-                        }
-    	log.info(result);
-    	res.json({
-    		countOfBlockUsers: result.length,
-    		listOfBlockUsers: result
-    	})
+    .exec(function (err, result) {
+      if (err) {
+        log.error(err)
+        res.send(err)
+      }
+      log.info(result)
+      res.json({
+        countOfBlockUsers: result.length,
+        listOfBlockUsers: result
+      })
     })
-
 }
 
 module.exports = ({
-	setmuteuser : setmuteuser,
-	getmuteuser : getmuteuser
-});
+  setmuteuser: setmuteuser,
+  getmuteuser: getmuteuser
+})

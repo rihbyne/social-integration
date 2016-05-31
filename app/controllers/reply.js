@@ -410,6 +410,187 @@ var getReply = function(req, res) {
 
 }
 
+/*
+Get reply api give reply result.
+Reply is filtered by privacy setting.
+Public - shown to all
+Private - if logged in and reply user id same
+Following - if logged in user following to reply_user_id
+*/
+var getReply_new = function(req, res) {
+
+    var type = req.body.type;
+    var id = req.body.id;
+    var logged_id = req.body.logged_id;
+
+    log.info('Get reply api hitted');
+
+    log.info('Post Type', type);
+    log.info('Post id', id);
+    log.info('logged_in', logged_id)
+
+    // master.getPrivacyStatus()
+
+    if (type == 1 || type == '1') {
+
+        var post_id = id;
+
+        var option = [{
+            path: 'post_id',
+            path: 'reply_user_id'
+        }, {
+            path: 'post_id',
+            populate: {
+                path: 'posted_by'
+            }
+        }];
+
+        post_model.reply
+            .find({
+                post_id: post_id
+            })
+            .populate(option)
+            .lean()
+            .exec(function(err, postReplys) {
+
+                if (err) {
+
+                    log.error(err)
+                    res.send(err);
+                    return;
+                }
+
+                if (postReplys == "" || postReplys == null || postReplys == undefined) {
+                    res.send('No Reply on this Post');
+                    return;
+                }
+
+                // console.info(postReplys);
+
+                getReplyWithPrivacyStatus(postReplys, logged_id, function(err, result) {
+
+                    if (err) {
+                        console.info(result);
+                        res.send(result);
+                        return;
+                    };
+
+                    res.json(
+                        result
+                    );
+                    console.info(result);
+
+                })
+
+            })
+    }
+
+    if (type == 2 || type == '2') {
+
+        var retweet_quote_id = id;
+        log.info(retweet_quote_id);
+
+        var option = [{
+            path: 'retweet_quote_id',
+            path: 'reply_user_id'
+        }, {
+            path: 'retweet_quote_id',
+            populate: {
+                path: 'ret_user_id'
+            }
+        }];
+
+        post_model.reply
+            .find({
+                retweet_quote_id: retweet_quote_id
+            })
+            .populate(option)
+            .lean()
+            .exec(function(err, retweetReplys) {
+
+                if (err) {
+
+                    log.error(err)
+                    res.send(err);
+                    return;
+                }
+
+                if (retweetReplys == "" || retweetReplys == null || retweetReplys == undefined) {
+                    res.send('No Reply on this Retweet');
+                    return;
+                }
+
+                getReplyWithPrivacyStatus(retweetReplys, logged_id, function(err, result) {
+
+                    if (err) {
+                        console.info(result);
+                        res.send(result);
+                        return;
+                    };
+
+                    res.json(
+                        result
+                    );
+                    console.info(result);
+
+                })
+
+            })
+    }
+
+    if (type == 3 || type == '3') {
+
+        var reply_id = id;
+
+        var option = [{
+            path: 'reply_id',
+            path: 'reply_user_id'
+        }, {
+            path: 'reply_id',
+            populate: {
+                path: 'reply_user_id'
+            }
+        }];
+
+        post_model.reply
+            .find({
+                reply_id: reply_id
+            })
+            .populate(option)
+            .lean()
+            .exec(function(err, replyReplys) {
+
+                if (err) {
+
+                    log.error(err)
+                    res.send(err);
+                    return;
+                }
+
+                if (replyReplys == "" || replyReplys == null || replyReplys == undefined) {
+                    res.send('No Reply on this Reply');
+                    return;
+                }
+
+                getReplyWithPrivacyStatus(replyReplys, logged_id, function(err, result) {
+
+                    if (err) {
+                        console.info(result);
+                        res.send(result);
+                        return;
+                    };
+
+                    res.json(
+                        result
+                    );
+                    console.info(result);
+
+                })
+                
+            })
+    }
+
+}
 var deletereply = function(req, res) {
 
     var reply_id = req.body.reply_id;
@@ -461,9 +642,91 @@ var deletereply = function(req, res) {
 
 };
 
+var getReplyWithPrivacyStatus = function(postReplys, logged_id, callback) {
+
+    log.info('Get reply with privacy status');
+
+    var reqReply = new Array();
+
+    async.each(postReplys, function(singlepostReply, callback) {
+
+        var reply_id = singlepostReply._id;
+        var privacyStatus = singlepostReply.privacy_setting;
+        var reply_user_id = singlepostReply.reply_user_id._id;
+
+        log.info(privacyStatus);
+
+        if (privacyStatus == 2) { //private post
+
+            if (logged_id == reply_user_id) {
+
+                reqReply.push(singlepostReply);
+                console.info('req reply', reqReply[0]._id);
+            }
+
+        } else if (privacyStatus == 1) { //public
+
+            reqReply.push(singlepostReply);
+
+        } else if (privacyStatus == 3) { //follower
+
+            if (logged_id == reply_user_id) {
+
+                reqReply.push(singlepostReply);
+
+            } else {
+
+                master.isFollowing(logged_id, reply_user_id, function(err, result) {
+
+                    if (err) {
+                        res.send(result);
+                        log.info(result);
+                        return;
+                    }
+
+                    if (result) {
+                        reqReply.push(singlepostReply);
+                    }
+
+                })
+            }
+
+        }
+
+        post_model.reply
+            .count({
+                reply_id: reply_id
+            })
+            .lean()
+            .exec(function(err, result) {
+
+                singlepostReply.count = result;
+                callback();
+
+            })
+
+    }, function(err) {
+
+        //date wise sort
+        function custom_sort(a, b) {
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        }
+
+        reqReply.sort(custom_sort);
+
+        reqReply = reqReply.slice(0, 10);
+
+        log.info(reqReply);
+        callback(null, reqReply);
+
+    })
+
+}
+
 module.exports = ({
     setreply: setreply,
     //getreply : getreply,
     deletereply: deletereply,
-    getReply: getReply
+    getReply: getReply,
+    getReply_new: getReply_new
 })

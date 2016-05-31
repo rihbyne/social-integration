@@ -221,18 +221,18 @@ var isFollowing = function(user_id, following_id, callback) {
 
                 log.error(err);
                 res.send(err);
-                return;
+                return callback(true, err); //following
             }
 
             log.info('isFollowing Result', result);
 
             if (result.length !== 0) {
 
-                return callback(true); //following
+                return callback(null, true); //following
 
             } else {
 
-                return callback(false);
+                return callback(null, false);
             }
 
         })

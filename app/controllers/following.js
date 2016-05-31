@@ -99,11 +99,17 @@ var setfollowing = function(req, res) {
                             follow_back = 'false';
                         };
 
-                        master.isFollowing(user_id, following_id, function(result) {
+                        master.isFollowing(user_id, following_id, function(err, result) {
 
                             log.info(result);
 
-                            if (!result) {
+                            if (err) {
+                                res.send(result);
+                                log.info(result);
+                                return;
+                            }
+
+                            if (!result) {  
 
                                 var followingModel = new follower({
                                     user_id: user_id,

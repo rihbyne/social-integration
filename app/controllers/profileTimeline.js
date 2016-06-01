@@ -200,6 +200,7 @@ var getpostsrtreply = function (req, res) { // get a post
 
 // find post from userid
 function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
+
   var query, privacyStatus
 
   switch (privacyStatus) {
@@ -219,12 +220,14 @@ function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
           }
         }]
       }
-      break
+    break
 
     default:
       query = {
         posted_by: userid,
-        privacy_setting: 1
+        privacy_setting: {
+            $ne: 2
+          }
       }
 
   }
@@ -396,7 +399,9 @@ function getQuoteRetweetByUserId (userid, privacyStatus, timestamp, flag, callba
     default:
       query = {
         ret_user_id: userid,
-        privacy_setting: 1
+        privacy_setting: {
+            $ne: 2
+          }
       }
   }
 
@@ -476,13 +481,14 @@ function getQuoteRetweetByUserId (userid, privacyStatus, timestamp, flag, callba
 
 // find reply from userid
 function getReplyByUserId (userid, privacyStatus, timestamp, flag, callback) {
+
   var query, privacyStatus
 
   switch (privacyStatus) {
     case 1:
       query = {
         reply_user_id: userid,
-      timeQuery}
+      }
       break
 
     case 2:
@@ -493,17 +499,17 @@ function getReplyByUserId (userid, privacyStatus, timestamp, flag, callback) {
           privacy_setting: {
             $ne: 2
           }
-        },
-          timeQuery
-        ]
+        }]
       }
       break
 
     default:
       query = {
         reply_user_id: userid,
-        privacy_setting: 1,
-      timeQuery}
+        privacy_setting: {
+            $ne: 2
+          }
+      }
   }
 
   if (flag == 1) {

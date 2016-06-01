@@ -151,6 +151,8 @@ var getpostsrtreply = function (req, res) { // get a post
 
   var userid = req.body.user_id // find posts of user
   var loggedid = req.body.logged_id
+  var timestamp = req.body.timestamp
+  var flag = req.body.flag; // New - 1 and Old - 2 
   var profilePosts
   var result1, result2
 

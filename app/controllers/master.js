@@ -191,11 +191,11 @@ var isFollowing = function (user_id, following_id, callback) {
     3. if not following -- privacyStatus - 3
 */
 var getPrivacyStatus = function (userid, loggedid, callback) {
-
+log.info('getPrivacyStatus api hitted');
   // check userid and loggeduser same or not
   if (loggedid == userid) {
     privacyStatus = 1
-
+    log.info('Privacy Status',privacyStatus);
     callback(null, privacyStatus)
   } else {
     isFollowing(userid, loggedid, function (followResult) {
@@ -204,10 +204,8 @@ var getPrivacyStatus = function (userid, loggedid, callback) {
       } else {
         privacyStatus = 3
       }
-
+      log.info('Privacy Status',privacyStatus);
       callback(null, privacyStatus)
-
-      console.info('master', privacyStatus)
     })
   }
 }

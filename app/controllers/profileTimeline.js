@@ -108,8 +108,8 @@ var getuserhomeposts = function (req, res) { // get a post
 
   master.getPrivacyStatus(userid, loggedid, function (err, privacyStatus) {
     if (err) {
-      log.error(err)
-      res.send(err)
+      log.error(privacyStatus)
+      res.send(privacyStatus)
       return
     }
 
@@ -205,6 +205,10 @@ function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
 
   var query, privacyStatus
 
+  /*case 1 - own user
+    case 2 - following user
+    case 3 - unknown user*/
+    
   switch (privacyStatus) {
     case 1:
       query = {
@@ -214,22 +218,17 @@ function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
 
     case 2:
       query = {
-        $and: [{
-          posted_by: userid
-        }, {
+          posted_by: userid,
           privacy_setting: {
             $ne: 2
           }
-        }]
-      }
+        }
     break
 
     default:
       query = {
         posted_by: userid,
-        privacy_setting: {
-            $ne: 2
-          }
+        privacy_setting: 1
       }
 
   }

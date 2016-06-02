@@ -263,9 +263,10 @@ var unlink_following = function (req, res) {
     return
   }
 
-  if (following_id == process.env.SUPERUSERID) {
+  if (unlink_following == process.env.SUPERUSERID) {
     log.info('You can not unfollow searchtrade user')
     res.send('You can not unfollow searchtrade user')
+    return
   }
 
   follower

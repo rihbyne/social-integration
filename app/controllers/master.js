@@ -162,8 +162,7 @@ var isFollowing = function (user_id, following_id, callback) {
   follower
     .find({
       user_id: user_id,
-      following_id: following_id,
-      follow_status: 'true'
+      following_id: following_id
     })
     .lean()
     .exec(function (err, result) {
@@ -172,15 +171,16 @@ var isFollowing = function (user_id, following_id, callback) {
         res.send(err)
         return callback(true, err) // following
       }
-
       log.info('isFollowing Result', result)
 
       if (result.length !== 0) {
-        return callback(null, true) // following
-
+        if (result[0].follow_status == false) {//For old following user
+          return callback(null, true) 
+        }     
       } else {
-        return callback(null, false)
+        return callback(null, false); //For new user
       }
+
     })
 }
 

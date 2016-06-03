@@ -19,7 +19,7 @@ var setretweet = function (req, res) {
   log.info('Retweet Type', retweet_type)
   log.info('Retweet Quote', retweet_msg)
 
-  req.checkBody('post_type', 'post type').notEmpty()
+  req.checkBody('post_type', 'post type').notEmpty().isAlpha();
   req.checkBody('ret_user_id', 'ret_user_id').notEmpty()
   req.checkBody('retweet_type', 'retweet_type').notEmpty()
   req.checkBody('post_id', 'post id').notEmpty()

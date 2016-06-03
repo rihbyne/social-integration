@@ -1,7 +1,18 @@
+var log = require('../../config/logging')()
+
 var sendJsonResponse = function(res, status, content) {
   res.contentType('application/json')
   res.status(status)
   res.send(content)
+}
+
+var validateParameter = function (parameter, name) {
+  if (parameter === undefined || parameter.length <= 0) {
+    log.error(name + ' Is Missing')
+    return false
+  }
+
+  return true
 }
 
 var isoDateValidate = function(dateStr) {
@@ -11,5 +22,6 @@ var isoDateValidate = function(dateStr) {
 }
 module.exports = {
   sendJsonResponse: sendJsonResponse,
-  isoDateValidate: isoDateValidate
+  isoDateValidate: isoDateValidate,
+  validateParameter: validateParameter
 }

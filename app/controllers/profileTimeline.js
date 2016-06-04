@@ -157,7 +157,7 @@ var getpostsrtreply = function (req, res) { // get a post
   var result1, result2
 
   log.info('userid, loggedid', userid + '   ' + loggedid)
-  
+
   req.checkBody('user_id', 'Mandatory field not found').notEmpty()
   req.checkBody('logged_id', 'Mandatory field not found').notEmpty()
   req.checkBody('timestamp', 'Mandatory field not found').isInt()
@@ -215,13 +215,12 @@ var getpostsrtreply = function (req, res) { // get a post
 
 // find post from userid
 function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
-
   var query, privacyStatus
 
   /*case 1 - own user
     case 2 - following user
     case 3 - unknown user*/
-    
+
   switch (privacyStatus) {
     case 1:
       query = {
@@ -231,12 +230,12 @@ function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
 
     case 2:
       query = {
-          posted_by: userid,
-          privacy_setting: {
-            $ne: 2
-          }
+        posted_by: userid,
+        privacy_setting: {
+          $ne: 2
         }
-    break
+      }
+      break
 
     default:
       query = {
@@ -414,8 +413,8 @@ function getQuoteRetweetByUserId (userid, privacyStatus, timestamp, flag, callba
       query = {
         ret_user_id: userid,
         privacy_setting: {
-            $ne: 2
-          }
+          $ne: 2
+        }
       }
   }
 
@@ -495,13 +494,12 @@ function getQuoteRetweetByUserId (userid, privacyStatus, timestamp, flag, callba
 
 // find reply from userid
 function getReplyByUserId (userid, privacyStatus, timestamp, flag, callback) {
-
   var query, privacyStatus
 
   switch (privacyStatus) {
     case 1:
       query = {
-        reply_user_id: userid,
+        reply_user_id: userid
       }
       break
 
@@ -521,8 +519,8 @@ function getReplyByUserId (userid, privacyStatus, timestamp, flag, callback) {
       query = {
         reply_user_id: userid,
         privacy_setting: {
-            $ne: 2
-          }
+          $ne: 2
+        }
       }
   }
 

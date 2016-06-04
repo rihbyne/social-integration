@@ -174,13 +174,10 @@ var isFollowing = function (user_id, following_id, callback) {
       log.info('isFollowing Result', result)
 
       if (result.length !== 0) {
-        if (result[0].follow_status == false) {//For old following user
-          return callback(null, true) 
-        }     
+        return callback(null, true) // For following user
       } else {
-        return callback(null, false); //For new user
+        return callback(null, false) // For new user
       }
-
     })
 }
 
@@ -191,25 +188,25 @@ var isFollowing = function (user_id, following_id, callback) {
     3. if not following -- privacyStatus - 3
 */
 var getPrivacyStatus = function (userid, loggedid, callback) {
-log.info('getPrivacyStatus api hitted');
+  log.info('getPrivacyStatus api hitted')
   // check userid and loggeduser same or not
   if (loggedid == userid) {
     privacyStatus = 1
-    log.info('Privacy Status -- Own user',privacyStatus);
+    log.info('Privacy Status -- Own user', privacyStatus)
     callback(null, privacyStatus)
   } else {
     isFollowing(loggedid, userid, function (err, followResult) {
       if (err) {
         log.error(err)
-        callback(true, 'something went wrong');
+        callback(true, 'something went wrong')
         return
       }
       if (followResult) {
         privacyStatus = 2
-        log.info('Privacy Status -- following',privacyStatus);
+        log.info('Privacy Status -- following', privacyStatus)
       } else {
         privacyStatus = 3
-        log.info('Privacy Status -- Not following',privacyStatus);
+        log.info('Privacy Status -- Not following', privacyStatus)
       }
 
       callback(null, privacyStatus)

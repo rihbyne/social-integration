@@ -157,6 +157,19 @@ var getpostsrtreply = function (req, res) { // get a post
   var result1, result2
 
   log.info('userid, loggedid', userid + '   ' + loggedid)
+  
+  req.checkBody('user_id', 'Mandatory field not found').notEmpty()
+  req.checkBody('logged_id', 'Mandatory field not found').notEmpty()
+  req.checkBody('timestamp', 'Mandatory field not found').isInt()
+  req.checkBody('flag', 'Mandatory field not found').isInt()
+
+  var errors = req.validationErrors()
+
+  if (errors) {
+    log.warn('There have been validation errors: \n' + util.inspect(errors))
+    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    return
+  }
 
   master.getPrivacyStatus(userid, loggedid, function (err, privacyStatus) {
     if (err) {

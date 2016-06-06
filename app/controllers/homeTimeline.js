@@ -122,6 +122,7 @@ var homeTimeline = function (req, res) {
 function getPostByUserId (showPostLoggedUser, userid, timestamp, flag, callback) {
 
   // log.info(showPostLoggedUser)
+  /* if cond - when logged user have post*/
   if (showPostLoggedUser) {
     var query = {
       $or: [{

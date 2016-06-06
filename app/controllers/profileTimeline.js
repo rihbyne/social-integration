@@ -215,12 +215,13 @@ var getpostsrtreply = function (req, res) { // get a post
 
 // find post from userid
 function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
-  var query, privacyStatus
 
   /*case 1 - own user
     case 2 - following user
     case 3 - unknown user*/
 
+  var query, privacyStatus
+  
   switch (privacyStatus) {
     case 1:
       query = {

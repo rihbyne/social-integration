@@ -36,6 +36,7 @@ var setfollowing = function (req, res) {
     })
     return
   }
+
   // validation for the profile if already followed
   follower
     .find({
@@ -101,7 +102,7 @@ var setfollowing = function (req, res) {
                 return
               }
 
-              if (!result) {
+              if (result == 'newUser') {
                 var followingModel = new follower({
                   user_id: user_id,
                   following_id: following_id,
@@ -117,7 +118,7 @@ var setfollowing = function (req, res) {
 
                   log.info('following/followers set saved')
                 })
-              } else {
+              } else if(result == 'oldFollowing') {
                 follower
                   .update({
                     user_id: user_id,

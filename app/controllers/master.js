@@ -174,9 +174,14 @@ var isFollowing = function (user_id, following_id, callback) {
       log.info('isFollowing Result', result)
 
       if (result.length !== 0) {
-        return callback(null, true) // For following user
+        if (result[0].follow_status == true) {
+          return callback(null, 'following') // For following user  
+        }
+        else{
+          return callback(null, 'oldFollowing') // For old following user
+        }        
       } else {
-        return callback(null, false) // For new user
+        return callback(null, 'newUser') // For new user
       }
     })
 }
@@ -201,10 +206,10 @@ var getPrivacyStatus = function (userid, loggedid, callback) {
         callback(true, 'something went wrong')
         return
       }
-      if (followResult) {
+      if (followResult == 'following') {
         privacyStatus = 2
         log.info('Privacy Status -- following', privacyStatus)
-      } else {
+      } else{
         privacyStatus = 3
         log.info('Privacy Status -- Not following', privacyStatus)
       }

@@ -90,7 +90,7 @@ var setfollowing = function (req, res) {
 
               follow_back = 'true'
             } else {
-              follow_back = 'false'
+                follow_back = 'false'
             }
 
             master.isFollowing(user_id, following_id, function (err, result) {
@@ -125,7 +125,8 @@ var setfollowing = function (req, res) {
                     following_id: following_id,
                     follow_status: false
                   }, {
-                    follow_status: true
+                    follow_status: true,
+                    follow_back: true
                   })
                   .exec(function (err, result) {
                     if (err) {

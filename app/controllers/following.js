@@ -14,7 +14,6 @@ var master = require('./master.js')
 var setfollowing = function (req, res) {
   var user_id = req.body.user_id // User Id
   var following_id = req.body.following_id // Following Id
-  var follow_back
 
   // validation for blank variables
   req.checkBody('user_id', 'User id is mandatory').notEmpty()
@@ -37,116 +36,44 @@ var setfollowing = function (req, res) {
     return
   }
 
-  // validation for the profile if already followed
-  follower
-    .find({
-      user_id: user_id,
-      following_id: following_id,
-      follow_status: true
-    })
-    .lean()
-    .exec(function (err, result) {
-      if (result.length !== 0) {
-        log.info('User already following')
-        res.json({
-          message: 'User already following'
-        })
-        return
-      } else { // add new follower
-        log.info('update follower status')
+  // check following status
+  master.isFollowing(user_id, following_id, function (err, result) {
+    log.info('user status: ', result)
 
-        follower
-          .find({
-            user_id: following_id,
-            following_id: user_id
-          })
-          .lean()
-          .select('follow_back')
-          .exec(function (err, result) {
-            if (err) {
-              log.error(err)
-              res.send(err)
-              return
-            }
+    if (err) {
+      res.send(result)
+      log.info(result)
+      return
+    }
 
-            if (result.length == 1) {
-              log.info(result)
-              /*update user follower status true*/
-              follower
-                .update({
-                  _id: result[0]._id
-                }, {
-                  follow_back: 'true'
-                })
-                .exec(function (err, statusResult) {
-                  if (err) {
-                    log.error(err)
-                    res.send(err)
-                    return
-                  }
+    else if (result == 'following') {
+      res.json({
+        message: 'User is already following'
+      })
+    }else {
+      // add or update database as result
+      followingModel(result, user_id, following_id, function (err, followingModelResult) {
+        if (err) {
+          res.send(result)
+          log.info(result)
+          return
+        }
 
-                  log.info(statusResult)
-                })
-
-              follow_back = 'true'
-            } else {
-              follow_back = 'false'
-            }
-
-            master.isFollowing(user_id, following_id, function (err, result) {
-              log.info(result)
-
-              if (err) {
-                res.send(result)
-                log.info(result)
-                return
-              }
-
-              if (result == 'newUser') {
-                var followingModel = new follower({
-                  user_id: user_id,
-                  following_id: following_id,
-                  follow_back: follow_back
-                })
-
-                followingModel.save(function (err) {
-                  if (err) {
-                    log.error(err)
-                    res.send(err)
-                    return
-                  }
-
-                  log.info('following/followers set saved')
-                })
-              } else if(result == 'oldFollowing') {
-                follower
-                  .update({
-                    user_id: user_id,
-                    following_id: following_id,
-                    follow_status: false
-                  }, {
-                    follow_status: true
-                  })
-                  .exec(function (err, result) {
-                    if (err) {
-                      log.error(err)
-                      res.send(err)
-                      return
-                    }
-
-                    log.info('following/followers update')
-                  })
-
-                log.info('update following')
-              }
+        // update follow back status
+        updateFollowBack(user_id, following_id, function (err, followBackStatus) {
+          if (err) {
+            res.send(result)
+            log.info(result)
+            return
+          }else {
+            res.json({
+              message: 'following/followers set'
             })
-          })
-
-        res.json({
-          message: 'following/followers set'
+          }
         })
-      }
-    })
+      })
+    }
+  })
 }
 
 // //Get following
@@ -485,6 +412,99 @@ var getMutualFollowerYouKnow = function (req, res) {
     })
 }
 
+function updateFollowBack (user_id, following_id, callback) {
+  log.info('Update Follow Back api hitted')
+  follower
+    .find({$or: [{
+        user_id: following_id,
+        following_id: user_id,
+        follow_status: 'true'
+      }, {user_id: user_id,
+        following_id: following_id,
+        follow_status: 'true'
+    }]})
+    .lean()
+    .select('follow_back')
+    .exec(function (err, result) {
+      if (err) {
+        log.error(err)
+        res.send(err)
+        return
+      }
+      console.log('Result update follow back', result)
+      if (result.length !== 0) {
+        log.info(result)
+        if (result.length == 2) {
+          var query = {$or: [{
+              _id: result[0]._id
+            }, {
+              _id: result[1]._id
+          }]}
+
+          /*update user follower status true*/
+          follower
+            .update(query, {
+              follow_back: 'true'
+            }, {multi: true})
+            .exec(function (err, statusResult) {
+              if (err) {
+                log.error(err)
+                res.send(err)
+                return
+              }
+              callback(null, true)
+              log.info(statusResult)
+            })
+        }else {
+          callback(null, false)
+        }
+      } else {
+        callback(null, false)
+      }
+    })
+}
+
+function followingModel (result, user_id, following_id, callback) {
+  if (result == 'newUser') {
+    var followingModel = new follower({
+      user_id: user_id,
+      following_id: following_id,
+      follow_back: false
+    })
+
+    followingModel.save(function (err) {
+      if (err) {
+        log.error(err)
+        res.send(err)
+        return
+      }
+
+      log.info('following/followers set saved')
+    })
+  } else if (result == 'oldFollowing') {
+    follower
+      .update({
+        user_id: user_id,
+        following_id: following_id,
+        follow_status: false
+      }, {
+        follow_status: true
+      })
+      .exec(function (err, result) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
+
+        log.info('following/followers update')
+      })
+
+    log.info('update following')
+  }
+  callback(null, result)
+}
+
 module.exports = ({
   setfollowing: setfollowing,
   getfollowing: getfollowing,
@@ -492,6 +512,7 @@ module.exports = ({
   unlink_following: unlink_following,
   getFollowerCount: getFollowerCount,
   getFollowingCount: getFollowingCount,
-  getMutualFollowerYouKnow: getMutualFollowerYouKnow,
+  getMutualFollowerYouKnow: getMutualFollowerYouKnow
+
 // followLatestPost : followLatestPost
 })

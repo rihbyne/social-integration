@@ -120,6 +120,11 @@ module.exports = function(app, passport) {
 
 
 /*===========================================================================================================================*/
+    //
+    app.use(function(err, req, res, next) {
+      console.error(err.stack);
+      res.status(500).send('Something broke!');
+    });
 
     // UserHome
     app.post('/user_timeline/1', profileTimeline.getuserhomeposts);    				// user home timeline post API

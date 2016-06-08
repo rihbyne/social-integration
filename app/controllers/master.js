@@ -16,7 +16,7 @@ var getUserId = function (username, res) {
     .exec(function (err, userdata) {
       if (err) {
         log.error(err)
-        res.send(err)
+        res(err, 'No user found')
         return
       } else if (userdata.length !== 0) {
         userid = (userdata[0]._id).toString()
@@ -37,7 +37,7 @@ var getusername = function (id, res) {
     .exec(function (err, userdata) {
       if (err) {
         log.error(err)
-        res.send(err)
+        return res(err, 'No user found')
         return
       } else if (userdata.length !== 0) {
         username = userdata[0].username
@@ -79,7 +79,7 @@ var hashtagMention = function (type, post, mentionusers, hashtags, res) {
     mention.save(function (err) {
       if (err) {
         log.error(err)
-        res.send(err)
+        res(err, 'something went wrong')
         return
       }
     })
@@ -106,7 +106,7 @@ var hashtagMention = function (type, post, mentionusers, hashtags, res) {
         }, function (err, result) {
           if (err) {
             log.error(err)
-            res.send(err)
+            res(err, 'something went wrong')
             return
           }
 
@@ -135,7 +135,7 @@ var hashtagMention = function (type, post, mentionusers, hashtags, res) {
     hashtag.save(function (err) {
       if (err) {
         log.error(err)
-        res.send(err)
+        res(err, 'something went wrong')
         return
       }
     })
@@ -253,7 +253,7 @@ var isValidUser = function (collectionName, query, callback) {
     .exec(function (err, postResult) {
       if (err) {
         log.error(err)
-        res.send(err)
+        callback(err, 'Not valid user')
         return
       }
       else if (postResult.length === 0) {
@@ -289,7 +289,7 @@ var isValidPost = function (collectionName, query, callback) {
 
 // check user is owner of post or not
 var isPostOwner = function (collectionName, query, callback) {
-  console.info('isValidUser api hitted')
+  console.info('isPostOwner api hitted')
 
   collectionName
     .find(query)
@@ -312,7 +312,7 @@ var isPostOwner = function (collectionName, query, callback) {
 
 // check user existence in database
 var userExistence = function (userid, callback) {
-  log.info('isValidUser api hitted')
+  log.info('userExistence api hitted')
 
   user
     .find({

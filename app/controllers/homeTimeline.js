@@ -11,7 +11,9 @@ var homeTimeline = function (req, res) {
   var flag = req.body.flag; // New - 1 and Old - 2 
 
   req.checkBody('userid', 'User id is mandatory').notEmpty()
-
+  req.checkBody('timestamp', 'Mandatory field not found').isInt()
+  req.checkBody('flag', 'Mandatory field not found').isInt()
+  
   var errors = req.validationErrors()
 
   if (errors) {

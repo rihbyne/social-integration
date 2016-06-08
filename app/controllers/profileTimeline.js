@@ -524,7 +524,5 @@ function getReplyByUserId (userid, privacyStatus, timestamp, flag, callback) {
 
 module.exports = ({
   getuserhomeposts: getuserhomeposts,
-  getpostsrtreply: getpostsrtreply,
-  loggednin_home_userdetails: loggednin_home_userdetails
-// getRetweetByUserId:getRetweetByUserId
+  getpostsrtreply: getpostsrtreply
 })

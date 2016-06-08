@@ -21,7 +21,7 @@ var homeTimeline   = require('./controllers/homeTimeline.js');
 // app/routes.js
 module.exports = function(app, passport) {
 
-    app.get('/' ,  isLoggedIn , profileTimeline.loggednin_home_userdetails);
+    // app.get('/' ,  isLoggedIn , profileTimeline.loggednin_home_userdetails);
 
     // =====================================
     // LOGIN ===============================

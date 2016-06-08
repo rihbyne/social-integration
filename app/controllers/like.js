@@ -6,13 +6,14 @@ var log = require('../../config/logging')()
 
 // Set Post Like
 var setLike = function (req, res) {
+  log.info('Set like api hitted');
   var post_id = req.body.post_id
   var retweet_quote_id = req.body.retweet_quote_id
   var reply_id = req.body.reply_id
   var like_user_id = req.body.like_user_id
   var type = req.body.type
   var postId
-
+  
   req.checkBody('type', 'post type').notEmpty()
   req.checkBody('like_user_id', 'like_user_id').notEmpty()
 

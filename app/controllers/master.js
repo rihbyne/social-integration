@@ -16,7 +16,7 @@ var getUserId = function (username, res) {
     .exec(function (err, userdata) {
       if (err) {
         log.error(err)
-        res(err, 'No user found')
+        res(err, 'something went wrong')
         return
       } else if (userdata.length !== 0) {
         userid = (userdata[0]._id).toString()
@@ -37,7 +37,7 @@ var getusername = function (id, res) {
     .exec(function (err, userdata) {
       if (err) {
         log.error(err)
-        return res(err, 'No user found')
+        res(err, 'something went wrong')
         return
       } else if (userdata.length !== 0) {
         username = userdata[0].username
@@ -50,7 +50,6 @@ var getusername = function (id, res) {
 
 // Save hashtag and mention -- master file code for set post, retweet and reply 
 var hashtagMention = function (type, post, mentionusers, hashtags, res) {
-  console.info(post._id)
 
   if (typeof mentionusers != 'undefined' && mentionusers != null && mentionusers.length > 0) {
     var mention_users = []
@@ -168,7 +167,7 @@ var isFollowing = function (user_id, following_id, callback) {
     .exec(function (err, result) {
       if (err) {
         log.error(err)
-        res.send(err)
+        callback(err, 'something went wrong')
         return callback(true, err) // following
       }
       log.info('isFollowing Result', result)
@@ -203,7 +202,7 @@ var getPrivacyStatus = function (userid, loggedid, callback) {
     isFollowing(loggedid, userid, function (err, followResult) {
       if (err) {
         log.error(err)
-        callback(true, 'something went wrong')
+        callback(err, 'something went wrong')
         return
       }
       if (followResult == 'following') {
@@ -233,7 +232,7 @@ var updateUser = function (userid, callback) {
     .exec(function (err, updateResult) {
       if (err) {
         log.error(err)
-        callback(true, 'No user found to update')
+        callback(err, 'something went wrong')
       }
       else if (updateResult) {
         callback(null, updateResult)
@@ -253,7 +252,7 @@ var isValidUser = function (collectionName, query, callback) {
     .exec(function (err, postResult) {
       if (err) {
         log.error(err)
-        callback(err, 'Not valid user')
+        callback(err, 'something went wrong')
         return
       }
       else if (postResult.length === 0) {
@@ -276,7 +275,7 @@ var isValidPost = function (collectionName, query, callback) {
     .exec(function (err, postResult) {
       if (err) {
         log.error(err)
-        res.send(err)
+        callback(err, 'something went wrong')
         return
       }
       else if (postResult.length == 0) {
@@ -297,7 +296,7 @@ var isPostOwner = function (collectionName, query, callback) {
     .exec(function (err, postResult) {
       if (err) {
         log.error(err)
-        res.send(err)
+        callback(err, 'something went wrong')
         return
       }
       else if (postResult.length == 0) {
@@ -322,7 +321,7 @@ var userExistence = function (userid, callback) {
     .exec(function (err, postResult) {
       if (err) {
         log.error(err)
-        callback(true, 'User is not found')
+        callback(true, 'something went wrong')
       }
       else if (postResult.length == 0) {
         callback(true, 'User is not found')

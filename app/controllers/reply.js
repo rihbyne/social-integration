@@ -177,173 +177,6 @@ var setreply = function (req, res) {
   })
 }
 
-var getReply = function (req, res) {
-  var type = req.params.type
-  var id = req.params.id
-
-  if (type == 1 || type == '1') {
-    var post_id = id
-
-    var option = [{
-      path: 'post_id',
-      path: 'reply_user_id'
-    }, {
-      path: 'post_id',
-      populate: {
-        path: 'posted_by'
-      }
-    }]
-
-    post_model.reply
-      .find({
-        post_id: post_id
-      })
-      .populate(option)
-      .lean()
-      .exec(function (err, postReplys) {
-        if (err) {
-          log.error(err)
-          res.send(err)
-          return
-        }
-
-        if (postReplys == '' || postReplys == null || postReplys == undefined) {
-          res.send('No Reply on this Post')
-          return
-        }
-
-        async.each(postReplys, function (singlepostReplys, callback) {
-          var reply_id = singlepostReplys._id
-
-          post_model.reply
-            .count({
-              reply_id: reply_id
-            })
-            .lean()
-            .exec(function (err, result) {
-              singlepostReplys.count = result
-              callback()
-            })
-        }, function (err) {
-          res.send(postReplys)
-        })
-      })
-  }
-
-  if (type == 2 || type == '2') {
-    var retweet_quote_id = id
-    log.info(retweet_quote_id)
-
-    var option = [{
-      path: 'retweet_quote_id',
-      path: 'reply_user_id'
-    }, {
-      path: 'retweet_quote_id',
-      populate: {
-        path: 'ret_user_id'
-      }
-    }]
-
-    post_model.reply
-      .find({
-        retweet_quote_id: retweet_quote_id
-      })
-      .populate(option)
-      .lean()
-      .exec(function (err, retweetReplys) {
-        log.info(retweetReplys)
-
-        if (err) {
-          log.error(err)
-          res.send(err)
-          return
-        }
-
-        if (retweetReplys == '' || retweetReplys == null || retweetReplys == undefined) {
-          res.send('No Reply on this Retweet')
-          return
-        }
-
-        async.each(retweetReplys, function (singleretweetReplys, callback) {
-          var reply_id = singleretweetReplys._id
-
-          post_model.reply
-            .count({
-              reply_id: reply_id
-            })
-            .lean()
-            .exec(function (err, result) {
-              if (err) {
-                log.error(err)
-                res.send(err)
-                return
-              }
-
-              singleretweetReplys.count = result
-              callback()
-            })
-        }, function (err) {
-          res.send(retweetReplys)
-        })
-      })
-  }
-
-  if (type == 3 || type == '3') {
-    var reply_id = id
-
-    var option = [{
-      path: 'reply_id',
-      path: 'reply_user_id'
-    }, {
-      path: 'reply_id',
-      populate: {
-        path: 'reply_user_id'
-      }
-    }]
-
-    post_model.reply
-      .find({
-        reply_id: reply_id
-      })
-      .populate(option)
-      .lean()
-      .exec(function (err, replyReplys) {
-        if (err) {
-          log.error(err)
-          res.send(err)
-          return
-        }
-
-        if (replyReplys == '' || replyReplys == null || replyReplys == undefined) {
-          res.send('No Reply on this Reply')
-          return
-        }
-
-        async.each(replyReplys, function (singlereplyReplys, callback) {
-          var reply_id = singlereplyReplys._id
-
-          post_model.reply
-            .count({
-              reply_id: reply_id
-            })
-            .lean()
-            .exec(function (err, result) {
-              if (err) {
-                log.error(err)
-                res.send(err)
-                return
-              }
-
-              singlereplyReplys.count = result
-              callback()
-            })
-        }, function (err) {
-          res.send(replyReplys)
-        })
-      })
-  }
-}
-
 /*
 Get reply api give reply result.
 Reply is filtered by privacy setting.
@@ -351,7 +184,7 @@ Public - shown to all
 Private - if logged in and reply user id same
 Following - if logged in user following to reply_user_id
 */
-var getReply_new = function (req, res) {
+var getReply = function (req, res) {
   var type = req.body.type
   var id = req.body.id
   var logged_id = req.body.logged_id
@@ -505,6 +338,7 @@ var getReply_new = function (req, res) {
       })
   }
 }
+
 var deletereply = function (req, res) {
   var reply_id = req.body.reply_id
   var reply_user_id = req.body.reply_user_id

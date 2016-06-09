@@ -169,8 +169,7 @@ module.exports = function(app, passport) {
 	// app.get('/followLatestPost/:user_id', follow.followLatestPost);
    
     //Reply
-    app.get('/reply/:type/:id',reply.getReply);       								// Get Reply
-    app.post('/getReply_new',reply.getReply_new);                                     // Get Reply
+    app.post('/getreply',reply.getReply);                                     // Get Reply
 
     app.post('/setreply', reply.setreply);          								// Set reply
     app.delete('/deletereply', reply.deletereply);        							// delete Reply

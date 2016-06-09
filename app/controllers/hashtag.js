@@ -105,6 +105,16 @@ var gethashposts = function (req, res) { // get a post
 
   log.info('Hashtag : ', hashtag)
 
+  req.checkParams('HashTag', 'hashtag').isAlpha()
+  
+  var errors = req.validationErrors()
+
+  if (errors) {
+    log.error('There have been validation errors: \n' + util.inspect(errors))
+    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    return
+  }
+  
   var hashtag = req.params.hashtag
 
   async.parallel([

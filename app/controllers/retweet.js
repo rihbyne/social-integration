@@ -280,6 +280,7 @@ var setretweet = function (req, res) {
 
 // Get Retweets of single post
 var getretweet = function (req, res) {
+  log.info('Get retweet api hitted');
   var post_id = req.params.post_id
   var post_type = req.params.post_type
   var query

@@ -448,8 +448,6 @@ var getReplyWithPrivacyStatus = function (postReplys, logged_id, callback) {
 
 module.exports = ({
   setreply: setreply,
-  // getreply : getreply,
   deletereply: deletereply,
-  getReply: getReply,
-  getReply_new: getReply_new
+  getReply: getReply
 })

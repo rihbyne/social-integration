@@ -96,9 +96,11 @@ var secureAPI = function() {
           log.error('Curl request Failed for register api: \t'+ meta.inspect(err))
           helpers.sendJsonResponse(res, 500, {failed:"wallet gateway down"})
           return
-        }
-
-		    if(body.errCode == -1) {
+        } else if (body.errCode !== -1) {
+          log.error('abnormal request: \t'+ meta.inspect(body.errMsg))
+          helpers.sendJsonResponse(res, 500, {failed:body.errMsg})
+          return
+        } else {
 			    var privateKey = body.errMsg;
           var varArgs = paramsForCrypt(func, req, res)
 			    var text = crypt.generateSignText(varArgs)

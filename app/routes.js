@@ -17,6 +17,7 @@ var suggest			= require('./controllers/suggestion.js');
 var notification	= require('./controllers/notification.js');
 var privacy         = require('./controllers/privacy.js');
 var homeTimeline   = require('./controllers/homeTimeline.js');
+var middleware      = require('../config/middleware.js');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -127,27 +128,27 @@ module.exports = function(app, passport) {
     });
 
     // UserHome
-    app.post('/user_timeline/1', profileTimeline.getuserhomeposts);    				// user home timeline post API
-    app.post('/user_timeline/2', profileTimeline.getpostsrtreply);   				// tweet,retweet & reply post
+    app.post('/user_timeline/1', middleware.secureAPI('t1'), profileTimeline.getuserhomeposts);    				// user home timeline post API
+    app.post('/user_timeline/2', middleware.secureAPI('t2'), profileTimeline.getpostsrtreply);   				// tweet,retweet & reply post
 
     //Home Timeline
-    app.post('/homeTimeline', homeTimeline.homeTimeline);
+    app.post('/homeTimeline', middleware.secureAPI('htl'), homeTimeline.homeTimeline);
     
     // Mention
-    app.get('/mention/:mention_user', mention.getmentionuser);     					// Get post of user by mention user
+    app.get('/mention/:mention_user', middleware.secureAPI('mu'), mention.getmentionuser);     					// Get post of user by mention user
     // app.get('/getpost/user/mention/:mention_user', mention.getmentionuser); 		// Get post of user by mention user
 
     // HashTags
-    app.get('/hashtag/:hashtag', hashtag.gethashposts);      						// Get post from hashtag
-    app.get('/hashtag/count/:hashtag', hashtag.hashtagcount);     					// Get the count of specifiedhashtag
+    app.get('/hashtag/:hashtag', middleware.secureAPI('htag'), hashtag.gethashposts);      						// Get post from hashtag
+    app.get('/hashtag/count/:hashtag', middleware.secureAPI('htagcount'), hashtag.hashtagcount);     					// Get the count of specifiedhashtag
     //app.post('/hashtags', hashtag.gethashtag);         							// Get all hashtag keyword    
     //app.get('/hashtag/count', hashtag.allhashtagcount);      						// Get the count of all hashtag
     //app.post('/gethashtaglistcount', hashtag.gethashtaglist);     				// Get all hashtag keyword
 
     // Retweet
-    app.post('/setretweet', retweet.setretweet);        							// Set new user
-    app.get('/retweet/:post_type/:post_id', retweet.getretweet);      				// Get Retweet by post
-    app.delete('/deleteretweet', retweet.deleteRetweet);       						// delete retweet
+    app.post('/setretweet', middleware.secureAPI('rwt'), retweet.setretweet);        							// Set new user
+    app.get('/retweet/:post_type/:post_id', middleware.secureAPI('rwtp'), retweet.getretweet);      				// Get Retweet by post
+    app.delete('/deleteretweet', middleware.secureAPI('rwtd'), retweet.deleteRetweet);       						// delete retweet
 
     //Post
     //app.get('/getpost/:user', post.getuserposts);        							// Get post by username

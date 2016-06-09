@@ -285,6 +285,9 @@ var getretweet = function (req, res) {
   var post_type = req.params.post_type
   var query
 
+  log.info('post id', post_id)
+  log.info('post type', post_type)
+
   if (post_type == 1) {
     var query = {
       post_id: post_id

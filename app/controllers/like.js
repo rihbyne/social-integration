@@ -4,16 +4,17 @@ var master = require('./master.js')
 var notificationModel = require('../models/notificationSchema.js')
 var log = require('../../config/logging')()
 
+var Promise = require('bluebird')
 // Set Post Like
 var setLike = function (req, res) {
-  log.info('Set like api hitted');
+  log.info('Set like api hitted')
   var post_id = req.body.post_id
   var retweet_quote_id = req.body.retweet_quote_id
   var reply_id = req.body.reply_id
   var like_user_id = req.body.like_user_id
   var type = req.body.type
   var postId
-  
+
   req.checkBody('type', 'post type').notEmpty()
   req.checkBody('like_user_id', 'like_user_id').notEmpty()
 
@@ -245,91 +246,21 @@ var setLike = function (req, res) {
     })
 }
 
-// Get Likes On Post
-var getLikeByPost = function (req, res) {
-  var post_id = req.params.post_id
-
-  postModel.post_like
-    .find({
-      post_id: post_id
-    })
-    .exec(function (err, postLikeResult) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
-
-      log.info(postLikeResult.length + '\n' + postLikeResult)
-
-      res.json({
-        count: postLikeResult.length,
-        likeinfo: postLikeResult
-      })
-    })
-}
-
-// Get Likes On Retweet
-var getLikeByRetweet = function (req, res) {
-  var retweet_quote_id = req.params.retweet_quote_id
-
-  postModel.retweet_like
-    .find({
-      retweet_quote_id: retweet_quote_id
-    })
-    .exec(function (err, retweetLikeResult) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
-
-      log.info(retweetLikeResult.length + '\n' + retweetLikeResult)
-
-      res.json({
-        count: retweetLikeResult.length,
-        likeinfo: retweetLikeResult
-      })
-    })
-}
-
-// Get Likes On Reply
-var getLikeByReply = function (req, res) {
-  var reply_id = req.params.reply_id
-
-  postModel.reply_like
-    .find({
-      reply_id: reply_id
-    })
-    .exec(function (err, replyLikeResult) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
-
-      log.info(replyLikeResult.length + '\n' + replyLikeResult)
-
-      res.json({
-        count: replyLikeResult.length,
-        likeinfo: replyLikeResult
-      })
-    })
-}
-
+// Get post of liked by user
 var getLikeByUser = function (req, res) { // get new like
-
+  log.info('Get Like by user api hitted')
   var username = req.params.username
-
+  log.info('username', username)
   master.getUserId(username, function (err, user_id) {
     if (err) {
-      log.error(err)
-      res.send(err)
+      log.error(user_id)
+      res.send(user_id)
       return
     }
 
     async.parallel([
 
+      likeCount,
       postLike,
       retweetLike,
       replyLike
@@ -341,9 +272,9 @@ var getLikeByUser = function (req, res) { // get new like
         return
       }
 
-      var likePosts = results[0].concat(results[1]).concat(results[2]); // Got two result , concent two results
+      var likePosts = results[1].concat(results[2]).concat(results[3]); // Got two result , concent two results
 
-      console.info(likePosts)
+      log.info(likePosts)
 
       function custom_sort (a, b) {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -351,9 +282,58 @@ var getLikeByUser = function (req, res) { // get new like
 
       likePosts.sort(custom_sort)
 
-      res.json({
-      likePosts})
+      res.json({likeCount : results[0], likePosts: likePosts})
     })
+
+    function likeCount (callback) {
+      async.parallel([
+        likePostCount,
+        likeQuoteRetweetCount,
+        likeReplyCount]
+
+        , function (err, result) {
+          if (err) {
+            log.err(err)
+            callback(true, 'something went wrong')
+          }
+          var likePostsCount = result[0] + result[1] + result[2]
+          console.log(likePostsCount)
+          callback(null, likePostsCount)
+        })
+
+      log.info('like callbackount function hitted')
+
+      function likePostCount (cb) {
+        postModel.post_like.count({like_user_id: user_id})
+          .exec(function (err, results) {
+            if (err) {
+              log.info(results)
+              cb(err, results)
+            }
+            cb(null, results)
+          })
+      }
+      function likeQuoteRetweetCount (cb) {
+        postModel.retweet_like.count({like_user_id: user_id})
+          .exec(function (err, results) {
+            if (err) {
+              log.info(results)
+              cb(err, results)
+            }
+            cb(null, results)
+          })
+      }
+      function likeReplyCount (cb) {
+        postModel.reply_like.count({like_user_id: user_id})
+          .exec(function (err, results) {
+            if (err) {
+              log.info(results)
+              cb(err, results)
+            }
+            cb(null, results)
+          })
+      }
+    }
 
     function postLike (callback) {
       var option = [{
@@ -369,6 +349,7 @@ var getLikeByUser = function (req, res) { // get new like
         .find({
           like_user_id: user_id
         })
+        .limit(10)
         .populate(option)
         .exec(function (err, userPostLikeResult) {
           if (err) {
@@ -376,7 +357,6 @@ var getLikeByUser = function (req, res) { // get new like
             res.send(err)
             return
           }
-          // log.info('Post result', userPostLikeResult)
           callback(null, userPostLikeResult)
         })
     }
@@ -402,7 +382,6 @@ var getLikeByUser = function (req, res) { // get new like
             res.send(err)
             return
           }
-
           callback(null, userRetweetLikeResult)
         })
     }
@@ -593,9 +572,6 @@ var getlike = function (req, res) {
 module.exports = ({
   getlike: getlike,
   getLikeByUser: getLikeByUser,
-  getLikeByPost: getLikeByPost,
-  getLikeByRetweet: getLikeByRetweet,
-  getLikeByReply: getLikeByReply,
   setLike: setLike,
   setLikeCount: setLikeCount
 })

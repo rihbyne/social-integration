@@ -128,8 +128,8 @@ module.exports = function(app, passport) {
     });
 
     // UserHome
-    app.post('/user_timeline/1', middleware.secureAPI('t1'), profileTimeline.getuserhomeposts);    				// user home timeline post API
-    app.post('/user_timeline/2', middleware.secureAPI('t2'), profileTimeline.getpostsrtreply);   				// tweet,retweet & reply post
+    app.post('/user_timeline', middleware.secureAPI('t1'), profileTimeline.getuserhomeposts);    				// user home timeline post API
+    app.post('/user_timeline/with_reply', middleware.secureAPI('t2'), profileTimeline.getpostsrtreply);   				// tweet,retweet & reply post
 
     //Home Timeline
     app.post('/homeTimeline', middleware.secureAPI('htl'), homeTimeline.homeTimeline);
@@ -189,9 +189,6 @@ module.exports = function(app, passport) {
     app.post('/setLike', like.setLike);          									// Set Like
     app.get('/like/:post_type/:post_id', like.getlike);      						// Get like by post/retweet/reply
 	app.get('/like/:username', like.getLikeByUser);      							// Get like by User
-    // app.get('/like/post/:post_id', like.getLikeByPost);      					// Get like by post
-    // app.get('/like/retweet/:retweet_quote_id', like.getLikeByRetweet);   		// Get like by retweet
-    // app.get('/like/reply/:reply_id', like.getLikeByReply);      					// Get like by reply
 
 	//Privacy Setting
     app.put('/privacy/update', privacy.updatePrivacy);								// Update Privacy

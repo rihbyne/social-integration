@@ -267,7 +267,7 @@ var isValidUser = function (collectionName, query, callback) {
 
 // check post, reply, retweet exist or not -- cross-side test only
 var isValidPost = function (collectionName, query, callback) {
-  console.info('isValidPost api hitted')
+  log.info('isValidPost api hitted')
 
   collectionName
     .find(query)
@@ -288,7 +288,7 @@ var isValidPost = function (collectionName, query, callback) {
 
 // check user is owner of post or not
 var isPostOwner = function (collectionName, query, callback) {
-  console.info('isPostOwner api hitted')
+  log.info('isPostOwner api hitted')
 
   collectionName
     .find(query)

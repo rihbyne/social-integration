@@ -742,8 +742,8 @@ var deletepost = function (req, res) {
 
   master.userExistence(posted_by, function (err, result) {
     if (err) {
-      log.error(username)
-      res.send(username)
+      log.error(result)
+      res.send(result)
       return
     }
 

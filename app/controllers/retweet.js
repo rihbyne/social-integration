@@ -19,9 +19,9 @@ var setretweet = function (req, res) {
   log.info('Retweet Type', retweet_type)
   log.info('Retweet Quote', retweet_msg)
 
-  req.checkBody('post_type', 'post type').notEmpty().isAlpha()
+  req.checkBody('post_type', 'post type').notEmpty().isInt()
   req.checkBody('ret_user_id', 'ret_user_id').notEmpty()
-  req.checkBody('retweet_type', 'retweet_type').notEmpty()
+  req.checkBody('retweet_type', 'retweet_type').notEmpty().isInt()
   req.checkBody('post_id', 'post id').notEmpty()
   req.checkBody('privacy_setting', 'privacy setting').notEmpty()
 
@@ -280,7 +280,7 @@ var setretweet = function (req, res) {
 
 // Get Retweets of single post
 var getretweet = function (req, res) {
-  log.info('Get retweet api hitted');
+  log.info('Get retweet api hitted')
   var post_id = req.params.post_id
   var post_type = req.params.post_type
   var query
@@ -385,28 +385,58 @@ var deleteRetweet = function (req, res) {
   log.info('retweet quote id', retweet_quote_id)
   log.info('retweet user id', ret_user_id)
 
-  post_model.retweet_quote
-    .findOneAndRemove({
-      _id: retweet_quote_id,
-      ret_user_id: ret_user_id
-    })
-    .lean()
-    .exec(function (err, result) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
+req.checkBody('retweet_quote_id', 'retweet_quote_id').notEmpty()
+  req.checkBody('ret_user_id', 'ret_user_id').notEmpty()
 
-      if (result == null || result == undefined || result == '') {
-        log.info('Can not delete retweet')
-        res.send('Can not delete retweet')
+  var errors = req.validationErrors()
+
+  if (errors) {
+    log.warn('There have been validation errors: \n' + util.inspect(errors))
+    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    return
+  }
+
+  master.userExistence(ret_user_id, function (err, result) {
+    if (err) {
+      log.error(result)
+      res.send(result)
+      return
+    }
+
+    var query = {_id: retweet_quote_id, ret_user_id: ret_user_id}
+    var collectionName = post_model.retweet_quote
+
+    master.isValidUser(collectionName, query, function (err, isPostOwnerResult) {
+      if (err) {
+        log.error(isPostOwnerResult)
+        res.send(isPostOwnerResult)
         return
-      } else {
-        log.info('Quote retweet Deleted Successfully')
-        res.send('Quote retweet Deleted Successfully')
+      }else {
+        post_model.retweet_quote
+          .findOneAndRemove({
+            _id: retweet_quote_id,
+            ret_user_id: ret_user_id
+          })
+          .lean()
+          .exec(function (err, result) {
+            if (err) {
+              log.error(err)
+              res.send(err)
+              return
+            }
+
+            if (result == null || result == undefined || result == '') {
+              log.info('Can not delete retweet')
+              res.send('Can not delete retweet')
+              return
+            } else {
+              log.info('Quote retweet Deleted Successfully')
+              res.send('Quote retweet Deleted Successfully')
+            }
+          })
       }
     })
+  })
 }
 
 module.exports = {

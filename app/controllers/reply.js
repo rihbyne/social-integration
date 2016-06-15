@@ -340,10 +340,16 @@ var getReply = function (req, res) {
 }
 
 var deletereply = function (req, res) {
+  log.info('delete reply api hitted')
+
   var reply_id = req.body.reply_id
   var reply_user_id = req.body.reply_user_id
 
+  log.info('reply id', reply_id)
+  log.info('reply user id', reply_user_id)
+
   req.checkBody('reply_id', 'reply_id').notEmpty()
+  req.checkBody('reply_user_id', 'reply_user_id').notEmpty()
 
   var errors = req.validationErrors()
 
@@ -353,32 +359,51 @@ var deletereply = function (req, res) {
     return
   }
 
-  post_model.reply
-    .findOneAndRemove({
-      _id: reply_id,
-      reply_user_id: reply_user_id
-    })
-    .exec(function (err, result) {
+  master.userExistence(reply_user_id, function (err, result) {
+    if (err) {
+      log.error(result)
+      res.send(result)
+      return
+    }
+
+    var query = {_id: reply_id, reply_user_id: reply_user_id}
+    var collectionName = post_model.reply
+
+    master.isValidUser(collectionName, query, function (err, isPostOwnerResult) {
       if (err) {
-        log.error(err)
-        res.send(err)
+        log.error(isPostOwnerResult)
+        res.send(isPostOwnerResult)
         return
-      }
+      }else {
+        post_model.reply
+          .findOneAndRemove({
+            _id: reply_id,
+            reply_user_id: reply_user_id
+          })
+          .exec(function (err, result) {
+            if (err) {
+              log.error(err)
+              res.send(err)
+              return
+            }
 
-      if (result !== null) {
-        log.info('Reply Deleted')
+            if (result !== null) {
+              log.info('Reply Deleted')
 
-        res.json({
-          message: 'Reply Deleted'
-        })
-      } else {
-        log.info('No Reply Found')
+              res.json({
+                message: 'Reply Deleted'
+              })
+            } else {
+              log.info('No Reply Found')
 
-        res.json({
-          message: 'No Reply Found'
-        })
+              res.json({
+                message: 'No Reply Found'
+              })
+            }
+          })
       }
     })
+  })
 }
 
 var getReplyWithPrivacyStatus = function (postReplys, logged_id, callback) {

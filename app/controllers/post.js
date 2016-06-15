@@ -721,8 +721,13 @@ var getuserpostcount = function (req, res) { // get a post
 }
 
 var deletepost = function (req, res) {
+  log.info('Delete post api hitted')
+
   var post_id = req.body.post_id
   var posted_by = req.body.posted_by
+
+  log.info('post id', post_id)
+  log.info('posted by', posted_by)
 
   req.checkBody('post_id', 'post_id').notEmpty()
   req.checkBody('posted_by', 'posted_by').notEmpty()
@@ -735,43 +740,78 @@ var deletepost = function (req, res) {
     return
   }
 
-  post_model.post
-    .findOneAndRemove({
-      _id: post_id,
-      posted_by: posted_by
-    })
-    .exec(function (err, result) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
-      if (result !== null) {
-        log.info('Post Deleted')
-
-        res.json({
-          message: 'Post Deleted'
-        })
-      } else {
-        log.info('No Post Found')
-
-        res.json({
-          message: 'No Post Found'
-        })
-      }
-    })
-
-  master.getusername(posted_by, function (err, username) {
+  master.userExistence(posted_by, function (err, result) {
     if (err) {
-      log.error(err)
-      res.send(err)
+      log.error(username)
+      res.send(username)
       return
     }
 
-    notificationModel.notification
+    var query ={_id: post_id, posted_by: posted_by}
+    var collectionName = post_model.post
+
+    master.isValidUser(collectionName, query, function (err, isPostOwnerResult) {
+      
+      if (err) {
+        log.error(isPostOwnerResult)
+        res.send(isPostOwnerResult)
+        return
+      }else {
+        post_model.post
+          .findOneAndRemove(query)
+          .exec(function (err, result) {
+            if (err) {
+              log.error(err)
+              res.send(err)
+              return
+            }
+            if (result !== null) {
+              log.info('Post Deleted')
+
+              res.json({
+                message: 'Post Deleted'
+              })
+            } else {
+              log.info('No Post Found')
+
+              res.json({
+                message: 'No Post Found'
+              })
+            }
+          })
+      }
+    })
+
+    master.getusername(posted_by, function (err, username) {
+      if (err) {
+        log.error(username)
+        res.send(username)
+        return
+      }
+
+      notificationModel.notification
+        .findOneAndRemove({
+          post_id: post_id,
+          username: username
+        })
+        .exec(function (err, result) {
+          if (err) {
+            log.error(err)
+            res.send(err)
+            return
+          }
+
+          if (result !== null) {
+            log.info('Notification Deleted')
+          } else {
+            log.info('No Notification Found')
+          }
+        })
+    })
+
+    mentionModel.post_mention
       .findOneAndRemove({
-        post_id: post_id,
-        username: username
+        post_id: post_id
       })
       .exec(function (err, result) {
         if (err) {
@@ -781,30 +821,12 @@ var deletepost = function (req, res) {
         }
 
         if (result !== null) {
-          log.info('Notification Deleted')
+          log.info('Mention Document Deleted')
         } else {
-          log.info('No Notification Found')
+          log.info('No Mention Document Found')
         }
       })
   })
-
-  mentionModel.post_mention
-    .findOneAndRemove({
-      post_id: post_id
-    })
-    .exec(function (err, result) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
-
-      if (result !== null) {
-        log.info('Mention Document Deleted')
-      } else {
-        log.info('No Mention Document Found')
-      }
-    })
 }
 
 // Get all post 

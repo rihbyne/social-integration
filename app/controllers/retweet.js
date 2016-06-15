@@ -377,8 +377,13 @@ var setretweetcount = function (post_id, post_type, collectionName, res) {
 }
 
 var deleteRetweet = function (req, res) {
+  log.info('Delete retweet api hitted')
+
   var retweet_quote_id = req.body.retweet_quote_id
   var ret_user_id = req.body.ret_user_id
+
+  log.info('retweet quote id', retweet_quote_id)
+  log.info('retweet user id', ret_user_id)
 
   post_model.retweet_quote
     .findOneAndRemove({

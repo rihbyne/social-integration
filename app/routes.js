@@ -114,7 +114,7 @@ module.exports = function(app, passport) {
         res.redirect('/login');
     });
 
-	app.get('/about', post.getuserdetails); 					// about page
+	// app.get('/about', post.getuserdetails); 					// about page
 
     // user home tile line bind to profile EJS , changed in route/path  also
     // app.get('/:username', isLoggedIn , userhome.getuserhomeposts);          // user home timeline post API

@@ -103,11 +103,12 @@ var gethashposts = function (req, res) { // get a post
 
   log.info('Show posts of hashtag')
 
+  var hashtag = req.params.hashtag
+
   log.info('Hashtag : ', hashtag)
 
-  var hashtag = req.params.hashtag
   req.checkParams('hashtag', 'hashtag').isAlpha()
-  
+
   var errors = req.validationErrors()
 
   if (errors) {
@@ -115,7 +116,7 @@ var gethashposts = function (req, res) { // get a post
     res.status('400').json('There have been validation errors: ' + util.inspect(errors))
     return
   }
-  
+
   async.parallel([
     getPostByHashtagkd,
     getRetweetByHashtagkd,

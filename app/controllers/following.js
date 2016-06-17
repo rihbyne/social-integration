@@ -12,8 +12,14 @@ var master = require('./master.js')
 
 // Set following
 var setfollowing = function (req, res) {
+
+  log.info('Set following API hitted')
+
   var user_id = req.body.user_id // User Id
   var following_id = req.body.following_id // Following Id
+
+  log.info('user id', user_id)
+  log.info('following id', following_id)
 
   // validation for blank variables
   req.checkBody('user_id', 'User id is mandatory').notEmpty()
@@ -78,7 +84,12 @@ var setfollowing = function (req, res) {
 
 // //Get following
 var getfollowing = function (req, res) {
+
+  log.info('Get Following API hitted')
+
   var user_name = req.params.user_name
+  
+  log.info('user name', user_name)
 
   // validation for blank variables
   req.checkParams('user_name', 'User name is mandatory').notEmpty()
@@ -133,8 +144,13 @@ var getfollowing = function (req, res) {
 
 // get follower
 var getfollowers = function (req, res) {
+
+  log.info('Get follower API hitted')
+
   var user_name = req.params.user_name
   // validation for blank variables
+  log.info('user name', user_name)
+
   req.checkParams('user_name', 'User name is mandatory').notEmpty()
   var errors = req.validationErrors()
   if (errors) {
@@ -163,7 +179,7 @@ var getfollowers = function (req, res) {
               res.send(err)
               return
             }
-
+            console.log(followerResult)
             res.json({
               FollowersList: followerResult
             })
@@ -431,9 +447,9 @@ function updateFollowBack (user_id, following_id, callback) {
         res.send(err)
         return
       }
-      console.log('Result update follow back', result)
+      // console.log('Result update follow back', result)
       if (result.length !== 0) {
-        log.info(result)
+        // log.info(result)
         if (result.length == 2) {
           var query = {$or: [{
               _id: result[0]._id
@@ -453,7 +469,7 @@ function updateFollowBack (user_id, following_id, callback) {
                 return
               }
               callback(null, true)
-              log.info(statusResult)
+              // log.info(statusResult)
             })
         }else {
           callback(null, false)

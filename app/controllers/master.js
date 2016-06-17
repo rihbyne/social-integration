@@ -301,10 +301,8 @@ var isPostOwner = function (collectionName, query, callback) {
       }
       else if (postResult.length == 0) {
         callback(null, 'User is not owner of post')
-        log.info('User is not owner of post')
       } else {
         callback(true, 'User is owner of post')
-        log.info('User is owner of post')
       }
     })
 }

@@ -7,13 +7,21 @@ var log = require('../../config/logging')()
 var Promise = require('bluebird')
 // Set Post Like
 var setLike = function (req, res) {
+
   log.info('Set like api hitted')
+
   var post_id = req.body.post_id
   var retweet_quote_id = req.body.retweet_quote_id
   var reply_id = req.body.reply_id
   var like_user_id = req.body.like_user_id
   var type = req.body.type
   var postId
+
+  log.info('Post Id', post_id)
+  log.info('Post Type', type)
+  log.info('Like user id', like_user_id)
+  log.info('Reply id', reply_id)
+  log.info('Retweet Quote id', retweet_quote_id)
 
   req.checkBody('type', 'post type').notEmpty()
   req.checkBody('like_user_id', 'like_user_id').notEmpty()

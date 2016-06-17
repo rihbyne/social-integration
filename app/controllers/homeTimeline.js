@@ -1,4 +1,4 @@
-var user = require('../models/userSchema.js')
+ var user = require('../models/userSchema.js')
 var follower = require('../models/followersSchema.js')
 var post_model = require('../models/postSchema.js')
 var log = require('../../config/logging')()

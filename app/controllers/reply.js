@@ -21,10 +21,10 @@ var setreply = function (req, res) {
 
   log.info('Set reply api hitted')
   log.info('post type', post_type)
-  log.info('reply user id', post_type)
-  log.info('reply msg', post_type)
-  log.info('post id', post_type)
-  log.info('privacy setting', post_type)
+  log.info('reply user id', reply_user_id)
+  log.info('reply msg', reply_msg)
+  log.info('post id', post_id)
+  log.info('privacy setting', privacy_setting)
 
   req.checkBody('post_type', 'post type').notEmpty()
   req.checkBody('reply_user_id', 'reply user id').notEmpty()
@@ -137,7 +137,6 @@ var setreply = function (req, res) {
                 })
 
                 master.getusername(reply_user_id, function (err, result) {
-                  log.info(result)
 
                   if (err) {
                     log.error(err)

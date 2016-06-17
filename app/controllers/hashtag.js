@@ -117,10 +117,18 @@ var gethashposts = function (req, res) { // get a post
     return
   }
 
+  master.getPrivacyStatus(userid, loggedid, function (err, privacyStatus) {
+
+  if (err) {
+    log.error(privacyStatus)
+    res.send(privacyStatus)
+    return
+  }
+
   async.parallel([
-    getPostByHashtagkd,
-    getRetweetByHashtagkd,
-    getReplyByHashtagkd
+          callback => getPostByHashtagkd(privacyStatus, callback),
+          callback => getRetweetByHashtagkd(privacyStatus, callback),
+          callback => getReplyByHashtagkd(privacyStatus, callback)    
   ],
     function (err, result) {
       if (err) {
@@ -146,14 +154,20 @@ var gethashposts = function (req, res) { // get a post
       hashtagePosts})
     }
   )
+})
 
   function getPostByHashtagkd (callback) {
+
+    log.info('get post by hashtag')
+
     var filterOptions = [{
       path: 'post_id'
     }, {
       path: 'post_id',
       populate: {
-        path: 'posted_by'
+        path: 'posted_by',
+        select: 'username firstname lastname'
+
       }
     }]
 

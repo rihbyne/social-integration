@@ -11,13 +11,18 @@ var log = require('../../config/logging')()
 // Get all post and retweet of user
 var getuserhomeposts = function (req, res) { // get a post 
 
-  log.info('Show all posts for single user on home page')
+  log.info('User Profile API hitted')
 
   var userid = req.body.user_id // find posts of user
   var loggedid = req.body.logged_id
   var timestamp = req.body.timestamp
   var flag = req.body.flag; // New - 1 and Old - 2 
   var profilePosts
+
+  log.info('userid', userid)  
+  log.info('loggedid', loggedid)
+  log.info('timestamp', timestamp)
+  log.info('flag', flag)
 
   req.checkBody('user_id', 'Mandatory field not found').notEmpty()
   req.checkBody('logged_id', 'Mandatory field not found').notEmpty()
@@ -31,8 +36,6 @@ var getuserhomeposts = function (req, res) { // get a post
     res.status('400').json('There have been validation errors: ' + util.inspect(errors))
     return
   }
-
-  log.info('userid, loggedid', userid + '   ' + loggedid)
 
   master.getPrivacyStatus(userid, loggedid, function (err, privacyStatus) {
     if (err) {
@@ -75,7 +78,7 @@ var getuserhomeposts = function (req, res) { // get a post
 // Get all post, retweet and reply of user
 var getpostsrtreply = function (req, res) { // get a post 
 
-  log.info('Show all posts, retweet & reply for single user')
+  log.info('User Profile with reply API hitted')
 
   var userid = req.body.user_id // find posts of user
   var loggedid = req.body.logged_id
@@ -84,7 +87,10 @@ var getpostsrtreply = function (req, res) { // get a post
   var profilePosts
   var result1, result2
 
-  log.info('userid, loggedid', userid + '   ' + loggedid)
+  log.info('userid', userid)  
+  log.info('loggedid', loggedid)
+  log.info('timestamp', timestamp)
+  log.info('flag', flag)
 
   req.checkBody('user_id', 'Mandatory field not found').notEmpty()
   req.checkBody('logged_id', 'Mandatory field not found').notEmpty()
@@ -115,8 +121,7 @@ var getpostsrtreply = function (req, res) { // get a post
     ],
       function (err, result) {
 
-        // log.info(result)
-
+        log.info(result)
         var profilePosts
 
         if (err) {
@@ -203,7 +208,7 @@ function getPostByUserId (userid, privacyStatus, timestamp, flag, callback) {
         callback(null, []) // No post found
 
       } else {
-        console.info(result)
+        // console.info(result)
         callback(null, result)
       }
     })

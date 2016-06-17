@@ -42,10 +42,10 @@ app.use(express.static(path.join(__dirname, '/public')))
 app.use(express.static(path.join(__dirname, '/node_modules')))
 
 app.set('view engine', 'ejs')
-require('./config/passport.js')(passport) // pass passport for configuration
+// require('./config/passport.js')(passport) // pass passport for configuration
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport) // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app) // load our routes and pass in our app and fully configured passport
 
 // ============ direct messaging router====================
 app.use('/api/direct_messages', routeDirectMsgApi)

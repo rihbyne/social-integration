@@ -1,7 +1,7 @@
 var post_model = require('../models/postSchema.js')
 var hashtag_model = require('../models/hashtagSchema.js')
 var log = require('../../config/logging')()
-
+var master = require('../controllers/master.js')
 // Get all post
 var gethashtag = function (req, res) { // get a post 
   log.info('Show all HashTag')
@@ -117,30 +117,34 @@ var gethashposts = function (req, res) { // get a post
     return
   }
 
-  master.getPrivacyStatus(userid, loggedid, function (err, privacyStatus) {
+  // master.getPrivacyStatus(userid, loggedid, function (err, privacyStatus) {
 
-  if (err) {
-    log.error(privacyStatus)
-    res.send(privacyStatus)
-    return
-  }
+  // if (err) {
+  //   log.error(privacyStatus)
+  //   res.send(privacyStatus)
+  //   return
+  // }
 
   async.parallel([
-          callback => getPostByHashtagkd(privacyStatus, callback),
-          callback => getRetweetByHashtagkd(privacyStatus, callback),
-          callback => getReplyByHashtagkd(privacyStatus, callback)    
+    callback => getPostByHashtagkd(callback),
+    callback => getRetweetByHashtagkd(callback),
+    callback => getReplyByHashtagkd(callback)
   ],
     function (err, result) {
       if (err) {
-        if (result[0] === 0) {
-          console.info('Own posts are zero')
-          var hashtagePosts = result[1]
-        }
+        log.error(result)
+        res.send(result)
+        return
 
-        if (result[1] === 0) {
-          console.info('Retweet posts are zero')
-          var hashtagePosts = result[0]
-        }
+        // if (result[0] === 0) {
+        //   console.info('Own posts are zero')
+        //   var hashtagePosts = result[1]
+        // }
+
+      // if (result[1] === 0) {
+      //   console.info('Retweet posts are zero')
+      //   var hashtagePosts = result[0]
+      // }
       } else {
         var hashtagePosts = result[0].concat(result[1]).concat(result[2]); // Got two result , concent two results
         function custom_sort (a, b) {
@@ -154,30 +158,15 @@ var gethashposts = function (req, res) { // get a post
       hashtagePosts})
     }
   )
-})
 
   function getPostByHashtagkd (callback) {
-
     log.info('get post by hashtag')
 
-    var filterOptions = [{
-      path: 'post_id'
-    }, {
-      path: 'post_id',
-      populate: {
-        path: 'posted_by',
-        select: 'username firstname lastname'
-
-      }
-    }]
-
-    // find by mention collection from post_mention and check for errors
     hashtag_model.post_hashtag
       .find({
         hashtag: hashtag
       })
       .select('post_id')
-      .populate(filterOptions)
       .lean()
       .exec(function (err, hashtagpost) {
         if (err) {
@@ -186,46 +175,85 @@ var gethashposts = function (req, res) { // get a post
           return
         }
 
-        if (hashtagpost.length !== '') {
-
-          // log.info(mentionspost)
-
-          callback(null, hashtagpost)
+        if (hashtagpost.length !== 0) {
+          var items = []
+          async.forEach(hashtagpost, function (rslthashpost, cb) {
+            post_model.post
+              .find({_id: rslthashpost.post_id, privacy_setting: 1})
+              .populate('posted_by')
+              .exec(function (err, resultPost) {
+                if (err) {
+                  log.error(err)
+                  cb()
+                }
+                else if (resultPost.length !== 0) {
+                  // console.log(resultPost)
+                  items.push(resultPost[0])
+                  cb()
+                }else {
+                  cb()
+                }
+              })
+          }, function (err) {
+            if (err) {
+              console.log('something went wrong')
+              callback(null, [])
+            } else {
+              // console.log('Final all post', items)
+              callback(null, items)
+            }
+          })
         } else {
           callback(null, [])
-
-        // res.json('No Post Found')
         }
       })
   }
 
   function getRetweetByHashtagkd (callback) {
-    var filterOptions = [{
-      path: 'retweet_quote_id'
-    }, {
-      path: 'retweet_quote_id',
-      populate: {
-        path: 'ret_user_id'
-      }
-    }]
+    log.info('get retweet by hashtag')
 
-    // find by mention collection from post_mention and check for errors
     hashtag_model.retweet_quote_hashtag
       .find({
         hashtag: hashtag
       })
       .select('retweet_quote_id')
-      .populate(filterOptions)
       .lean()
-      .exec(function (err, hashtagpost) {
+      .exec(function (err, hashtagretweet) {
         if (err) {
           log.error(err)
           res.send(err)
           return
         }
 
-        if (hashtagpost.length !== '') {
-          callback(null, hashtagpost)
+        if (hashtagretweet.length !== 0) {
+          var items = []
+          async.forEach(hashtagretweet, function (rslthashretweet, cb) {
+            post_model.retweet_quote
+            .find({_id: rslthashretweet.retweet_quote_id, privacy_setting: 1})
+              .populate('ret_user_id')
+              .exec(function (err, resultRetweet) {
+
+                if (err) {
+                  log.error(err)
+                  cb()
+                }
+                else if (resultRetweet.length !== 0) {
+                  // console.log(resultRetweet)
+                  items.push(resultRetweet[0])
+                  cb()
+                }else {
+                  cb()
+                }
+              })
+          }, function (err) {
+            if (err) {
+              console.log('something went wrong')
+              callback(null, [])
+            } else {
+              // console.log('Final all post', items)
+              callback(null, items)
+            }
+          })
         } else {
           callback(null, [])
         }
@@ -233,38 +261,55 @@ var gethashposts = function (req, res) { // get a post
   }
 
   function getReplyByHashtagkd (callback) {
-    var filterOptions = [{
-      path: 'reply_id'
-    }, {
-      path: 'reply_id',
-      populate: {
-        path: 'reply_user_id'
-      }
-    }]
-    // find by mention collection from post_mention and check for errors
+    log.info('get reply by hashtag')
+
     hashtag_model.reply_hashtag
       .find({
         hashtag: hashtag
       })
       .select('reply_id')
-      .populate(filterOptions)
       .lean()
-      .exec(function (err, hashtagpost) {
+      .exec(function (err, hashtagreply) {
         if (err) {
           log.error(err)
           res.send(err)
           return
         }
 
-        if (hashtagpost.length !== '') {
-          callback(null, hashtagpost)
-          log.info('hashtag post', hashtagpost)
+        if (hashtagreply.length !== 0) {
+          var items = []
+          async.forEach(hashtagreply, function (rslthashreply, cb) {
+            post_model.reply
+            .find({_id: rslthashreply.reply_id, privacy_setting: 1})
+              .populate('reply_user_id')
+              .exec(function (err, resultReply) {
+
+                if (err) {
+                  log.error(err)
+                  cb()
+                }
+                else if (resultReply.length !== 0) {
+                  items.push(resultReply[0])
+                  cb()
+                }else {
+                  cb()
+                }
+              })
+          }, function (err) {
+            if (err) {
+              console.log('something went wrong')
+              callback(null, [])
+            } else {
+              // console.log('Final all post', items)
+              callback(null, items)
+            }
+          })
         } else {
           callback(null, [])
-          log.info('No Post Found')
         }
       })
   }
+
 }
 
 module.exports = ({

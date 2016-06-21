@@ -195,6 +195,9 @@ var unlink_following = function (req, res) {
   var user_id = req.body.user_id
   var unlink_following = req.body.unlink_following
 
+  log.info('user id', user_id)
+  log.info('unlink_following', unlink_following)
+
   // validation for blank variables
   req.checkBody('user_id', 'User id is mandatory').notEmpty()
   req.checkBody('unlink_following', 'unlink_following is mandatory').notEmpty()

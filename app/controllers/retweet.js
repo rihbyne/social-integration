@@ -385,7 +385,7 @@ var deleteRetweet = function (req, res) {
   log.info('retweet quote id', retweet_quote_id)
   log.info('retweet user id', ret_user_id)
 
-req.checkBody('retweet_quote_id', 'retweet_quote_id').notEmpty()
+  req.checkBody('retweet_quote_id', 'retweet_quote_id').notEmpty()
   req.checkBody('ret_user_id', 'ret_user_id').notEmpty()
 
   var errors = req.validationErrors()
@@ -403,38 +403,48 @@ req.checkBody('retweet_quote_id', 'retweet_quote_id').notEmpty()
       return
     }
 
-    var query = {_id: retweet_quote_id, ret_user_id: ret_user_id}
     var collectionName = post_model.retweet_quote
+    var query = {_id: retweet_quote_id}
 
-    master.isValidUser(collectionName, query, function (err, isPostOwnerResult) {
+    master.isValidPost(collectionName, query, function (err, validPostResult) {
       if (err) {
-        log.error(isPostOwnerResult)
-        res.send(isPostOwnerResult)
+        log.error(validPostResult)
+        res.send(validPostResult)
         return
-      }else {
-        post_model.retweet_quote
-          .findOneAndRemove({
-            _id: retweet_quote_id,
-            ret_user_id: ret_user_id
-          })
-          .lean()
-          .exec(function (err, result) {
-            if (err) {
-              log.error(err)
-              res.send(err)
-              return
-            }
-
-            if (result == null || result == undefined || result == '') {
-              log.info('Can not delete retweet')
-              res.send('Can not delete retweet')
-              return
-            } else {
-              log.info('Quote retweet Deleted Successfully')
-              res.send('Quote retweet Deleted Successfully')
-            }
-          })
       }
+
+      var query = {_id: retweet_quote_id, ret_user_id: ret_user_id}
+
+      master.isValidUser(collectionName, query, function (err, isPostOwnerResult) {
+        if (err) {
+          log.error(isPostOwnerResult)
+          res.json(isPostOwnerResult)
+          return
+        }else {
+          post_model.retweet_quote
+            .findOneAndRemove({
+              _id: retweet_quote_id,
+              ret_user_id: ret_user_id
+            })
+            .lean()
+            .exec(function (err, result) {
+              if (err) {
+                log.error(err)
+                res.json(err)
+                return
+              }
+
+              if (result == null || result == undefined || result == '') {
+                log.error('Can not delete retweet')
+                res.json('Can not delete retweet')
+                return
+              } else {
+                log.info('Quote retweet Deleted Successfully')
+                res.json({msg:'Quote retweet Deleted Successfully'})
+              }
+            })
+        }
+      })
     })
   })
 }

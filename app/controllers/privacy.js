@@ -76,7 +76,7 @@ var updatePrivacy = function (req, res) {
               return
             }
             log.info('Privacy setting Updated')
-            res.json('Privacy setting Updated')
+            res.json({message:'Privacy setting Updated'})
           })
       })
     }

@@ -137,11 +137,11 @@ var setretweet = function (req, res) {
           var regexat = /@([^\s]+)/g
           var regexhash = /#([^\s]+)/g
 
-          while (match_at = regexat.exec(retweet_quote)) {
+          while (match_at = regexat.exec(retweet_msg)) {
             mentionusers.push(match_at[1])
           }
 
-          while (match_hash = regexhash.exec(retweet_quote)) {
+          while (match_hash = regexhash.exec(retweet_msg)) {
             hashtags.push(match_hash[1])
           }
 

@@ -11,7 +11,7 @@ var getmentionuser = function (req, res) { // get a post
   var mention_user = req.params.mention_user
 
   req.checkParams('mention_user', 'mention_user').isAlpha()
-  
+
   var errors = req.validationErrors()
 
   if (errors) {
@@ -26,17 +26,10 @@ var getmentionuser = function (req, res) { // get a post
     getReplyByMentionUser
   ],
     function (err, result) {
-      log.info(result)
+      // log.info(result)
       if (err) {
-        if (result[0] === 0) {
-          log.info('Own posts are zero')
-          var mentionUserPosts = result[1]
-        }
-
-        if (result[1] === 0) {
-          log.info('Retweet posts are zero')
-          var mentionUserPosts = result[0]
-        }
+        log.info(err)
+        res.send(err)
       } else {
         var mentionUserPosts = result[0].concat(result[1]).concat(result[2]); // Got two result , concent two results
 
@@ -68,7 +61,7 @@ var getmentionuser = function (req, res) { // get a post
           res.send(err)
           return
         }
-        console.log(mentionspost)
+
         if (mentionspost.length !== 0) {
           var items = []
           async.forEach(mentionspost, function (rsltmentionspost, cb) {
@@ -118,13 +111,13 @@ var getmentionuser = function (req, res) { // get a post
           res.send(err)
           return
         }
-        console.log('mentionretweet',mentionsretweet)
+
         if (mentionsretweet.length !== 0) {
           var items = []
           async.forEach(mentionsretweet, function (rsltmentionsretweet, cb) {
             post_model.retweet_quote
-              .find({_id: rsltmentionsretweet.retweet_id, privacy_setting: 1})
-              .populate('posted_by')
+              .find({_id: rsltmentionsretweet.retweet_quote_id, privacy_setting: 1})
+              .populate('ret_user_id')
               .exec(function (err, resultPost) {
                 if (err) {
                   log.error(err)
@@ -140,10 +133,10 @@ var getmentionuser = function (req, res) { // get a post
               })
           }, function (err) {
             if (err) {
-              console.log('something went wrong')
+              log.error('something went wrong')
               callback(null, [])
             } else {
-              console.log('Final all post', items)
+              // console.log('Final all post', items)
               callback(null, items)
             }
           })
@@ -172,9 +165,9 @@ var getmentionuser = function (req, res) { // get a post
         if (mentionsreply.length !== 0) {
           var items = []
           async.forEach(mentionsreply, function (rsltmentionsreply, cb) {
-            post_model.post
-              .find({_id: rsltmentionsreply.post_id, privacy_setting: 1})
-              .populate('posted_by')
+            post_model.reply
+              .find({_id: rsltmentionsreply.reply_id, privacy_setting: 1})
+              .populate('reply_user_id')
               .exec(function (err, resultPost) {
                 if (err) {
                   log.error(err)
@@ -202,7 +195,6 @@ var getmentionuser = function (req, res) { // get a post
         }
       })
   }
-
 }
 
 module.exports = ({

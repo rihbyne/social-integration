@@ -1,4 +1,5 @@
 var mention_model = require('../models/mentionSchema.js')
+var post_model = require('../models/postSchema.js')
 var async = require('async')
 var log = require('../../config/logging')()
 
@@ -53,19 +54,13 @@ var getmentionuser = function (req, res) { // get a post
   )
 
   function getPostByMentionUser (callback) {
-    var optionFilter = [{
-      path: 'post_id',
-      populate: {
-        path: 'posted_by'
-      }
-    }]
-    // find by mention collection from post_mention and check for errors
+    log.info('get post by mention user')
+
     mention_model.post_mention
       .find({
         mention_users: mention_user
       })
       .select('post_id')
-      .populate(optionFilter)
       .lean()
       .exec(function (err, mentionspost) {
         if (err) {
@@ -73,12 +68,35 @@ var getmentionuser = function (req, res) { // get a post
           res.send(err)
           return
         }
-
-        if (mentionspost.length !== '') {
-
-          // log.info(mentionspost)
-
-          callback(null, mentionspost)
+        console.log(mentionspost)
+        if (mentionspost.length !== 0) {
+          var items = []
+          async.forEach(mentionspost, function (rsltmentionspost, cb) {
+            post_model.post
+              .find({_id: rsltmentionspost.post_id, privacy_setting: 1})
+              .populate('posted_by')
+              .exec(function (err, resultPost) {
+                if (err) {
+                  log.error(err)
+                  cb()
+                }
+                else if (resultPost.length !== 0) {
+                  // console.log(resultPost)
+                  items.push(resultPost[0])
+                  cb()
+                }else {
+                  cb()
+                }
+              })
+          }, function (err) {
+            if (err) {
+              console.log('something went wrong')
+              callback(null, [])
+            } else {
+              // console.log('Final all post', items)
+              callback(null, items)
+            }
+          })
         } else {
           callback(null, [])
         }
@@ -86,33 +104,49 @@ var getmentionuser = function (req, res) { // get a post
   }
 
   function getRetweetByMentionUser (callback) {
-    log.info(mention_user)
+    log.info('get retweet by mention user')
 
-    var filterOptions = [{
-      path: 'retweet_quote_id'
-    }, {
-      path: 'retweet_quote_id',
-      populate: {
-        path: 'ret_user_id'
-      }
-    }]
-    // find by mention collection from post_mention and check for errors
     mention_model.retweet_quote_mention
       .find({
         mention_users: mention_user
       })
       .select('retweet_quote_id')
-      .populate(filterOptions)
       .lean()
-      .exec(function (err, mentionspostdata) {
+      .exec(function (err, mentionsretweet) {
         if (err) {
           log.error(err)
           res.send(err)
           return
         }
-
-        if (mentionspostdata.length !== '') {
-          callback(null, mentionspostdata)
+        console.log('mentionretweet',mentionsretweet)
+        if (mentionsretweet.length !== 0) {
+          var items = []
+          async.forEach(mentionsretweet, function (rsltmentionsretweet, cb) {
+            post_model.retweet_quote
+              .find({_id: rsltmentionsretweet.retweet_id, privacy_setting: 1})
+              .populate('posted_by')
+              .exec(function (err, resultPost) {
+                if (err) {
+                  log.error(err)
+                  cb()
+                }
+                else if (resultPost.length !== 0) {
+                  // console.log(resultPost)
+                  items.push(resultPost[0])
+                  cb()
+                }else {
+                  cb()
+                }
+              })
+          }, function (err) {
+            if (err) {
+              console.log('something went wrong')
+              callback(null, [])
+            } else {
+              console.log('Final all post', items)
+              callback(null, items)
+            }
+          })
         } else {
           callback(null, [])
         }
@@ -120,38 +154,55 @@ var getmentionuser = function (req, res) { // get a post
   }
 
   function getReplyByMentionUser (callback) {
-    var filterOptions = [{
-      path: 'reply_id'
-    }, {
-      path: 'reply_id',
-      populate: {
-        path: 'reply_user_id'
-      }
-    }]
+    log.info('get reply by mention user')
 
-    log.info(mention_user)
-    // find by mention collection from post_mention and check for errors
     mention_model.reply_mention
       .find({
         mention_users: mention_user
       })
       .select('reply_id')
-      .populate(filterOptions)
       .lean()
-      .exec(function (err, mentionspost) {
+      .exec(function (err, mentionsreply) {
         if (err) {
           log.error(err)
           res.send(err)
           return
         }
-
-        if (mentionspost.length !== '') {
-          callback(null, mentionspost)
+        // console.log('mentionREply',mentionsreply)
+        if (mentionsreply.length !== 0) {
+          var items = []
+          async.forEach(mentionsreply, function (rsltmentionsreply, cb) {
+            post_model.post
+              .find({_id: rsltmentionsreply.post_id, privacy_setting: 1})
+              .populate('posted_by')
+              .exec(function (err, resultPost) {
+                if (err) {
+                  log.error(err)
+                  cb()
+                }
+                else if (resultPost.length !== 0) {
+                  // console.log(resultPost)
+                  items.push(resultPost[0])
+                  cb()
+                }else {
+                  cb()
+                }
+              })
+          }, function (err) {
+            if (err) {
+              console.log('something went wrong')
+              callback(null, [])
+            } else {
+              // console.log('Final all post', items)
+              callback(null, items)
+            }
+          })
         } else {
           callback(null, [])
         }
       })
   }
+
 }
 
 module.exports = ({

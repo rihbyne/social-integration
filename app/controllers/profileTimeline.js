@@ -101,7 +101,7 @@ var getpostsrtreply = function (req, res) { // get a post
 
   if (errors) {
     log.warn('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    res.status('400').json({message:'validation error'})
     return
   }
 
@@ -310,9 +310,7 @@ function getRetweetByUserId (userid, privacyStatus, timestamp, flag, callback) {
                 callback()
               })
           }, function (err) {
-
             // log.info(retweets)
-
             return callback(null, retweets)
           })
       }
@@ -381,7 +379,6 @@ function getQuoteRetweetByUserId (userid, privacyStatus, timestamp, flag, callba
 
       } else {
         async.each(retweets,
-
           function (singleretweet, callback) {
             if (singleretweet.post_id !== undefined) {
               var options = [{
@@ -486,7 +483,6 @@ function getReplyByUserId (userid, privacyStatus, timestamp, flag, callback) {
       // log.info('Reply By user: \n',postReplyResult)
 
       async.each(postReplyResult,
-
         function (singleReplyResult, callback) {
           if (singleReplyResult.post_id !== undefined) {
             var options = [{

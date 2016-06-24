@@ -16,7 +16,7 @@ var getmentionuser = function (req, res) { // get a post
 
   if (errors) {
     log.error('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    res.status('400').json({message:'validation error'})
     return
   }
 
@@ -61,37 +61,38 @@ var getmentionuser = function (req, res) { // get a post
           res.send(err)
           return
         }
-
-        if (mentionspost.length !== 0) {
-          var items = []
-          async.forEach(mentionspost, function (rsltmentionspost, cb) {
-            post_model.post
-              .find({_id: rsltmentionspost.post_id, privacy_setting: 1})
-              .populate('posted_by')
-              .exec(function (err, resultPost) {
-                if (err) {
-                  log.error(err)
-                  cb()
-                }
-                else if (resultPost.length !== 0) {
-                  // console.log(resultPost)
-                  items.push(resultPost[0])
-                  cb()
-                }else {
-                  cb()
-                }
-              })
-          }, function (err) {
-            if (err) {
-              console.log('something went wrong')
-              callback(null, [])
-            } else {
-              // console.log('Final all post', items)
-              callback(null, items)
-            }
-          })
-        } else {
-          callback(null, [])
+        else{
+          if (mentionspost.length !== 0) {
+            var items = []
+            async.forEach(mentionspost, function (rsltmentionspost, cb) {
+              post_model.post
+                .find({_id: rsltmentionspost.post_id, privacy_setting: 1})
+                .populate('posted_by')
+                .exec(function (err, resultPost) {
+                  if (err) {
+                    log.error(err)
+                    cb()
+                  }
+                  else if (resultPost.length !== 0) {
+                    // console.log(resultPost)
+                    items.push(resultPost[0])
+                    cb()
+                  }else {
+                    cb()
+                  }
+                })
+            }, function (err) {
+              if (err) {
+                console.log('something went wrong')
+                callback(null, [])
+              } else {
+                // console.log('Final all post', items)
+                callback(null, items)
+              }
+            })
+          } else {
+            callback(null, [])
+          }
         }
       })
   }
@@ -111,37 +112,38 @@ var getmentionuser = function (req, res) { // get a post
           res.send(err)
           return
         }
-
-        if (mentionsretweet.length !== 0) {
-          var items = []
-          async.forEach(mentionsretweet, function (rsltmentionsretweet, cb) {
-            post_model.retweet_quote
-              .find({_id: rsltmentionsretweet.retweet_quote_id, privacy_setting: 1})
-              .populate('ret_user_id')
-              .exec(function (err, resultPost) {
-                if (err) {
-                  log.error(err)
-                  cb()
-                }
-                else if (resultPost.length !== 0) {
-                  // console.log(resultPost)
-                  items.push(resultPost[0])
-                  cb()
-                }else {
-                  cb()
-                }
-              })
-          }, function (err) {
-            if (err) {
-              log.error('something went wrong')
-              callback(null, [])
-            } else {
-              // console.log('Final all post', items)
-              callback(null, items)
-            }
-          })
-        } else {
-          callback(null, [])
+        else{
+          if (mentionsretweet.length !== 0) {
+            var items = []
+            async.forEach(mentionsretweet, function (rsltmentionsretweet, cb) {
+              post_model.retweet_quote
+                .find({_id: rsltmentionsretweet.retweet_quote_id, privacy_setting: 1})
+                .populate('ret_user_id')
+                .exec(function (err, resultPost) {
+                  if (err) {
+                    log.error(err)
+                    cb()
+                  }
+                  else if (resultPost.length !== 0) {
+                    // console.log(resultPost)
+                    items.push(resultPost[0])
+                    cb()
+                  }else {
+                    cb()
+                  }
+                })
+            }, function (err) {
+              if (err) {
+                log.error('something went wrong')
+                callback(null, [])
+              } else {
+                // console.log('Final all post', items)
+                callback(null, items)
+              }
+            })
+          } else {
+            callback(null, [])
+          }
         }
       })
   }
@@ -161,37 +163,39 @@ var getmentionuser = function (req, res) { // get a post
           res.send(err)
           return
         }
-        // console.log('mentionREply',mentionsreply)
-        if (mentionsreply.length !== 0) {
-          var items = []
-          async.forEach(mentionsreply, function (rsltmentionsreply, cb) {
-            post_model.reply
-              .find({_id: rsltmentionsreply.reply_id, privacy_setting: 1})
-              .populate('reply_user_id')
-              .exec(function (err, resultPost) {
-                if (err) {
-                  log.error(err)
-                  cb()
-                }
-                else if (resultPost.length !== 0) {
-                  // console.log(resultPost)
-                  items.push(resultPost[0])
-                  cb()
-                }else {
-                  cb()
-                }
-              })
-          }, function (err) {
-            if (err) {
-              console.log('something went wrong')
-              callback(null, [])
-            } else {
-              // console.log('Final all post', items)
-              callback(null, items)
-            }
-          })
-        } else {
-          callback(null, [])
+        else{
+          // console.log('mentionREply',mentionsreply)
+          if (mentionsreply.length !== 0) {
+            var items = []
+            async.forEach(mentionsreply, function (rsltmentionsreply, cb) {
+              post_model.reply
+                .find({_id: rsltmentionsreply.reply_id, privacy_setting: 1})
+                .populate('reply_user_id')
+                .exec(function (err, resultPost) {
+                  if (err) {
+                    log.error(err)
+                    cb()
+                  }
+                  else if (resultPost.length !== 0) {
+                    // console.log(resultPost)
+                    items.push(resultPost[0])
+                    cb()
+                  }else {
+                    cb()
+                  }
+                })
+            }, function (err) {
+              if (err) {
+                console.log('something went wrong')
+                callback(null, [])
+              } else {
+                // console.log('Final all post', items)
+                callback(null, items)
+              }
+            })
+          } else {
+            callback(null, [])
+          }
         }
       })
   }

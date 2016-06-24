@@ -16,6 +16,225 @@ var notificationModel = require('../models/notificationSchema.js')
 var user_followers = require('../models/followersSchema.js')
 var mentionModel = require('../models/mentionSchema.js')
 
+// Set new post
+var setpost = function (req, res) { // create a post 
+
+  log.info('Set post api hitted')
+
+  var userid = req.body.userid
+  var post_description = req.body.post_description
+  var privacy_setting = req.body.privacy_setting
+  // var post_links = req.body.post_links
+
+  var mentionusers = []
+  var hashtags = []
+
+  var regexat = /@([^\s]+)/g
+  var regexhash = /#([^\s]+)/g
+
+  req.checkBody('userid', 'userid is empty').notEmpty()
+  req.checkBody('post_description', 'Can not post empty tweet').notEmpty()
+  req.checkBody('post_description', '0 to 300 characters required').len(0, 300)
+  req.checkBody('privacy_setting', 'privacy setting is empty').notEmpty()
+  req.checkBody('privacy_setting', 'privacy setting must be integer').isInt().gte(1).lte(3)
+
+  var errors = req.validationErrors()
+
+  if (errors) {
+    log.warn('There have been validation errors: \n' + util.inspect(errors))
+    res.status('400').json({message:'validation error'})
+    return
+  }
+
+  while (match_at = regexat.exec(post_description)) {
+    mentionusers.push(match_at[1])
+  }
+
+  while (match_hash = regexhash.exec(post_description)) {
+    hashtags.push(match_hash[1])
+  }
+
+  // while (match_url = regexat.exec(post_description)) {
+  //     urls.push(match_url[1])
+  // }
+
+  log.info('Mention Users : ', mentionusers)
+  log.info('Hash Tags : ', hashtags)
+
+  var post = new post_model.post({
+    posted_by: userid,
+    post_description: post_description,
+    privacy_setting: privacy_setting
+
+  }) // create a new instance of the post model
+
+  master.updateUser(userid, function (err, updateResult) {
+    if (err) {
+      log.error(updateResult)
+      res.send(updateResult)
+      return
+    }
+
+    // save the post and check for errors
+    post.save(function (err, result) {
+      if (err) {
+        log.error(err)
+        res.send(err)
+        return
+      }
+
+      master.getusername(result.posted_by, function (err, username) {
+        log.info('Mention Users :' + mentionusers)
+
+        if (mentionusers != '') {
+          var notification_message = username + ' Has Mentioned you in post'
+
+          var notification = new notificationModel.notification({
+            notification_message: notification_message,
+            notification_user: mentionusers,
+            post_id: post._id,
+            usrname: username
+
+          })
+
+          // log.info(notification_user)
+          notification.save(function (err) {
+            if (err) {
+              log.error(err)
+              res.send(err)
+              return
+            }
+
+            log.info('Notification Saved')
+          })
+        }
+
+        master.hashtagMention(1, post, mentionusers, hashtags, function (err, result) {
+          if (err) {
+            log.error(err)
+            res.send(err)
+            return
+          }
+
+          res.status(201).json({
+            message: result
+          })
+
+          log.info('Post Created.')
+        })
+      })
+    })
+  })
+}
+
+var deletepost = function (req, res) {
+  log.info('Delete post api hitted')
+
+  var post_id = req.body.post_id
+  var posted_by = req.body.posted_by
+
+  log.info('post id', post_id)
+  log.info('posted by', posted_by)
+
+  req.checkBody('post_id', 'post_id').notEmpty()
+  req.checkBody('posted_by', 'posted_by').notEmpty()
+
+  var errors = req.validationErrors()
+
+  if (errors) {
+    log.warn('There have been validation errors: \n' + util.inspect(errors))
+    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    return
+  }
+
+  master.userExistence(posted_by, function (err, result) {
+    if (err) {
+      log.error(result)
+      res.send(result)
+      return
+    }
+
+    var query = {_id: post_id, posted_by: posted_by}
+    var collectionName = post_model.post
+
+    master.isValidUser(collectionName, query, function (err, isPostOwnerResult) {
+      if (err) {
+        log.error(isPostOwnerResult)
+        res.send(isPostOwnerResult)
+        return
+      }else {
+        post_model.post
+          .findOneAndRemove(query)
+          .exec(function (err, result) {
+            if (err) {
+              log.error(err)
+              res.send(err)
+              return
+            }
+            if (result !== null) {
+              log.info('Post Deleted')
+
+              res.json({
+                message: 'Post Deleted'
+              })
+            } else {
+              log.info('No Post Found')
+
+              res.json({
+                message: 'No Post Found'
+              })
+            }
+          })
+      }
+    })
+
+    master.getusername(posted_by, function (err, username) {
+      if (err) {
+        log.error(username)
+        res.send(username)
+        return
+      }
+
+      notificationModel.notification
+        .findOneAndRemove({
+          post_id: post_id,
+          username: username
+        })
+        .exec(function (err, result) {
+          if (err) {
+            log.error(err)
+            res.send(err)
+            return
+          }
+
+          if (result !== null) {
+            log.info('Notification Deleted')
+          } else {
+            log.info('No Notification Found')
+          }
+        })
+    })
+
+    mentionModel.post_mention
+      .findOneAndRemove({
+        post_id: post_id
+      })
+      .exec(function (err, result) {
+        if (err) {
+          log.error(err)
+          res.send(err)
+          return
+        }
+
+        if (result !== null) {
+          log.info('Mention Document Deleted')
+        } else {
+          log.info('No Mention Document Found')
+        }
+      })
+  })
+}
+
 var trend = function (req, res) {
   post_model.trends
     .find()
@@ -35,23 +254,6 @@ var trend = function (req, res) {
       })
     })
 }
-
-// Get all post 
-// var getpost = function(req, res) {
-
-//     post_model.post
-//  .find()
-//  .exec(function(err, allpost) {
-//         if (err)
-// log.error(err)
-//             res.send(err)
-
-//         res.json({
-//             posts: allpost
-//         })
-//     })
-
-// }
 
 // Get single post of user
 var getsinglepost = function (req, res) { // get a post 
@@ -206,116 +408,6 @@ var getuserpost = function (req, res) { // get a post
         posts: userposts
       })
     })
-}
-
-// Set new post
-var setpost = function (req, res) { // create a post 
-
-  log.info('Add post api hitted')
-
-  var userid = req.body.userid; // get the post name (comes from the request)
-  var post_description = req.body.post_description; // get the post name (comes from the request)
-  var privacy_setting = req.body.privacy_setting
-  // var post_links = req.body.post_links
-
-  var mentionusers = []
-  var hashtags = []
-
-  var regexat = /@([^\s]+)/g
-  var regexhash = /#([^\s]+)/g
-
-  req.checkBody('userid', 'userid is empty').notEmpty()
-  req.checkBody('post_description', 'Can not post empty tweet').notEmpty()
-  req.checkBody('post_description', '0 to 300 characters required').len(0, 300)
-  req.checkBody('privacy_setting', 'privacy setting is empty').notEmpty()
-
-  var errors = req.validationErrors()
-
-  if (errors) {
-    log.warn('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').send('There have been validation errors: \n' + util.inspect(errors))
-    return
-  }
-
-  while (match_at = regexat.exec(post_description)) {
-    mentionusers.push(match_at[1])
-  }
-
-  while (match_hash = regexhash.exec(post_description)) {
-    hashtags.push(match_hash[1])
-  }
-
-  // while (match_url = regexat.exec(post_description)) {
-  //     urls.push(match_url[1])
-  // }
-
-  log.info('Mention Users : ', mentionusers)
-  log.info('Hash Tags : ', hashtags)
-
-  var post = new post_model.post({
-    posted_by: userid,
-    post_description: post_description,
-    privacy_setting: privacy_setting
-
-  }) // create a new instance of the post model
-
-  master.updateUser(userid, function (err, updateResult) {
-    if (err) {
-      log.error(updateResult)
-      res.send(updateResult)
-      return
-    }
-
-    // save the post and check for errors
-    post.save(function (err, result) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
-
-      master.getusername(result.posted_by, function (err, username) {
-        log.info('Mention Users :' + mentionusers)
-
-        if (mentionusers != '') {
-          var notification_message = username + ' Has Mentioned you in post'
-
-          var notification = new notificationModel.notification({
-            notification_message: notification_message,
-            notification_user: mentionusers,
-            post_id: post._id,
-            usrname: username
-
-          })
-
-          // log.info(notification_user)
-          notification.save(function (err) {
-            if (err) {
-              log.error(err)
-              res.send(err)
-              return
-            }
-
-            log.info('Notification Saved')
-          })
-        }
-
-        master.hashtagMention(1, post, mentionusers, hashtags, function (err, result) {
-          if (err) {
-            log.error(err)
-            res.send(err)
-            return
-          }
-
-          res.json({
-            message: result
-          })
-
-          log.info('Post Created.')
-        })
-      })
-    })
-  })
 }
 
 // Set users
@@ -513,114 +605,22 @@ var getuserpostcount = function (req, res) { // get a post
   })
 }
 
-var deletepost = function (req, res) {
-  log.info('Delete post api hitted')
+// Get all post 
+// var getpost = function(req, res) {
 
-  var post_id = req.body.post_id
-  var posted_by = req.body.posted_by
+//     post_model.post
+//  .find()
+//  .exec(function(err, allpost) {
+//         if (err)
+// log.error(err)
+//             res.send(err)
 
-  log.info('post id', post_id)
-  log.info('posted by', posted_by)
+//         res.json({
+//             posts: allpost
+//         })
+//     })
 
-  req.checkBody('post_id', 'post_id').notEmpty()
-  req.checkBody('posted_by', 'posted_by').notEmpty()
-
-  var errors = req.validationErrors()
-
-  if (errors) {
-    log.warn('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
-    return
-  }
-
-  master.userExistence(posted_by, function (err, result) {
-    if (err) {
-      log.error(result)
-      res.send(result)
-      return
-    }
-
-    var query ={_id: post_id, posted_by: posted_by}
-    var collectionName = post_model.post
-
-    master.isValidUser(collectionName, query, function (err, isPostOwnerResult) {
-      
-      if (err) {
-        log.error(isPostOwnerResult)
-        res.send(isPostOwnerResult)
-        return
-      }else {
-        post_model.post
-          .findOneAndRemove(query)
-          .exec(function (err, result) {
-            if (err) {
-              log.error(err)
-              res.send(err)
-              return
-            }
-            if (result !== null) {
-              log.info('Post Deleted')
-
-              res.json({
-                message: 'Post Deleted'
-              })
-            } else {
-              log.info('No Post Found')
-
-              res.json({
-                message: 'No Post Found'
-              })
-            }
-          })
-      }
-    })
-
-    master.getusername(posted_by, function (err, username) {
-      if (err) {
-        log.error(username)
-        res.send(username)
-        return
-      }
-
-      notificationModel.notification
-        .findOneAndRemove({
-          post_id: post_id,
-          username: username
-        })
-        .exec(function (err, result) {
-          if (err) {
-            log.error(err)
-            res.send(err)
-            return
-          }
-
-          if (result !== null) {
-            log.info('Notification Deleted')
-          } else {
-            log.info('No Notification Found')
-          }
-        })
-    })
-
-    mentionModel.post_mention
-      .findOneAndRemove({
-        post_id: post_id
-      })
-      .exec(function (err, result) {
-        if (err) {
-          log.error(err)
-          res.send(err)
-          return
-        }
-
-        if (result !== null) {
-          log.info('Mention Document Deleted')
-        } else {
-          log.info('No Mention Document Found')
-        }
-      })
-  })
-}
+// }
 
 // Get all post 
 // var getpost = function(req, res) {

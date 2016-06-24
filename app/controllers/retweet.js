@@ -3,7 +3,8 @@ var master = require('./master.js')
 var log = require('../../config/logging')()
 
 var setretweet = function (req, res) {
-  log.info('Retweet Api hitted')
+
+  log.info('Set retweet Api hitted')
 
   var post_id = req.body.post_id
   var post_type = req.body.post_type
@@ -19,11 +20,13 @@ var setretweet = function (req, res) {
   log.info('Retweet Type', retweet_type)
   log.info('Retweet Quote', retweet_msg)
 
-  req.checkBody('post_type', 'post type').notEmpty().isInt()
+  req.checkBody('post_type', 'post type').notEmpty()
+  req.checkBody('post_type', 'post type must be integer').isInt().gte(1).lte(3)
   req.checkBody('ret_user_id', 'ret_user_id').notEmpty()
-  req.checkBody('retweet_type', 'retweet_type').notEmpty().isInt()
+  req.checkBody('retweet_type', 'retweet_type').notEmpty().isInt().gte(1).lte(2)
   req.checkBody('post_id', 'post id').notEmpty()
   req.checkBody('privacy_setting', 'privacy setting').notEmpty()
+  req.checkBody('privacy_setting', 'privacy setting must be integer').isInt().gte(1).lte(3)
 
   if (retweet_type == 2) { // check retweet quote is not empty if post type 2
 
@@ -35,7 +38,7 @@ var setretweet = function (req, res) {
 
   if (errors) {
     log.error('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    res.status('400').json({message:'validation error'})
     return
   }
 
@@ -163,7 +166,7 @@ var setretweet = function (req, res) {
                 return
               }
 
-              res.json({
+              res.status(201).json({
                 message: message
               })
 
@@ -392,7 +395,7 @@ var deleteRetweet = function (req, res) {
 
   if (errors) {
     log.warn('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    res.status('400').json({message:'validation error'})
     return
   }
 
@@ -440,7 +443,7 @@ var deleteRetweet = function (req, res) {
                 return
               } else {
                 log.info('Quote retweet Deleted Successfully')
-                res.json({msg:'Quote retweet Deleted Successfully'})
+                res.json({msg: 'Quote retweet Deleted Successfully'})
               }
             })
         }

@@ -6,6 +6,9 @@ var log = require('../../config/logging')()
 
 // update reply to post
 var setreply = function (req, res) {
+
+  log.info('Set reply api hitted')
+
   var post_type = req.body.post_type
   var reply_user_id = req.body.reply_user_id
   var reply_msg = req.body.reply_msg
@@ -27,17 +30,19 @@ var setreply = function (req, res) {
   log.info('privacy setting', privacy_setting)
 
   req.checkBody('post_type', 'post type').notEmpty()
+  req.checkBody('post_type', 'post type must be integer').isInt().gte(1).lte(3)
   req.checkBody('reply_user_id', 'reply user id').notEmpty()
   req.checkBody('reply_msg', 'reply msg').notEmpty()
   req.checkBody('reply_msg', '0 to 300 characters required').len(0, 300)
   req.checkBody('post_id', 'post id').notEmpty()
   req.checkBody('privacy_setting', 'Privacy Setting').notEmpty()
+  req.checkBody('privacy_setting', 'privacy setting must be integer').isInt().gte(1).lte(3)
 
   var errors = req.validationErrors()
 
   if (errors) {
     log.warn('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    res.status('400').json({message:'validation error'})
     return
   }
 
@@ -129,7 +134,7 @@ var setreply = function (req, res) {
                     return
                   }
 
-                  res.json({
+                  res.status(201).json({
                     message: 'Reply Inserted'
                   })
 

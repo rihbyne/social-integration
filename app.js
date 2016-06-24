@@ -50,6 +50,17 @@ require('./app/routes.js')(app) // load our routes and pass in our app and fully
 // ============ direct messaging router====================
 app.use('/api/direct_messages', routeDirectMsgApi)
 
+//custome validation function
+app.use(expressValidator({
+ customValidators: {
+    gte: function(param, num) {
+        return param >= num;
+    },
+    lte: function(param, num) {
+        return param <= num;
+    }
+ }
+}));
 // launch ======================================================================
 server.listen(port)
 log.info('Connected To server at port ' + port)

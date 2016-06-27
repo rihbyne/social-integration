@@ -248,7 +248,7 @@ var setretweet = function (req, res) {
                   setretweetcount(post_id, post_type, collectionName, function () {
                     log.info(message)
 
-                    res.json({
+                    res.status(201).json({
                       message: message
                     })
                   })
@@ -268,7 +268,7 @@ var setretweet = function (req, res) {
                     setretweetcount(post_id, post_type, collectionName, function () {
                       log.info('Retweet document removed')
 
-                      res.json({
+                      res.status(204).json({
                         message: 'Retweet document removed'
                       })
                     })

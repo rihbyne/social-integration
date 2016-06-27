@@ -24,13 +24,15 @@ var setLike = function (req, res) {
   log.info('Retweet Quote id', retweet_quote_id)
 
   req.checkBody('type', 'post type').notEmpty()
+  req.checkBody('type', 'post type must be integer').isInt().gte(1).lte(3)
   req.checkBody('like_user_id', 'like_user_id').notEmpty()
+
 
   var errors = req.validationErrors()
 
   if (errors) {
     log.warn('There have been validation errors: \n' + util.inspect(errors))
-    res.status('400').json('There have been validation errors: ' + util.inspect(errors))
+    res.status('400').json({message:'validation error'})
     return
   }
   // blank validation
@@ -98,7 +100,7 @@ var setLike = function (req, res) {
                     }
 
                     log.info('Post Unliked', result)
-                    res.send('Post Unliked Successfully')
+                    res.status(201).json({message:'Post Unliked Successfully'})
                   })
               }
               // Set Like for Post
@@ -115,7 +117,7 @@ var setLike = function (req, res) {
                     return
                   }
                   log.info('Post Like')
-                  res.send('Post Liked Successfully')
+                  res.status(201).json({message:'Post Liked Successfully'})
                 })
               }
 
@@ -162,7 +164,7 @@ var setLike = function (req, res) {
                     }
 
                     log.info('Retweet Unliked', result)
-                    res.send('Retweet Unliked Successfully')
+                    res.status(201).json({message:'Retweet Unliked Successfully'})
                   })
               }
               // Set Like for Retweet
@@ -180,7 +182,7 @@ var setLike = function (req, res) {
                   }
 
                   log.info('Retweet Like')
-                  res.send('Retweet Liked Successfully')
+                  res.status(201).json({message:'Retweet Liked Successfully'})
                 })
               }
 
@@ -221,7 +223,7 @@ var setLike = function (req, res) {
                       return
                     }
                     log.info('Reply Unliked', result)
-                    res.send('Reply Unliked Successfully')
+                    res.status(201).json({message:'Reply Unliked Successfully'})
                   })
               }
               // Set Like for Reply
@@ -238,7 +240,7 @@ var setLike = function (req, res) {
                     return
                   }
                   log.info('Reply Like')
-                  res.send('Reply Like Successfully')
+                  res.status(201).json({message:'Reply Liked Successfully'})
                 })
               }
 
@@ -248,7 +250,7 @@ var setLike = function (req, res) {
             })
         }
       } else {
-        res.send('No post found')
+        res.status().json('No post found')
         return
       }
     })

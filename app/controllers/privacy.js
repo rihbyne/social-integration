@@ -18,7 +18,9 @@ var updatePrivacy = function (req, res) {
 
   req.checkBody('userid', 'User id is mandatory').notEmpty()
   req.checkBody('privacy', 'privacy is mandatory').notEmpty()
+  req.checkBody('privacy', 'privacy must be integer').isInt().gte(1).lte(3)
   req.checkBody('post_type', 'post type is mandatory').notEmpty()
+  req.checkBody('post_type', 'post type must be integer').isInt().gte(1).lte(3)
   req.checkBody('post_id', 'postId is mandatory').notEmpty()
 
   var errors = req.validationErrors()
@@ -54,7 +56,7 @@ var updatePrivacy = function (req, res) {
   master.userExistence(userId, function (err, userExistenceResult) {
     if (err) {
       log.error(userExistenceResult)
-      res.send(userExistenceResult)
+      res.status(400).json(userExistenceResult)
       return
     }else {
       master.isValidUser(collectionName, query, function (err, validResult) {
@@ -72,11 +74,11 @@ var updatePrivacy = function (req, res) {
           .findOneAndUpdate(query, update, function (err, updateResult) {
             if (err) {
               log.error(validResult)
-              res.send(validResult)
+              res.status(400).json(validResult)
               return
             }
             log.info('Privacy setting Updated')
-            res.json({message:'Privacy setting Updated'})
+            res.status(200).json({message:'Privacy setting Updated'})
           })
       })
     }

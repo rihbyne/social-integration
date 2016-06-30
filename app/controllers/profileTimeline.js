@@ -28,6 +28,8 @@ var getuserhomeposts = function (req, res) { // get a post
   req.checkBody('logged_id', 'Mandatory field not found').notEmpty()
   req.checkBody('timestamp', 'Mandatory field not found').isInt()
   req.checkBody('flag', 'Mandatory field not found').isInt()
+  req.checkBody('flag', 'flag must be integer').isInt().gte(1).lte(2)
+
 
   var errors = req.validationErrors()
 

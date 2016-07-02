@@ -69,5 +69,5 @@ process.on('SIGTERM', function () {
 require('./userSchema')
 require('./flagging')
 require('./direct_msg')
-
+require('./multimedia')
 mongoose.set('debug', (process.env.MONGOOSE_DEBUG === "true"));

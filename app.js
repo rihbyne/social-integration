@@ -22,6 +22,7 @@ require('./app/models/db') // initialize db collections and its data
 var server = require('http').Server(app)
 var port = process.env.NODE_SERVER_PORT || 4000 // Port
 var routeDirectMsgApi = require('./app/routes/api_direct_msg')
+var routeMediaUploadApi = require('./app/routes/media_upload')
 
 // Middleware
 app.use(morgan('dev')) // log every request to the console
@@ -49,6 +50,9 @@ require('./app/routes.js')(app) // load our routes and pass in our app and fully
 
 // ============ direct messaging router====================
 app.use('/api/direct_messages', routeDirectMsgApi)
+
+// ============ media upload router =======================
+app.use('/api/social', routeMediaUploadApi)
 
 //custome validation function
 app.use(expressValidator({

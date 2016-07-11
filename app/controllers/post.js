@@ -4,6 +4,8 @@ var util = require('util')
 var async = require('async')
 var express = require('express')
 var router = express.Router() // get an instance of the express Router
+
+var helpers = require('../helpers/utils')
 var log = require('../../config/logging')()
 var querystring = require('querystring')
 var http = require('http')
@@ -15,11 +17,17 @@ var post_model = require('../models/postSchema.js')
 var notificationModel = require('../models/notificationSchema.js')
 var user_followers = require('../models/followersSchema.js')
 var mentionModel = require('../models/mentionSchema.js')
+var mediaUpload = require('./mediaUpload')
 
 // Set new post
-var setpost = function (req, res) { // create a post 
+var setpost = function (req, res) {
+  // create a post
+  // This API will only accepts params in multipart/form-data as a Content-Type set in HTTP headers
+  // rest all other Content-Types will be ignored and request will not be served.
 
   log.info('Set post api hitted')
+  log.info(req.file)
+  log.info(req.body)
 
   var userid = req.body.userid
   var post_description = req.body.post_description
@@ -61,69 +69,86 @@ var setpost = function (req, res) { // create a post
   log.info('Mention Users : ', mentionusers)
   log.info('Hash Tags : ', hashtags)
 
-  var post = new post_model.post({
-    posted_by: userid,
-    post_description: post_description,
-    privacy_setting: privacy_setting
-
-  }) // create a new instance of the post model
-
-  master.updateUser(userid, function (err, updateResult) {
-    if (err) {
-      log.error(updateResult)
-      res.send(updateResult)
+  //check for multimedia content if present here
+  mediaUpload.processMedia(req, function(errData, mediadata) {
+    if (errData) {
+      log.error('error in process media')
+      helpers.sendJsonResponse(res, errData.status, errData.content)
       return
-    }
-
-    // save the post and check for errors
-    post.save(function (err, result) {
-      if (err) {
-        log.error(err)
-        res.send(err)
-        return
-      }
-
-      master.getusername(result.posted_by, function (err, username) {
-        log.info('Mention Users :' + mentionusers)
-
-        if (mentionusers != '') {
-          var notification_message = username + ' Has Mentioned you in post'
-
-          var notification = new notificationModel.notification({
-            notification_message: notification_message,
-            notification_user: mentionusers,
-            post_id: post._id,
-            usrname: username
-
-          })
-
-          // log.info(notification_user)
-          notification.save(function (err) {
-            if (err) {
-              log.error(err)
-              res.send(err)
-              return
-            }
-
-            log.info('Notification Saved')
-          })
+    } else {
+      log.info('process media')
+      log.info('img object ->', util.inspect(mediadata))
+      
+      
+      var post = new post_model.post({
+        posted_by: userid,
+        post_description: post_description,
+        privacy_setting: privacy_setting,
+        img_upload_ref: mediadata.content.imgObjectId
+      }) // create a new instance of the post model
+      
+      master.updateUser(userid, function (err, updateResult) {
+        if (err) {
+          log.error(updateResult)
+          res.send(updateResult)
+          return
         }
-
-        master.hashtagMention(1, post, mentionusers, hashtags, function (err, result) {
+      
+        // save the post and check for errors
+        post.save(function (err, result) {
           if (err) {
             log.error(err)
             res.send(err)
             return
           }
 
-          res.status(201).json({
-            message: result
-          })
+          master.getusername(result.posted_by, function (err, username) {
+            log.info('Mention Users :' + mentionusers)
+      
+            if (mentionusers != '') {
+              var notification_message = username + ' Has Mentioned you in post'
+      
+              var notification = new notificationModel.notification({
+                notification_message: notification_message,
+                notification_user: mentionusers,
+                post_id: post._id,
+                usrname: username
+      
+              })
+      
+              // log.info(notification_user)
+              notification.save(function (err) {
+                if (err) {
+                  log.error(err)
+                  res.send(err)
+                  return
+                }
+      
+                log.info('Notification Saved')
+              })
+            }
+      
+            master.hashtagMention(1, post, mentionusers, hashtags, function (err, result) {
+              if (err) {
+                log.error(err)
+                res.send(err)
+                return
+              }
 
-          log.info('Post Created.')
+              log.info('Post Created.')
+              mediadata.content.imgURL = helpers
+                .assembleImgURL(post._id,
+                                mediadata.content.processed_filename)
+              helpers.sendJsonResponse(res, mediadata.status, mediadata.content)
+              return
+              //res.status(201).json({
+              //  message: result
+              //})
+            })
+          })
         })
       })
-    })
+    }
   })
 }
 

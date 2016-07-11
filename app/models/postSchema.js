@@ -1,17 +1,19 @@
 var mongoose        = require('mongoose');                                          // For Mongoose
 var User            = require('../models/userSchema.js');                           // For Referring User Collection
+var ImageUploadMedia = mongoose.model('ImageUploadMedia')
+var VideoUploadMedia = mongoose.model('VideoUploadMedia')
 
 // Post Schema
 var post = mongoose.Schema({
-    
-    posted_by:                       {type: String, ref:'User', required:true},                     // Posted By (User Id From user Colloction) 
-    post_description:                {type: String},                                // Post Description 
-    retweet_count:                   {type: Number, default: 0, min: 0},            // Retweet Count
-    like_count:                      {type: Number, default: 0, min: 0},            // Post Like Count
-    post_type :                      {type: Number, default: 1},
-    privacy_setting :                {type: Number, required:true},                     // 1 - Public, 2 - Private, 3 - Followers
-    created_at:                      {type: Number, default: Date.now},                 // created date
-    
+  posted_by: {type: String, ref:'User', required:true}, // Posted By (User Id From user Colloction) 
+  img_upload_ref: {type: mongoose.Schema.Types.ObjectId, ref: 'ImageUploadMedia', default: null},
+  vid_upload_ref: {type: mongoose.Schema.Types.ObjectId, ref: 'VideoUploadMedia', default: null},
+  post_description:                {type: String},                       // Post Description 
+  retweet_count:                   {type: Number, default: 0, min: 0},   // Retweet Count
+  like_count:                      {type: Number, default: 0, min: 0},   // Post Like Count
+  post_type :                      {type: Number, default: 1},
+  privacy_setting :                {type: Number, required:true},  // 1 - Public, 2 - Private, 3 - Followers
+  created_at:                      {type: Number, default: Date.now}, // created date
 }, { versionKey: false });
 
 // Post Url Schema
@@ -100,6 +102,8 @@ var reply_schema = mongoose.Schema({
     reply_msg :                      {type: String},                                // String of Reply Message
     retweet_count:                   {type: Number, default: 0, min: 0},            // Number of Retweets Made on this  
     like_count:                      {type: Number, default: 0, min: 0},            // Number of Likes on this
+  img_upload_ref: {type: mongoose.Schema.Types.ObjectId, ref: 'ImageUploadMedia'},
+  vid_upload_ref: {type: mongoose.Schema.Types.ObjectId, ref: 'VideoUploadMedia'},
     post_type :                      {type: Number, default: 3},
     privacy_setting :                {type: Number, required:true, default: 2, min:1, max:3},// 1 - Public, 2 - Private, 3 - Followers   
     created_at :                     {type: Number, default: Date.now}                  // Time of Reply

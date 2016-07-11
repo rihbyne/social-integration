@@ -2,6 +2,10 @@
 var express = require('express')
 var router = express.Router()
 var path = require('path')
+var multer = require('multer')
+
+var ctrlMediaUpload = require('./controllers/mediaUpload')
+var upload = multer(ctrlMediaUpload.multerImageConfig)
 
 // Pages
 var post = require('./controllers/post.js')
@@ -54,7 +58,7 @@ module.exports = function (app) {
   app.get('/getpost/count/:user', post.getuserpostcount) // Get post count by username
   app.delete('/deletepost', post.deletepost) // delete post
   app.post('/setuser', post.setuser) // Set new user
-  app.post('/setpost', post.setpost) // Set new post
+  app.post('/setpost', upload.single('img_attachment'), post.setpost) // Set new post
   app.get('/trend', post.trend) // trend keyword
 
   // Following - Follower   
